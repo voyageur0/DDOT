@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS parcels_cache (
+  id TEXT PRIMARY KEY,
+  zone TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+); 
