@@ -301,4 +301,4 @@ npm start  # Lance le serveur en production
 
 ## 👥 Développé par
 
-Dylan Taccoz et Oktay Demir 
+Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz 
