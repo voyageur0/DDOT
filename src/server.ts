@@ -6,6 +6,8 @@ import { performance } from 'perf_hooks';
 import axios from 'axios';
 import https from 'https';
 import iaConstraintsRouter from './routes/iaConstraints';
+import ownersRouter from './routes/owners';
+import utilsRouter from './routes/utils';
 
 const app = express();
 
@@ -45,6 +47,8 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.static('public'));
 
 app.use('/api', iaConstraintsRouter);
+app.use('/api', ownersRouter);
+app.use('/api', utilsRouter);
 
 // Route proxy pour GeoAdmin (résout les problèmes CORS)
 app.get('/api/geoadmin-search', async (req, res) => {

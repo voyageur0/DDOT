@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import { performance } from 'perf_hooks';
 import axios from 'axios';
 import { performComprehensiveAnalysis, performQuickAnalysis } from '../lib/parcelAnalysisOrchestrator';
+import { deepSearchAnalysis } from '../utils/openai';
 
 const router = Router();
 
@@ -43,56 +44,28 @@ async function testOpenAIConnection() {
 // Test au démarrage du module
 testOpenAIConnection();
 
-// Nouvelle fonction d'appel OpenAI avec données complètes automatisées
-async function callOpenAIWithComprehensiveData(comprehensiveData: any): Promise<string> {
-  console.log('🚀 🤖 Appel OpenAI avec données automatisées complètes');
+// Nouvelle fonction d'appel OpenAI avec analyse approfondie
+async function callOpenAIWithDeepSearch(comprehensiveData: any): Promise<string> {
+  console.log('🚀 🧠 Démarrage analyse approfondie avec modèle o3');
   
   try {
-    console.log('🎯 Envoi requête OpenAI...');
-    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `Vous êtes un expert en urbanisme et aménagement du territoire suisse, spécialisé dans les réglementations valaisannes. 
-
-Votre rôle est d'analyser des données cadastrales complètes et fournir des conseils pratiques et précis pour les projets de construction et d'aménagement.
-
-Vous recevrez des données structurées récoltées automatiquement depuis les APIs officielles suisses incluant :
-- Informations cadastrales détaillées (EGRID, surface, coordonnées)
-- Restrictions de droit public (PLR) officielles
-- Règlements communaux extraits des documents PDF
-- Cartes des dangers naturels du Valais
-- Contraintes géographiques et géologiques
-- Zones de construction et affectations
-
-Analysez ces données factuelles et fournissez une expertise professionnelle basée sur votre connaissance du droit suisse de la construction et de l'aménagement du territoire.
-
-IMPORTANT: Ces données proviennent des sources officielles. Basez votre analyse sur ces faits et votre expertise réglementaire.`
-        },
-        {
-          role: 'user',
-          content: comprehensiveData.formattedForAI
-        }
-      ],
-      max_tokens: 4000,
-      temperature: 0.2
-    }, {
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 45000
-    });
-
-    const expertAnalysis = response.data.choices[0].message.content;
-    console.log(`✅ Analyse OpenAI reçue: ${expertAnalysis.length} caractères`);
+    // Extraire les informations principales pour l'analyse approfondie
+    const zone = comprehensiveData.zoningInfo?.zone || 'Zone non déterminée';
+    const reglement = comprehensiveData.regulationText || 'Règlement non disponible';
+    const parcelLabel = comprehensiveData.parcelInfo?.label || 'Parcelle inconnue';
+    const additionalContext = comprehensiveData.formattedForAI;
     
-    return expertAnalysis;
+    console.log(`🎯 Analyse approfondie pour ${parcelLabel} en zone ${zone}`);
+    
+    // Utiliser la nouvelle fonction d'analyse approfondie
+    const analysis = await deepSearchAnalysis(zone, reglement, parcelLabel, additionalContext);
+    
+    console.log(`✅ Analyse approfondie terminée: ${analysis.length} caractères`);
+    return analysis;
     
   } catch (error: any) {
-    console.error('💥 ERREUR OPENAI:', error.response?.data || error.message);
-    throw new Error(`Erreur OpenAI: ${error.response?.data?.error?.message || error.message}`);
+    console.error('💥 ERREUR ANALYSE APPROFONDIE:', error.message);
+    throw new Error(`Erreur analyse approfondie: ${error.message}`);
   }
 }
 
@@ -166,7 +139,7 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
         console.log(`📊 Données collectées (${comprehensiveData.completeness}% complétude) - Envoi à OpenAI...`);
         
         // Envoyer les données formatées à OpenAI
-        const openaiAnalysis = await callOpenAIWithComprehensiveData(comprehensiveData);
+        const openaiAnalysis = await callOpenAIWithDeepSearch(comprehensiveData);
         
         const elapsedMs = performance.now() - t0;
         console.log(`✅ Analyse automatisée complète terminée en ${Math.round(elapsedMs)}ms`);
@@ -179,7 +152,7 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
           completeness: comprehensiveData.completeness,
           processingTime: comprehensiveData.processingTime,
           elapsedMs: Math.round(elapsedMs),
-          source: 'Analyse automatisée complète avec APIs officielles + OpenAI GPT-4o'
+          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI o3 (recherche approfondie)'
         });
         
       } catch (error: any) {
