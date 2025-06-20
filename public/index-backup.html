@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>DDOT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            width: 100%;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+            background: #f8f9fa;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            z-index: 100;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 60px 20px 20px;
+            font-size: 18px;
+            border: 3px solid #e9ecef;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            z-index: 101;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 102;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 99999;
+            display: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .results-container {
+            padding: 40px;
+            display: none;
+        }
+
+        .analysis-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .actions-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .action-btn.warning {
+            background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+        }
+
+        .action-btn.ai-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            font-size: 16px;
+            padding: 15px 30px;
+        }
+
+        .action-btn.ai-btn:hover {
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .ai-section {
+            border-left: 5px solid #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+        }
+
+        .ai-icon {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        .ai-loading {
+            border-top: 5px solid #ff6b6b;
+        }
+
+        .ai-result {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #ff6b6b, #ee5a24);
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ai-result h1, .ai-result h2, .ai-result h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .ai-result h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ai-result h2 {
+            font-size: 24px;
+            color: #ff6b6b;
+            border-bottom: 2px solid #ff6b6b;
+            padding-bottom: 8px;
+        }
+
+        .ai-result h3 {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .ai-result ul {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .ai-result li {
+            background: white;
+            margin: 8px 0;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .ai-result li::before {
+            content: '✓';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #27ae60;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .ai-result strong {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .metric-highlight {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ff6b6b;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .calculation-time {
+            text-align: right;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .property-owners {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .vsgis-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .commune-selector {
+            margin: 20px 0;
+        }
+
+        .commune-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .search-section, .results-container {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-container {
+                flex-direction: column;
+            }
+        }
+
+        /* === Styles ajoutés pour l'authentification et le footer === */
+        .user-menu {
+            margin-top: 15px;
+        }
+        .user-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+        }
+        .modal-content .close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #495057;
+            background: #f8f9fa;
+            margin-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DDOT</h1>
+            <p>Système avancé d'analyse immobilière pour le Valais avec IA<br>
+            <small>Données publiques GeoAdmin • Intelligence Artificielle • Règlements communaux</small></p>
+            <div class="user-menu">
+                <span id="userGreeting"></span>
+                <button id="loginBtn" class="user-btn">Se connecter / S'inscrire</button>
+                <button id="logoutBtn" class="user-btn" style="display: none;">Se déconnecter</button>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput" 
+                       placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
+                <button class="search-btn" id="searchBtn">🔍</button>
+                <div class="suggestions" id="suggestions"></div>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Analyse en cours via VSGIS.ch et GeoAdmin...</p>
+            </div>
+
+            <div class="loading" id="aiLoading" style="display: none;">
+                <div class="loading-spinner ai-loading"></div>
+                <p>🧠 Analyse IA en cours... Consultation des règlements communaux et synthèse des contraintes...</p>
+            </div>
+
+            <div id="analysisResults" style="display: none;">
+                <!-- Informations générales -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-icon">📋</div>
+                        <h2 class="section-title">Informations Générales</h2>
+                    </div>
+                    <div class="info-grid" id="generalInfo"></div>
+                </div>
+
+                <!-- Analyse IA des Contraintes -->
+                <div class="analysis-section ai-section" id="aiConstraintsSection" style="display: none;">
+                    <div class="section-header">
+                        <div class="section-icon ai-icon">🧠</div>
+                        <h2 class="section-title">Analyse IA - Contraintes Urbanistiques</h2>
+                    </div>
+                    <div id="aiConstraintsResult"></div>
+                </div>
+
+                <!-- Propriétaires -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-icon">👥</div>
+                        <h2 class="section-title">Informations Cadastrales</h2>
+                    </div>
+                    <div id="ownersInfo"></div>
+                </div>
+
+                <!-- Détails Cadastraux -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-icon">🗺️</div>
+                        <h2 class="section-title">Détails de la Parcelle</h2>
+                    </div>
+                    <div class="info-grid" id="cadastralInfo"></div>
+                </div>
+
+                <!-- Zonage et Réglementation -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-icon">⚖️</div>
+                        <h2 class="section-title">Zonage Public</h2>
+                    </div>
+                    <div class="info-grid" id="zoningInfo"></div>
+                </div>
+
+                <!-- Potentiel de Développement -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-icon">📈</div>
+                        <h2 class="section-title">Potentiel de Développement</h2>
+                    </div>
+                    <div class="info-grid" id="developmentInfo"></div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-container">
+                    <button class="action-btn ai-btn" id="aiConstraintsBtn" onclick="analyzeWithAI()">
+                        🧠 Analyse IA - Contraintes
+                    </button>
+                    <button class="action-btn" onclick="generatePDF()">
+                        📄 Générer Rapport PDF
+                    </button>
+                    <button class="action-btn warning" id="regulationBtn" style="display:none;">
+                        📚 Règlement Communal
+                    </button>
+                    <button class="action-btn" onclick="newSearch()">
+                        🔄 Nouvelle Recherche
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+                    DDOT - Système d'analyse cadastrale avec IA pour le Valais<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
+    </footer>
+
+    <!-- Modal Authentification -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="close" id="closeAuth">&times;</span>
+            <h2 id="authTitle">Connexion</h2>
+            <input type="text" id="authUsername" placeholder="Nom d'utilisateur">
+            <input type="password" id="authPassword" placeholder="Mot de passe">
+            <button id="authSubmitBtn" class="action-btn" style="margin-top:15px;">Se connecter</button>
+            <p id="switchAuth" style="margin-top:10px; font-size: 0.9em;">
+                Pas de compte ? <a href="#" id="switchToRegister">Inscrivez-vous</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des règlements communaux
+        let communalRegulations = {};
+        fetch('regulations-vs.json')
+          .then(r => r.json())
+          .then(json => { communalRegulations = json; })
+          .catch(() => { console.error('Impossible de charger regulations-vs.json'); });
+
+        // Variables globales
+        let currentData = null;
+        let searchTimeout = null;
+        let currentCoordinates = null;
+
+        // Fonction de test pour déboguer
+        window.testSuggestions = function() {
+            console.log('Test des suggestions...');
+            const suggestions = document.getElementById('suggestions');
+            suggestions.innerHTML = `
+                <div class="suggestion-item" onclick="alert('Test cliqué!')">
+                    🧪 Test Suggestion 1
+                </div>
+                <div class="suggestion-item" onclick="alert('Test cliqué!')">
+                    🧪 Test Suggestion 2
+                </div>
+            `;
+            suggestions.style.display = 'block';
+            console.log('Suggestions de test affichées');
+        };
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM chargé - Initialisation DDOT');
+            
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const suggestions = document.getElementById('suggestions');
+
+            if (!searchInput || !searchBtn || !suggestions) {
+                console.error('❌ Éléments DOM manquants:', { searchInput, searchBtn, suggestions });
+                return;
+            }
+
+            console.log('✅ Éléments DOM trouvés, ajout des événements...');
+
+            searchInput.addEventListener('input', function(e) {
+                console.log('📝 Input event:', e.target.value);
+                handleSearchInput();
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                console.log('⌨️ Keypress event:', e.key);
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            searchBtn.addEventListener('click', performSearch);
+            
+            console.log('✅ Événements ajoutés');
+            
+            // Masquer les suggestions quand on clique ailleurs
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    suggestions.style.display = 'none';
+                }
+            });
+        });
+
+        // Gestion de la recherche avec suggestions
+        async function handleSearchInput() {
+            const query = document.getElementById('searchInput').value.trim();
+            const suggestions = document.getElementById('suggestions');
+            
+            console.log('🔍 handleSearchInput called with:', query);
+            
+            if (!query || query.length < 2) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            
+            // Annuler la recherche précédente
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // Délai pour éviter trop de requêtes
+            searchTimeout = setTimeout(async () => {
+                try {
+                    console.log('📡 Recherche de suggestions pour:', query);
+                    
+                    const response = await fetch(`/api/geoadmin-search?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=8&sr=2056`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('✅ Données reçues:', data);
+                    
+                    displaySuggestions(data.results || []);
+                    
+                } catch (error) {
+                    console.error('❌ Erreur recherche suggestions:', error);
+                    suggestions.innerHTML = '<div class="suggestion-item error">Erreur de recherche</div>';
+                    suggestions.style.display = 'block';
+                }
+            }, 300);
+        }
+
+        // Afficher les suggestions
+        function displaySuggestions(results) {
+            const suggestions = document.getElementById('suggestions');
+            
+            if (!results || results.length === 0) {
+                suggestions.innerHTML = '<div class="suggestion-item">Aucun résultat trouvé</div>';
+                suggestions.style.display = 'block';
+                return;
+            }
+            
+            console.log('📋 Affichage de', results.length, 'suggestions');
+            
+            const html = results.map((result, index) => {
+                const label = result.attrs.label.replace(/<b>/g, '').replace(/<\/b>/g, '');
+                const detail = result.attrs.detail || '';
+                
+                return `
+                    <div class="suggestion-item" onclick="selectSuggestionByIndex(${index})">
+                        <div class="suggestion-main">${label}</div>
+                        <div class="suggestion-detail">${detail}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Stocker les résultats pour la sélection
+            window.currentSuggestions = results;
+            
+            suggestions.innerHTML = html;
+            suggestions.style.display = 'block';
+        }
+
+        // Sélectionner une suggestion par index
+        function selectSuggestionByIndex(index) {
+            if (!window.currentSuggestions || !window.currentSuggestions[index]) {
+                return;
+            }
+            
+            const result = window.currentSuggestions[index];
+            const label = result.attrs.label.replace(/<b>/g, '').replace(/<\/b>/g, '');
+            
+            console.log('🎯 Suggestion sélectionnée:', label, result.attrs.x, result.attrs.y);
+            
+            document.getElementById('searchInput').value = label;
+            document.getElementById('suggestions').style.display = 'none';
+            
+            currentCoordinates = { x: result.attrs.x, y: result.attrs.y };
+            performSearch();
+        }
+
+        // Effectuer la recherche
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                alert('Veuillez entrer une recherche');
+                return;
+            }
+            
+            console.log('🚀 Recherche lancée pour:', query);
+            
+            // Masquer les suggestions
+            document.getElementById('suggestions').style.display = 'none';
+            
+            // Afficher le loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analysisResults').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            try {
+                // Appel à l'API d'analyse
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        searchQuery: query,
+                        analysisType: 'complete'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Données d'analyse reçues:', data);
+                
+                currentData = data;
+                displayAnalysisResults(data);
+                
+            } catch (error) {
+                console.error('❌ Erreur analyse:', error);
+                alert('Erreur lors de l\'analyse: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Afficher les résultats
+        function displayAnalysisResults(data) {
+            console.log('📊 Affichage des résultats');
+            
+            // Masquer le loading et afficher les résultats
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('analysisResults').style.display = 'block';
+            
+            // Afficher un résumé simple
+            const generalInfo = document.getElementById('generalInfo');
+            generalInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Recherche effectuée</div>
+                    <div class="info-value">${data.searchQuery || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Type d'analyse</div>
+                    <div class="info-value">${data.analysisType || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Complétude</div>
+                    <div class="info-value">${data.completeness || 0}%</div>
+                </div>
+            `;
+            
+            // Si on a des résultats d'analyse IA
+            if (data.constraints) {
+                const aiSection = document.getElementById('aiConstraintsSection');
+                const aiResult = document.getElementById('aiConstraintsResult');
+                
+                aiResult.innerHTML = `<div class="ai-result">${data.constraints}</div>`;
+                aiSection.style.display = 'block';
+            }
+        }
+
+        // Nouvelle recherche
+        function newSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+            currentData = null;
+            currentCoordinates = null;
+        }
+
+        // Analyse IA
+        async function analyzeWithAI() {
+            if (!currentData) {
+                alert('Effectuez d\'abord une recherche');
+                return;
+            }
+            
+            const aiLoading = document.getElementById('aiLoading');
+            const aiSection = document.getElementById('aiConstraintsSection');
+            
+            aiLoading.style.display = 'block';
+            
+            try {
+                // L'analyse IA est déjà incluse dans la recherche
+                if (currentData.constraints) {
+                    const aiResult = document.getElementById('aiConstraintsResult');
+                    aiResult.innerHTML = `<div class="ai-result">${currentData.constraints}</div>`;
+                    aiSection.style.display = 'block';
+                } else {
+                    alert('Aucune analyse IA disponible');
+                }
+            } catch (error) {
+                console.error('❌ Erreur analyse IA:', error);
+                alert('Erreur lors de l\'analyse IA: ' + error.message);
+            } finally {
+                aiLoading.style.display = 'none';
+            }
+        }
+
+        // Génération PDF
+        function generatePDF() {
+            if (!currentData) {
+                alert('Effectuez d\'abord une recherche');
+                return;
+            }
+            
+            alert('Génération PDF - Fonctionnalité en cours de développement');
+        }
+
+        console.log('✅ JavaScript DDOT chargé');
+    </script>
+</body>
+</html>

@@ -91,8 +91,12 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   res.status(500).json({ error: 'Erreur interne, réessayez plus tard.' });
 });
 
-const port = process.env.PORT ?? 3001;
-app.listen(port, () => {
+const port = Number(process.env.PORT) || 3001;
+app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Serveur DDOT lancé sur port ${port} (${performance.timeOrigin.toFixed(0)})`);
   console.log(`📍 Environnement: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 Accessible sur:`);
+  console.log(`   - http://localhost:${port}`);
+  console.log(`   - http://127.0.0.1:${port}`);
+  console.log(`   - http://0.0.0.0:${port}`);
 }); 
