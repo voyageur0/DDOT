@@ -1,0 +1,75 @@
+[
+  {
+    "endpoint": "/health",
+    "method": "GET",
+    "params": null,
+    "success": false,
+    "duration": 32.07,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/",
+    "method": "GET",
+    "params": null,
+    "success": false,
+    "duration": 32.06,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/metrics",
+    "method": "GET",
+    "params": null,
+    "success": false,
+    "duration": 32.07,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/cache",
+    "method": "DELETE",
+    "params": null,
+    "success": false,
+    "duration": 32.05,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/analyse",
+    "method": "GET",
+    "params": {
+      "commune": "Lens",
+      "parcelle": "5217"
+    },
+    "success": false,
+    "duration": 32.05,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/rapport",
+    "method": "GET",
+    "params": {
+      "commune": "Lens",
+      "parcelle": "5217"
+    },
+    "success": false,
+    "duration": 32.08,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/analyse",
+    "method": "GET",
+    "params": {
+      "commune": "CommuneInexistante",
+      "parcelle": "99999"
+    },
+    "success": false,
+    "duration": 32.06,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  },
+  {
+    "endpoint": "/analyse",
+    "method": "GET",
+    "params": null,
+    "success": false,
+    "duration": 32.06,
+    "error": "HTTPConnectionPool(host='localhost', port=8000): Read timed out. (read timeout=30)"
+  }
+]
