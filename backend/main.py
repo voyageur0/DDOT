@@ -576,7 +576,7 @@ def ia_constraints(
             
             # STRATÉGIE DE FALLBACK: Extraction depuis zone RDPPF (seulement si RAG n'a rien trouvé)
             if not constraints:
-                print(f"[IA-CONSTRAINTS] 🔄 Fallback: Extraction depuis nom de zone RDPPF")
+                print(f"[IA-CONSTRAINTS] FALLBACK: Extraction depuis nom de zone RDPPF")
                 
                 indice_rdppf = extract_index_from_zone_name(zone_name)
                 hauteur_rdppf = extract_height_from_zone_name(zone_name)

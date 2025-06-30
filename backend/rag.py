@@ -345,10 +345,10 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
     elif 'artisan' in zone.lower():
         zone_type = 'artisanal'
     
-    print(f"🎯 Stratégies de recherche pour zone: {zone_number} (parent: {zone_parent}, type: {zone_type})")
+    print(f"[STRATEGIES] Recherche pour zone: {zone_number} (parent: {zone_parent}, type: {zone_type})")
     
     # Stratégie 1: Recherche par zone exacte avec query()
-    print("📍 Stratégie 1: Zone exacte")
+    print("[STRATEGIE 1] Zone exacte")
     try:
         client = chromadb.PersistentClient(path="chroma_db")
         collection = client.get_or_create_collection("reglements")
@@ -370,14 +370,14 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
                 )
                 all_results.extend(results['documents'][0] if results['documents'] else [])
             except Exception as e:
-                                    print(f"  ATTENTION Erreur recherche exacte '{query}': {e}")
+                print(f"  ATTENTION Erreur recherche exacte '{query}': {e}")
                 
     except Exception as e:
         print(f"  ERREUR stratégie 1: {e}")
     
     # Stratégie 2: Recherche par zone parent
     if zone_parent != zone_number:
-        print(f"📍 Stratégie 2: Zone parent ({zone_parent})")
+        print(f"[STRATEGIE 2] Zone parent ({zone_parent})")
         try:
             parent_queries = [
                 f"zone {zone_parent}",
@@ -401,7 +401,7 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
     
     # Stratégie 3: Recherche par type de zone
     if zone_type:
-        print(f"📍 Stratégie 3: Type de zone ({zone_type})")
+        print(f"[STRATEGIE 3] Type de zone ({zone_type})")
         try:
             type_queries = [
                 f"{zone_type} indice utilisation",
@@ -427,7 +427,7 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
     
     # Stratégie 4: Recherche par concept si spécifié
     if constraint_type:
-        print(f"📍 Stratégie 4: Concept ({constraint_type})")
+        print(f"[STRATEGIE 4] Concept ({constraint_type})")
         concept_mapping = {
             "indice d'utilisation": "indice utilisation coefficient",
             "indice": "indice utilisation coefficient",
@@ -459,7 +459,7 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
                     print(f"  ATTENTION Erreur recherche concept '{query}': {e}")
     
     # Stratégie 5: Recherche sémantique large
-    print("📍 Stratégie 5: Recherche sémantique")
+    print("[STRATEGIE 5] Recherche sémantique")
     try:
         semantic_queries = [
             f"indice utilisation",
@@ -495,5 +495,5 @@ def search_with_multiple_strategies(commune: str, zone: str, constraint_type: st
             seen.add(key)
             unique_results.append(result)
     
-    print(f"📋 Total: {len(all_results)} résultats bruts, {len(unique_results)} uniques")
+    print(f"[RESULTATS] Total: {len(all_results)} résultats bruts, {len(unique_results)} uniques")
     return unique_results[:limit] 

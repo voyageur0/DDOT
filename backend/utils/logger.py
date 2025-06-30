@@ -33,7 +33,7 @@ class PerformanceMonitor:
                     result = func(*args, **kwargs)
                     execution_time = time.time() - start_time
                     
-                    # Log de la performance - remplacer l'emoji par OK
+                    # Log de la performance
                     logger.info(f"OK {func_name or func.__name__} exécuté en {execution_time:.2f}s")
                     
                     # Stockage des métriques

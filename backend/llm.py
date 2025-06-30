@@ -75,7 +75,7 @@ def extract_rules(zone: str, rdppf_constraints: List[dict], commune: str) -> dic
     from rag import search_with_multiple_strategies
     
     print(f"🔍 Recherche de règles pour zone: {zone}")
-    print(f"📋 Contraintes RDPPF: {len(rdppf_constraints)} trouvées")
+    print(f"[CONSTRAINTS] RDPPF: {len(rdppf_constraints)} trouvées")
     
     # Structure pour stocker les résultats
     extracted_rules = {
@@ -92,7 +92,7 @@ def extract_rules(zone: str, rdppf_constraints: List[dict], commune: str) -> dic
     # ═══════════════════════════════════════════════════════════════
     # ÉTAPE 1 : Extraction directe depuis la zone RDPPF
     # ═══════════════════════════════════════════════════════════════
-    print(f"📍 ÉTAPE 1 : Extraction directe depuis la zone RDPPF")
+    print(f"[ETAPE 1] Extraction directe depuis la zone RDPPF")
     
     # Essayer d'extraire l'indice d'utilisation
     index_from_zone = extract_index_from_zone_name(zone)
@@ -141,7 +141,7 @@ def extract_rules(zone: str, rdppf_constraints: List[dict], commune: str) -> dic
             )
             
             if passages:
-                print(f"    ✅ {len(passages)} passages trouvés")
+                print(f"    OK {len(passages)} passages trouvés")
                 
                 # Extraire la règle spécifique
                 rule = extract_specific_rules(zone, search_term, passages)
@@ -154,7 +154,7 @@ def extract_rules(zone: str, rdppf_constraints: List[dict], commune: str) -> dic
                     if len(passage) > 50 and passage not in extracted_rules["passages_generaux"]:
                         extracted_rules["passages_generaux"].append(passage)
             else:
-                print(f"    ❌ Aucun passage trouvé")
+                print(f"    ATTENTION Aucun passage trouvé")
                 
         except Exception as e:
             print(f"    ⚠️ Erreur lors de la recherche '{search_term}': {e}")
@@ -827,7 +827,7 @@ def generate_feasibility_report(commune: str, zone: str, documents: List[dict]) 
                 "remarques": f"Extrait du contexte: ...{best_context}..."
             }
             report["constraints"].append(constraint_info)
-            print(f"[FEASIBILITY] ✅ {constraint_type}: {best_value} (confiance: {best_confidence:.2f})")
+            print(f"[FEASIBILITY] OK {constraint_type}: {best_value} (confiance: {best_confidence:.2f})")
     
     # Générer le résumé
     if report["constraints"]:
@@ -838,5 +838,5 @@ def generate_feasibility_report(commune: str, zone: str, documents: List[dict]) 
         report["summary"] = f"Aucune contrainte spécifique trouvée dans le règlement pour la zone {zone}"
         report["metadata"]["extraction_confidence"] = 0.0
     
-    print(f"[FEASIBILITY] ✅ Rapport généré: {len(report['constraints'])} contraintes")
+    print(f"[FEASIBILITY] OK Rapport généré: {len(report['constraints'])} contraintes")
     return report
