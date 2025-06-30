@@ -13,3 +13,5 @@ build/
 coverage/
 .nyc_output/
 *.log 
+.env
+.env.*.local
