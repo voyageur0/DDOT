@@ -5,9 +5,10 @@ from pydantic import BaseModel
 from typing import Optional, List
 import time
 import os
+import re
 from rdppf import fetch_rdppf
 from dotenv import load_dotenv
-from llm import extract_rules, generate_report, extract_index_from_zone_name, extract_height_from_zone_name, generate_feasibility_report
+from llm import extract_rules, generate_report, extract_index_from_zone_name, extract_height_from_zone_name, generate_feasibility_report, extract_rdppf_constraints
 from utils.logger import performance_monitor, log_api_request
 from rag import get_collection_stats, get_cache_stats, clear_cache, search_with_multiple_strategies
 from database import db
@@ -516,12 +517,52 @@ def ia_constraints(
         if zone_name:
             metadata["hybrid_extraction_used"] = True
             
-            # STRATÉGIE PRIORITAIRE: Recherche dans les règlements communaux
+            # STRATÉGIE PRIORITAIRE: Recherche SPÉCIFIQUE sur le nom de zone dans les règlements
             try:
-                # Recherche multi-stratégies dans le règlement
-                search_results = search_with_multiple_strategies(commune, zone_name, "contraintes générales")
+                print(f"[IA-CONSTRAINTS] Recherche spécifique pour la zone: {zone_name}")
+                
+                # Extraire les mots-clés de recherche depuis le nom de zone
+                zone_keywords = []
+                
+                # 1. Nom complet de zone
+                zone_keywords.append(zone_name)
+                
+                # 2. Extraire le numéro de zone (ex: "ZONE 18/3" -> "18/3", "ZONE 18")
+                zone_number_match = re.search(r'ZONE\s+(\d+(?:[/\\.-]\d+)?)', zone_name, re.IGNORECASE)
+                if zone_number_match:
+                    zone_number = zone_number_match.group(1)
+                    zone_keywords.append(f"ZONE {zone_number}")
+                    zone_keywords.append(zone_number)
+                    
+                    # Ajouter aussi la zone parent (ex: "18/3" -> "18")
+                    parent_zone = zone_number.split('/')[0].split('\\')[0].split('.')[0].split('-')[0]
+                    if parent_zone != zone_number:
+                        zone_keywords.append(f"ZONE {parent_zone}")
+                        zone_keywords.append(parent_zone)
+                
+                # 3. Extraire le type de zone (ex: "villas familliales")
+                zone_type_match = re.search(r'zone\s+(?:des?\s+)?([a-zàâäéèêëïîôöùûüÿç\s]+)', zone_name, re.IGNORECASE)
+                if zone_type_match:
+                    zone_type = zone_type_match.group(1).strip()
+                    if len(zone_type) > 3:  # Éviter les mots trop courts
+                        zone_keywords.append(zone_type)
+                
+                print(f"[IA-CONSTRAINTS] Mots-clés de recherche: {zone_keywords}")
+                
+                # Rechercher spécifiquement ces mots-clés dans le règlement
+                all_search_results = []
+                for keyword in zone_keywords:
+                    if keyword.strip():
+                        print(f"[IA-CONSTRAINTS] Recherche pour: '{keyword}'")
+                        results = search_with_multiple_strategies(commune, keyword, "zone_specific")
+                        all_search_results.extend(results)
+                        print(f"[IA-CONSTRAINTS] Trouvé {len(results)} résultats pour '{keyword}'")
+                
+                # Dédupliquer les résultats
+                search_results = list(dict.fromkeys(all_search_results))  # Garde l'ordre et supprime les doublons
+                
                 metadata["rag_documents_found"] = len(search_results)
-                metadata["search_strategies_used"] = 5  # 5 stratégies implémentées
+                metadata["search_strategies_used"] = len(zone_keywords)  # Nombre de mots-clés utilisés
                 metadata["regulation_search_success"] = len(search_results) > 0
                 
                 print(f"[IA-CONSTRAINTS] Documents RAG trouvés: {metadata['rag_documents_found']}")
@@ -574,36 +615,104 @@ def ia_constraints(
                 print(f"[IA-CONSTRAINTS] Erreur recherche RAG: {e}")
                 metadata["regulation_search_success"] = False
             
-            # STRATÉGIE DE FALLBACK: Extraction depuis zone RDPPF (seulement si RAG n'a rien trouvé)
+            # STRATÉGIE DE FALLBACK: Extraction COMPLÈTE depuis RDPPF (seulement si RAG n'a rien trouvé)
             if not constraints:
-                print(f"[IA-CONSTRAINTS] FALLBACK: Extraction depuis nom de zone RDPPF")
+                print(f"[IA-CONSTRAINTS] FALLBACK: Extraction complète depuis JSON RDPPF")
                 
+                # 1. Extraire TOUTES les contraintes du JSON RDPPF complet
+                rdppf_constraints = extract_rdppf_constraints(rdppf_data)
+                print(f"[IA-CONSTRAINTS] Contraintes RDPPF trouvées: {len(rdppf_constraints)}")
+                
+                # 2. Extraction depuis le nom de zone (comme avant)
                 indice_rdppf = extract_index_from_zone_name(zone_name)
                 hauteur_rdppf = extract_height_from_zone_name(zone_name)
                 
+                # 3. Analyser les contraintes RDPPF pour extraire plus d'informations
+                for rdppf_constraint in rdppf_constraints:
+                    constraint_value = rdppf_constraint.get('value', '')
+                    constraint_type = rdppf_constraint.get('type', 'général')
+                    
+                    print(f"[IA-CONSTRAINTS] Analyse contrainte RDPPF: {constraint_type} = {constraint_value[:100]}...")
+                    
+                    # Extraire indice d'utilisation depuis contraintes RDPPF
+                    if not indice_rdppf and constraint_type in ['indice d\'utilisation', 'général']:
+                        indice_match = re.search(r'(\d+[.,]\d+).*(?:indice|utilisation|densité|IU)', constraint_value, re.IGNORECASE)
+                        if indice_match:
+                            indice_rdppf = indice_match.group(1).replace(',', '.')
+                            print(f"[IA-CONSTRAINTS] Indice extrait des contraintes RDPPF: {indice_rdppf}")
+                    
+                    # Extraire hauteur depuis contraintes RDPPF
+                    if not hauteur_rdppf and constraint_type in ['hauteur', 'général']:
+                        hauteur_match = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:m|mètre).*(?:hauteur|max|limite)', constraint_value, re.IGNORECASE)
+                        if hauteur_match:
+                            hauteur_rdppf = f"{hauteur_match.group(1)} m"
+                            print(f"[IA-CONSTRAINTS] Hauteur extraite des contraintes RDPPF: {hauteur_rdppf}")
+                    
+                    # Extraire distances
+                    if constraint_type in ['distance', 'général']:
+                        distance_match = re.search(r'(\d+(?:[.,]\d+)?)\s*(?:m|mètre).*(?:distance|recul|marge|limite)', constraint_value, re.IGNORECASE)
+                        if distance_match:
+                            distance = f"{distance_match.group(1)} m"
+                            constraints.append(ConstraintInfo(
+                                type="Distance aux limites",
+                                distance_limite=distance,
+                                source_info="Contraintes RDPPF",
+                                confidence=0.8,
+                                remarques=f"Extrait des contraintes RDPPF: {constraint_value[:150]}..."
+                            ))
+                            print(f"[IA-CONSTRAINTS] Distance extraite: {distance}")
+                    
+                    # Extraire surfaces
+                    if constraint_type in ['surface', 'général']:
+                        surface_match = re.search(r'(\d+)\s*(?:m[²2]|m2).*(?:surface|terrain|parcelle|minimum)', constraint_value, re.IGNORECASE)
+                        if surface_match:
+                            surface = f"{surface_match.group(1)} m²"
+                            constraints.append(ConstraintInfo(
+                                type="Surface minimale",
+                                surface_min=surface,
+                                source_info="Contraintes RDPPF",
+                                confidence=0.8,
+                                remarques=f"Extrait des contraintes RDPPF: {constraint_value[:150]}..."
+                            ))
+                            print(f"[IA-CONSTRAINTS] Surface extraite: {surface}")
+                
+                # 4. Ajouter l'indice si trouvé
                 if indice_rdppf:
                     constraints.append(ConstraintInfo(
                         type="Indice d'utilisation du sol",
                         indice_utilisation_sol=indice_rdppf,
-                        source_info="Zone RDPPF (fallback)",
-                        confidence=0.7,
-                        remarques=f"Extrait du nom de zone car aucune info dans le règlement: {zone_name}"
+                        source_info="RDPPF (extraction hybride)",
+                        confidence=0.8,
+                        remarques=f"Extrait des données RDPPF car aucune info dans le règlement: {zone_name}"
                     ))
                     metadata["rdppf_extraction_success"] = True
                     print(f"[IA-CONSTRAINTS] Indice fallback trouvé: {indice_rdppf}")
                 
+                # 5. Ajouter la hauteur si trouvée
                 if hauteur_rdppf:
                     constraints.append(ConstraintInfo(
                         type="Hauteur maximale",
                         hauteur_max_batiment=hauteur_rdppf,
-                        source_info="Zone RDPPF (fallback)",
-                        confidence=0.7,
-                        remarques=f"Extrait du nom de zone car aucune info dans le règlement: {zone_name}"
+                        source_info="RDPPF (extraction hybride)",
+                        confidence=0.8,
+                        remarques=f"Extrait des données RDPPF car aucune info dans le règlement: {zone_name}"
                     ))
                     print(f"[IA-CONSTRAINTS] Hauteur fallback trouvée: {hauteur_rdppf}")
                 
-                if not indice_rdppf and not hauteur_rdppf:
-                    print(f"[IA-CONSTRAINTS] Aucune contrainte trouvée ni dans le règlement ni dans la zone RDPPF")
+                # 6. Ajouter toutes les autres contraintes pertinentes comme informations générales
+                for rdppf_constraint in rdppf_constraints[:3]:  # Limiter à 3 pour ne pas surcharger
+                    if rdppf_constraint.get('type') not in ['zone']:  # Exclure les informations de zone déjà affichées
+                        constraints.append(ConstraintInfo(
+                            type=f"Information RDPPF: {rdppf_constraint.get('type', 'général').title()}",
+                            remarques=rdppf_constraint.get('value', '')[:200] + "..." if len(rdppf_constraint.get('value', '')) > 200 else rdppf_constraint.get('value', ''),
+                            source_info="Contraintes RDPPF",
+                            confidence=0.6
+                        ))
+                
+                if not constraints:
+                    print(f"[IA-CONSTRAINTS] Aucune contrainte trouvée ni dans le règlement ni dans les données RDPPF complètes")
+                else:
+                    print(f"[IA-CONSTRAINTS] FALLBACK RÉUSSI: {len(constraints)} contraintes extraites du RDPPF")
         
         duration = time.time() - start_time
         

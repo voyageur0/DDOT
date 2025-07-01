@@ -1077,6 +1077,365 @@
                 updateUserUI();
             }
         }
+
+        // ===============================================
+        // INTÉGRATION AVEC L'API IA CONTRAINTES
+        // ===============================================
+        
+        // Fonction pour intégrer l'analyse IA après une recherche de parcelle
+        function integrateIAAnalysis(data) {
+            if (data && data.cadastral && data.cadastral.commune) {
+                // Déterminer le numéro de parcelle depuis l'ID fédéral ou autre source
+                const parcelle = extractParcelleNumber(data.cadastral.id_federal) || 
+                                extractParcelleFromSearch() || 
+                                '5217'; // Valeur par défaut pour tests
+                
+                // Ajouter automatiquement le bouton d'analyse IA après l'affichage des résultats
+                setTimeout(() => {
+                    addIAAnalysisButtonToResults(data.cadastral.commune, parcelle);
+                }, 500);
+            }
+        }
+        
+        // Extraire le numéro de parcelle depuis différentes sources
+        function extractParcelleNumber(idFederal) {
+            if (!idFederal) return null;
+            // Essayer d'extraire le numéro de parcelle depuis l'ID fédéral
+            const match = idFederal.toString().match(/(\d{3,5})$/);
+            return match ? match[1] : null;
+        }
+        
+        function extractParcelleFromSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput && searchInput.value) {
+                const match = searchInput.value.match(/parcelle[:\s]*(\d+)/i) || 
+                             searchInput.value.match(/(\d{3,5})/);
+                return match ? match[1] : null;
+            }
+            return null;
+        }
+        
+        // Ajouter le bouton d'analyse IA spécifiquement dans les résultats
+        function addIAAnalysisButtonToResults(commune, parcelle) {
+            const analysisResults = document.getElementById('analysisResults');
+            if (!analysisResults) return;
+            
+            // Vérifier si le bouton n'existe pas déjà
+            if (document.getElementById('iaAnalysisBtn')) return;
+            
+            // Créer le conteneur d'actions s'il n'existe pas
+            let actionsContainer = analysisResults.querySelector('.actions-container');
+            if (!actionsContainer) {
+                actionsContainer = document.createElement('div');
+                actionsContainer.className = 'actions-container';
+                actionsContainer.style.cssText = `
+                    text-align: center; 
+                    margin: 30px 0; 
+                    padding: 20px; 
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                    border-radius: 15px;
+                    border: 2px dashed #dee2e6;
+                `;
+                analysisResults.appendChild(actionsContainer);
+            }
+            
+            // Ajouter le bouton d'analyse IA
+            const iaButton = document.createElement('button');
+            iaButton.id = 'iaAnalysisBtn';
+            iaButton.className = 'action-btn';
+            iaButton.style.cssText = `
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white; border: none; padding: 15px 25px;
+                border-radius: 25px; font-size: 1.1em; cursor: pointer;
+                margin: 10px; transition: all 0.3s ease;
+                box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+                font-weight: 600;
+            `;
+            iaButton.innerHTML = '🤖 Analyser avec l\'IA - Contraintes Urbaines';
+            
+            iaButton.onclick = () => {
+                // Utiliser les fonctions du module d'intégration IA
+                if (window.urbanAI && window.urbanAI.analyzeParcelleWithIA) {
+                    window.urbanAI.analyzeParcelleWithIA(commune, parcelle);
+                } else {
+                    alert('⚠️ Module IA non chargé. Vérifiez que le serveur backend est démarré.');
+                }
+            };
+            
+            // Ajouter un effet de survol
+            iaButton.onmouseenter = () => {
+                iaButton.style.transform = 'scale(1.05)';
+                iaButton.style.boxShadow = '0 8px 25px rgba(40, 167, 69, 0.4)';
+            };
+            iaButton.onmouseleave = () => {
+                iaButton.style.transform = 'scale(1)';
+                iaButton.style.boxShadow = '0 6px 20px rgba(40, 167, 69, 0.3)';
+            };
+            
+            actionsContainer.appendChild(iaButton);
+            
+            // Ajouter une description explicative
+            const description = document.createElement('div');
+            description.style.cssText = `
+                margin-top: 15px; 
+                color: #6c757d; 
+                font-size: 0.9em; 
+                font-style: italic;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                line-height: 1.4;
+            `;
+            description.innerHTML = `
+                🧠 <strong>Analyse IA avancée</strong><br>
+                Extraction automatique des contraintes urbaines depuis les règlements communaux 
+                et données RDPPF officielles avec intelligence artificielle.
+            `;
+            actionsContainer.appendChild(description);
+        }
+        
+        // Modifier la fonction displayResults existante pour intégrer l'IA
+        // Sauvegarder la fonction originale AVANT de la redéfinir
+        const originalDisplayResults = window.displayResults;
+        
+        // Redéfinir displayResults avec intégration IA
+        window.displayResults = function(data) {
+            // Appeler la logique d'affichage standard
+            const loading = document.getElementById('loading');
+            const analysisResults = document.getElementById('analysisResults');
+            const generalInfo = document.getElementById('generalInfo');
+            const ownersInfo = document.getElementById('ownersInfo');
+            const cadastralInfo = document.getElementById('cadastralInfo');
+            const zoningInfo = document.getElementById('zoningInfo');
+
+            if (!loading || !analysisResults || !generalInfo || !ownersInfo || !cadastralInfo || !zoningInfo) {
+                console.error('Éléments DOM manquants');
+                showError('Erreur d\'affichage: éléments de page manquants');
+                return;
+            }
+
+            loading.style.display = 'none';
+            analysisResults.style.display = 'block';
+
+            // Affichage des données (logique copiée de la fonction originale)
+            generalInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Adresse/Localisation</div>
+                    <div class="info-value">${data.general.adresse}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Coordonnées</div>
+                    <div class="info-value">${data.general.coordonnees}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Système de référence</div>
+                    <div class="info-value">${data.general.systeme_ref}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date d'analyse</div>
+                    <div class="info-value">${data.general.date_analyse}</div>
+                </div>
+            `;
+
+            ownersInfo.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">ID Fédéral</div>
+                        <div class="info-value">${data.cadastral.id_federal}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Commune</div>
+                        <div class="info-value">${data.cadastral.commune}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Canton</div>
+                        <div class="info-value">${data.cadastral.canton}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Source des données</div>
+                        <div class="info-value">${data.cadastral.statut}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
+                    <p><strong>ℹ️ Informations importantes :</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Les données de propriétaires ne sont pas publiques</li>
+                        <li>Pour les informations détaillées : contactez le cadastre communal</li>
+                        <li>Consultez le règlement communal pour les contraintes de construction</li>
+                    </ul>
+                </div>
+            `;
+
+            cadastralInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Bounding Box</div>
+                    <div class="info-value">${data.cadastral.bbox}</div>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
+                    <p><strong>📋 Informations complémentaires disponibles :</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Surface exacte de la parcelle</li>
+                        <li>Limites cadastrales précises</li>
+                        <li>Servitudes et charges foncières</li>
+                        <li>Données de propriétaire</li>
+                    </ul>
+                    <p><em>Contactez le service du cadastre de ${data.cadastral.commune} pour ces informations.</em></p>
+                </div>
+            `;
+
+            zoningInfo.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Source d'information</div>
+                    <div class="info-value">${data.zonage.source}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Recommandation</div>
+                    <div class="info-value">${data.zonage.note}</div>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: #d4edda; border-radius: 10px; border-left: 4px solid #28a745;">
+                    <p><strong>🏗️ Informations d'aménagement disponibles dans le règlement :</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Zone d'affectation</li>
+                        <li>Indice d'utilisation du sol</li>
+                        <li>Hauteur maximale des constructions</li>
+                        <li>Distance aux limites</li>
+                        <li>Coefficient d'occupation du sol</li>
+                        <li>Prescriptions architecturales</li>
+                    </ul>
+                </div>
+            `;
+
+            // Cacher la section potentiel de développement
+            const developmentSection = document.querySelector('#developmentInfo');
+            if (developmentSection) {
+                const parentSection = developmentSection.closest('.analysis-section');
+                if (parentSection) {
+                    parentSection.style.display = 'none';
+                }
+            }
+
+            // Configuration des boutons d'action
+            setupActionButtons(data);
+            
+            // Intégrer l'analyse IA
+            integrateIAAnalysis(data);
+        };
+        
+        // ===============================================
+        // AMÉLIORATION DE L'INTERFACE UTILISATEUR
+        // ===============================================
+        
+        // Ajouter des styles CSS pour l'intégration IA
+        const iaStyles = document.createElement('style');
+        iaStyles.innerHTML = `
+            /* Styles pour l'intégration IA */
+            .ia-status-indicator {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+                padding: 10px 15px;
+                border-radius: 20px;
+                font-size: 0.9em;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                color: white;
+                font-weight: 600;
+            }
+            
+            .ia-loading {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1001;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .ia-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1002;
+                padding: 15px 20px;
+                border-radius: 10px;
+                color: white;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                animation: slideInRight 0.3s ease-out;
+                max-width: 350px;
+            }
+            
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .ia-spinner {
+                width: 20px;
+                height: 20px;
+                border: 2px solid rgba(255,255,255,0.3);
+                border-top: 2px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* Amélioration des boutons d'action existants */
+            .action-btn {
+                transition: all 0.3s ease;
+                font-weight: 600;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+            
+            .action-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            }
+            
+            /* Style pour la section d'analyse IA */
+            #iaAnalysisSection {
+                border: 2px solid #28a745;
+                background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            #iaAnalysisSection::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #28a745, #20c997, #17a2b8, #6f42c1);
+                background-size: 200% 100%;
+                animation: gradient 3s ease infinite;
+            }
+            
+            @keyframes gradient {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+        `;
+        document.head.appendChild(iaStyles);
     </script>
+    
+    <!-- Intégration du module IA -->
+    <script src="frontend_integration.js?v=2"></script>
 </body>
 </html> 
