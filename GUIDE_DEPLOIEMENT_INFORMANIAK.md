@@ -2,6 +2,78 @@
 
 Ce guide vous accompagne pas à pas pour déployer votre application DDOT (Analyse intelligente de documents d'urbanisme) sur l'hébergement Informaniak.
 
+## 🚀 Déploiement rapide depuis GitHub
+
+### Option A : Déploiement direct depuis GitHub (recommandé)
+
+1. **Connexion SSH à Informaniak** :
+```bash
+ssh votre-utilisateur@votre-domaine.infomaniak.ch
+```
+
+2. **Cloner le repository** :
+```bash
+cd /path/to/your/web/directory
+git clone https://github.com/voyageur0/DDOT.git
+cd DDOT
+```
+
+3. **Configuration rapide** :
+```bash
+# Copier et éditer les variables d'environnement
+cp env.production.template .env
+nano .env
+
+# Configurer vos clés API (obligatoire)
+# OPENAI_API_KEY=sk-votre-clé-openai-réelle
+# FRONTEND_URL=https://votre-domaine.infomaniak.ch
+# CORS_ORIGIN=https://votre-domaine.infomaniak.ch
+```
+
+4. **Démarrage automatique** :
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+5. **Vérification** :
+```bash
+pm2 status
+# Ouvrir https://votre-domaine.infomaniak.ch
+```
+
+### Option B : Déploiement continu avec GitHub Actions
+
+Créez un fichier `.github/workflows/deploy.yml` dans votre repository :
+
+```yaml
+name: Déploiement Informaniak
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Déploiement SSH
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        script: |
+          cd /path/to/your/web/directory/DDOT
+          git pull origin main
+          pm2 restart all
+```
+
+---
+
 ## 📋 Prérequis
 
 ### Hébergement Informaniak

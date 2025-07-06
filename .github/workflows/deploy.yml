@@ -1,0 +1,91 @@
+name: 🚀 Déploiement automatique Informaniak
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: 🌐 Déploiement sur Informaniak
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📂 Checkout du code
+      uses: actions/checkout@v4
+    
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: 📦 Installation des dépendances
+      run: npm ci
+    
+    - name: 🧪 Tests (optionnel)
+      run: npm test --if-present
+    
+    - name: 🚀 Déploiement SSH
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.INFORMANIAK_HOST }}
+        username: ${{ secrets.INFORMANIAK_USERNAME }}
+        key: ${{ secrets.INFORMANIAK_PRIVATE_KEY }}
+        port: ${{ secrets.INFORMANIAK_PORT || 22 }}
+        script: |
+          echo "🚀 Début du déploiement DDOT..."
+          
+          # Aller dans le répertoire du projet
+          cd ${{ secrets.INFORMANIAK_PROJECT_PATH || '~/DDOT' }}
+          
+          # Arrêter les processus PM2
+          pm2 stop all || true
+          
+          # Sauvegarder la base de données
+          cp urban_analysis.db urban_analysis.db.backup.$(date +%Y%m%d_%H%M%S) || true
+          
+          # Mettre à jour le code
+          git pull origin main
+          
+          # Installer les dépendances si nécessaire
+          npm install --production
+          
+          # Activer l'environnement Python et installer les dépendances
+          source venv/bin/activate 2>/dev/null || python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+          # Créer les dossiers nécessaires
+          mkdir -p logs uploads temp-ocr cache/parcels
+          
+          # Télécharger les données OCR si nécessaire
+          if [ ! -f "eng.traineddata" ]; then
+            wget -O eng.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+          fi
+          if [ ! -f "fra.traineddata" ]; then
+            wget -O fra.traineddata https://github.com/tesseract-ocr/tessdata/raw/main/fra.traineddata
+          fi
+          
+          # Exécuter les migrations
+          sqlite3 urban_analysis.db < migrations/001_create_parcels_cache.sql 2>/dev/null || true
+          
+          # Redémarrer avec PM2
+          pm2 start ecosystem.config.js --env production
+          
+          # Sauvegarder la configuration PM2
+          pm2 save
+          
+          # Afficher le statut
+          pm2 status
+          
+          echo "✅ Déploiement DDOT terminé avec succès!"
+    
+    - name: 📊 Notification de statut
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Déploiement réussi sur Informaniak!"
+        else
+          echo "❌ Échec du déploiement sur Informaniak"
+        fi 
