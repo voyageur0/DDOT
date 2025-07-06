@@ -1,6 +1,8 @@
 import axios from 'axios';
+// @ts-ignore: type definitions optionally installed via @types/cheerio
 import * as cheerio from 'cheerio';
 import { extractTextFromPdfUrl, extractUrbanismRules, getCachedOCR, setCachedOCR } from './ocrService';
+import { extractRegulationConstraints, RegulationConstraint, extractConstraintsFromLargeText } from './regulationExtractor';
 
 export interface CommunalRegulation {
   municipality: string;
@@ -10,6 +12,7 @@ export interface CommunalRegulation {
   lastUpdate?: string;
   textContent?: string;
   relevantSections?: string[];
+  structuredConstraints?: RegulationConstraint[];
 }
 
 const VALAIS_MUNICIPALITIES = [
@@ -82,7 +85,7 @@ async function searchCommunalWebsite(municipality: string): Promise<CommunalRegu
         'aménagement', 'prescriptions', 'gabarit', 'zone'
       ];
       
-      $('a[href]').each((_, element) => {
+      $('a[href]').each((_idx: number, element: any) => {
         const link = $(element);
         const href = link.attr('href');
         const text = link.text().toLowerCase();
@@ -225,6 +228,15 @@ export async function analyzeCommunalRegulation(regulation: CommunalRegulation, 
       if (relevantText.length > 50) {
         regulation.relevantSections = [relevantText];
       }
+      
+      // NEW: Extraction structurée des contraintes avec fallback chunké
+      const constraintsSource = relevantText.length > 50 ? relevantText : ocrResult.text;
+      let constraints = await extractRegulationConstraints(constraintsSource);
+      if (constraints.length < 5 && ocrResult.text.length > 12000) {
+        console.log('⬆️ Relance extraction par segments pour plus de contraintes...');
+        constraints = await extractConstraintsFromLargeText(ocrResult.text);
+      }
+      regulation.structuredConstraints = constraints;
       
       console.log(`✅ Analyse terminée - ${ocrResult.text.length} caractères extraits`);
     } else {

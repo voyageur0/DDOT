@@ -4,6 +4,9 @@ import { findCommunalRegulations, analyzeCommunalRegulation, formatRegulationsFo
 import { getHazardAssessment, formatHazardAssessment, type HazardAssessment } from './dangerMapsVS';
 import { geocodeAddress, getFallbackCoordinates, type GeocodeResult } from './geocodingVS';
 import { getAllAdditionalData, formatAdditionalDataForAI, type CantonalDataResult } from './additionalDataSources';
+import { buildConstraintTable } from './buildConstraintTable';
+import { analyzeRdppf, type RdppfConstraint } from './rdppfExtractor';
+import { RegulationConstraint } from './regulationExtractor';
 
 export interface ComprehensiveParcelAnalysis {
   // Données de base
@@ -26,6 +29,10 @@ export interface ComprehensiveParcelAnalysis {
   
   // Données supplémentaires
   additionalData: CantonalDataResult[];
+  
+  // Nouvelles données structurées à partir des règlements communaux
+  communalConstraints: import('./regulationExtractor').RegulationConstraint[];
+  rdppfConstraints: RdppfConstraint[];
   
   // Métadonnées
   processingTime: number;
@@ -55,6 +62,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     communalRegulations: [],
     hazardAssessment: null,
     additionalData: [],
+    communalConstraints: [],
+    rdppfConstraints: [],
     processingTime: 0,
     completeness: 0,
     errors: [],
@@ -62,11 +71,11 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
   };
   
   let successCount = 0;
-  const totalSteps = 8; // Nombre total d'étapes
+  const totalSteps = 10; // Nombre total d'étapes (inclut contraintes structurées)
   
   try {
     // ÉTAPE 1: Recherche de la parcelle
-    console.log('📍 Étape 1/8: Recherche parcelle...');
+    console.log('📍 Étape 1/10: Recherche parcelle...');
     try {
       analysis.searchResult = await searchParcel(searchQuery);
       if (analysis.searchResult) {
@@ -96,7 +105,7 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     const egrid = analysis.searchResult.egrid;
     
     // ÉTAPE 2: Détails de la parcelle
-    console.log('📊 Étape 2/8: Détails parcelle...');
+    console.log('📊 Étape 2/10: Détails parcelle...');
     try {
       analysis.parcelDetails = await getParcelDetails(x, y);
       if (analysis.parcelDetails) successCount++;
@@ -104,8 +113,36 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur détails parcelle: ${error}`);
     }
     
-    // ÉTAPE 3: Zones et contraintes
-    console.log('🗺️ Étape 3/8: Zones et contraintes...');
+    // ÉTAPE 3: RDPPF
+    console.log('📑 Étape 3/10: RDPPF...');
+    try {
+      // Construire l'URL RDPPF à partir de l'EGRID
+      let rdppfUrl = null;
+      if (analysis.searchResult?.egrid) {
+        rdppfUrl = `https://rdppfvs.geopol.ch/extract/pdf?EGRID=${analysis.searchResult.egrid}&LANG=fr`;
+        console.log(`📑 URL RDPPF construite: ${rdppfUrl}`);
+      }
+      
+      if (rdppfUrl) {
+        try {
+          console.log(`📑 Tentative téléchargement RDPPF...`);
+          analysis.rdppfConstraints = await analyzeRdppf(rdppfUrl);
+          if (analysis.rdppfConstraints.length) successCount++;
+          console.log(`📑 RDPPF analysé: ${analysis.rdppfConstraints.length} contraintes extraites`);
+        } catch (rdppfError: any) {
+          console.log(`⚠️ Erreur RDPPF: ${rdppfError.message}`);
+          console.log(`📑 Stack: ${rdppfError.stack?.substring(0, 200)}...`);
+          analysis.errors.push(`RDPPF: ${rdppfError.message}`);
+        }
+      } else {
+        console.log('⚠️ Pas d\'EGRID disponible pour construire l\'URL RDPPF');
+      }
+    } catch (error) {
+      analysis.errors.push(`Erreur RDPPF: ${error}`);
+    }
+    
+    // ÉTAPE 4: Zones et contraintes
+    console.log('🗺️ Étape 4/10: Zones et contraintes...');
     try {
       analysis.zones = await identifyZonesAndConstraints(x, y);
       if (Object.keys(analysis.zones).length > 0) successCount++;
@@ -113,8 +150,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur zones: ${error}`);
     }
     
-    // ÉTAPE 4: Informations géologiques
-    console.log('🗻 Étape 4/8: Infos géologiques...');
+    // ÉTAPE 5: Informations géologiques
+    console.log('🗻 Étape 5/10: Infos géologiques...');
     try {
       analysis.geologicalInfo = await getGeologicalInfo(x, y);
       if (Object.keys(analysis.geologicalInfo).length > 0) successCount++;
@@ -122,8 +159,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur géologie: ${error}`);
     }
     
-    // ÉTAPE 5: Zone de construction
-    console.log('🏗️ Étape 5/8: Zone de construction...');
+    // ÉTAPE 6: Zone de construction
+    console.log('🏗️ Étape 6/10: Zone de construction...');
     try {
       analysis.buildingZone = await getBuildingZoneInfo(x, y);
       if (Object.keys(analysis.buildingZone).length > 0) successCount++;
@@ -131,8 +168,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur zone construction: ${error}`);
     }
     
-    // ÉTAPE 6: Restrictions PLR
-    console.log('📋 Étape 6/8: Restrictions PLR...');
+    // ÉTAPE 7: Restrictions PLR
+    console.log('📋 Étape 7/10: Restrictions PLR...');
     if (egrid) {
       try {
         analysis.plrData = await getPLRRestrictions(egrid);
@@ -142,25 +179,103 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       }
     }
     
-    // ÉTAPE 7: Règlements communaux
-    console.log('🏛️ Étape 7/8: Règlements communaux...');
-    const municipality = analysis.parcelDetails?.municipality || analysis.searchResult?.municipality || '';
+    // ÉTAPE 8: Règlements communaux
+    console.log('🏛️ Étape 8/10: Règlements communaux...');
+    // Extraire la commune depuis searchResult.number (format: "<b>Vétroz</b> 12558...")
+    let municipality = analysis.parcelDetails?.municipality || analysis.searchResult?.municipality || '';
+    if (!municipality && analysis.searchResult?.number) {
+      const municipalityMatch = analysis.searchResult.number.match(/<b>([^<]+)<\/b>/);
+      if (municipalityMatch) {
+        municipality = municipalityMatch[1];
+        console.log(`📋 Commune extraite du label: ${municipality}`);
+      }
+    }
+    
     if (municipality) {
       try {
-        const regulations = await findCommunalRegulations(municipality);
-        // Analyser les premiers règlements trouvés
-        for (let i = 0; i < Math.min(regulations.length, 3); i++) {
-          const analyzed = await analyzeCommunalRegulation(regulations[i]);
-          analysis.communalRegulations.push(analyzed);
+        // Lire directement le PDF local du règlement communal
+        const localRegulationPath = `reglements/VS_${municipality}_Règlement des constructions.pdf`;
+        console.log(`📋 Lecture règlement local: ${localRegulationPath}`);
+        
+        try {
+          const fs = await import('node:fs/promises');
+          const path = await import('node:path');
+          
+          const fullPath = path.join(process.cwd(), localRegulationPath);
+          
+          // Vérifier d'abord si un fichier JSON OCR existe
+          const jsonPath = localRegulationPath.replace('.pdf', '.json');
+          const fullJsonPath = path.join(process.cwd(), jsonPath);
+          
+          let regulationText = '';
+          
+          try {
+            console.log(`📖 Recherche fichier JSON OCR: ${jsonPath}`);
+            await fs.access(fullJsonPath);
+            
+            // Lire le fichier JSON avec OCR
+            console.log(`✅ Fichier JSON OCR trouvé: ${jsonPath}`);
+            const jsonContent = await fs.readFile(fullJsonPath, 'utf-8');
+            const parsedJson = JSON.parse(jsonContent);
+            
+            // Extraire tout le texte des pages
+            if (parsedJson.pages && Array.isArray(parsedJson.pages)) {
+              regulationText = parsedJson.pages
+                .map((page: any) => `=== PAGE ${page.page} ===\n${page.text}`)
+                .join('\n\n');
+              console.log(`✅ Texte extrait du JSON OCR: ${regulationText.length} caractères`);
+              console.log(`📄 Titre: ${parsedJson.title || 'Non spécifié'}`);
+              console.log(`📄 Pages: ${parsedJson.pages.length}`);
+            } else {
+              throw new Error('Format JSON invalide - pages manquantes');
+            }
+          } catch (jsonError: any) {
+            console.log(`⚠️ Fichier JSON OCR non trouvé (${jsonError.message}), fallback vers PDF...`);
+            
+            // Fallback vers extraction PDF
+            await fs.access(fullPath);
+            const { extractTextFromPDFWithOCR } = await import('./pdfOcrExtractor');
+            
+            console.log(`📖 Extraction intelligente PDF+OCR: ${localRegulationPath}`);
+            const result = await extractTextFromPDFWithOCR(fullPath, true);
+            regulationText = result.text;
+            
+            console.log(`✅ Extraction terminée en ${result.processingTime}ms`);
+            console.log(`📄 Méthode: ${result.method}, Confiance: ${result.confidence}%, Pages: ${result.pageCount}`);
+          }
+          
+          if (regulationText && regulationText.length > 500) {
+            // Extraire les contraintes structurées du règlement
+            const { extractConstraintsFromLargeText } = await import('./regulationExtractor');
+            analysis.communalConstraints = await extractConstraintsFromLargeText(regulationText);
+            
+            console.log(`✅ Règlement analysé: ${analysis.communalConstraints.length} contraintes extraites`);
+            if (analysis.communalConstraints.length > 0) successCount++;
+          }
+        } catch (fileError: any) {
+          console.log(`⚠️ Règlement local non trouvé (${fileError.message}), recherche web...`);
+          // Fallback vers la recherche web originale
+          const regulations = await findCommunalRegulations(municipality);
+          for (let i = 0; i < Math.min(regulations.length, 2); i++) {
+            const analyzed = await analyzeCommunalRegulation(regulations[i]);
+            analysis.communalRegulations.push(analyzed);
+          }
+          if (analysis.communalRegulations.length > 0) {
+            for (const reg of analysis.communalRegulations) {
+              if (reg.structuredConstraints?.length) {
+                analysis.communalConstraints.push(...reg.structuredConstraints);
+              }
+            }
+            successCount++;
+          }
         }
-        if (analysis.communalRegulations.length > 0) successCount++;
       } catch (error) {
         analysis.errors.push(`Erreur règlements: ${error}`);
       }
     }
     
-    // ÉTAPE 8: Dangers naturels
-    console.log('⚠️ Étape 8/8: Dangers naturels...');
+    // ÉTAPE 9: Dangers naturels
+    console.log('⚠️ Étape 9/10: Dangers naturels...');
     try {
       analysis.hazardAssessment = await getHazardAssessment(x, y, municipality);
       if (analysis.hazardAssessment) successCount++;
@@ -227,6 +342,14 @@ function formatForOpenAI(analysis: ComprehensiveParcelAnalysis): string {
   if (analysis.communalRegulations.length > 0) {
     formatted += `## 4. RÈGLEMENTS COMMUNAUX\n\n`;
     formatted += formatRegulationsForAnalysis(analysis.communalRegulations);
+  }
+  
+  // 4b. TABLEAU DE CONTRAINTES FUSIONNÉES
+  if (analysis.communalConstraints.length || analysis.rdppfConstraints.length || analysis.plrData || Object.keys(analysis.buildingZone).length) {
+    formatted += `## 4b. SYNTHÈSE DES CONTRAINTES\n\n`;
+    const merged: RegulationConstraint[] = [...analysis.communalConstraints, ...analysis.rdppfConstraints.map(c => ({ zone: '*', theme: c.theme, rule: c.rule }))];
+    formatted += buildConstraintTable(merged, analysis.plrData, analysis.buildingZone);
+    formatted += '\n';
   }
   
   // 5. DANGERS NATURELS
@@ -324,6 +447,8 @@ export async function performQuickAnalysis(searchQuery: string): Promise<Compreh
     communalRegulations: [],
     hazardAssessment: null,
     additionalData: [],
+    communalConstraints: [],
+    rdppfConstraints: [],
     processingTime: 0,
     completeness: 0,
     errors: [],

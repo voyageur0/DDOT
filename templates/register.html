@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription - Analyse Urbanisme IA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Créer un compte</h2>
+                    <p class="text-center text-muted mb-4">Commencez gratuitement et accédez aux fonctionnalités de base</p>
+                    
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                            <div class="form-text">Minimum 8 caractères</div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus"></i> S'inscrire
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <p class="text-center mb-0">
+                        Déjà un compte ? 
+                        <a href="{{ url_for('login') }}">Connectez-vous</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

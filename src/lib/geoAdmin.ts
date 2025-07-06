@@ -65,8 +65,18 @@ export async function searchParcel(searchText: string): Promise<ParcelSearchResu
           const hit = data.results[0];
           console.log(`✅ Parcelle trouvée avec "${searchTerm}": ${hit.attrs?.label || hit.attrs?.number}`);
           
+          // Extraire l'EGRID depuis le label (format: "CH 1234 5678 9012")
+          let egrid = hit?.attrs?.egrid;
+          if (!egrid && hit?.attrs?.label) {
+            const egridMatch = hit.attrs.label.match(/CH\s*(\d{4})\s*(\d{4})\s*(\d{4})/);
+            if (egridMatch) {
+              egrid = `CH${egridMatch[1]}${egridMatch[2]}${egridMatch[3]}`;
+              console.log(`📋 EGRID extrait du label: ${egrid}`);
+            }
+          }
+          
           return {
-            egrid: hit?.attrs?.egrid,
+            egrid: egrid || '',
             number: hit?.attrs?.number || hit?.attrs?.label,
             municipality: hit?.attrs?.municipality || communeInfo?.name || '',
             canton: hit?.attrs?.kantonskürzel || 'VS',

@@ -168,4 +168,28 @@ Sois précis, actionnable et structure ta réponse clairement.`;
     // Fallback vers l'analyse simple
     return await chatCompletion(zone, reglement, parcelLabel);
   }
+}
+
+// Helper générique pour tout appel simple depuis d'autres modules
+export async function callOpenAI(params: {
+  model?: string;
+  temperature?: number;
+  messages: { role: 'system' | 'user' | 'assistant'; content: string }[];
+  max_tokens?: number;
+}) {
+  const {
+    model = 'o3-mini',
+    temperature = 0,
+    messages,
+    max_tokens = 1000
+  } = params;
+
+  return await exponentialRetry(async () => {
+    return await openai.chat.completions.create({
+      model,
+      temperature,
+      messages,
+      max_tokens
+    });
+  });
 } 

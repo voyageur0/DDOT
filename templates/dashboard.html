@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - Analyse Urbanisme IA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-area {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+        border-color: var(--secondary-color);
+        background-color: #f8f9fa;
+    }
+    
+    .upload-area.dragover {
+        border-color: var(--secondary-color);
+        background-color: #e3f2fd;
+    }
+    
+    .document-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .document-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,.15);
+    }
+    
+    .analysis-item {
+        border-left: 3px solid var(--secondary-color);
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                Tableau de bord
+                {% if current_user.is_premium %}
+                    <span class="premium-badge">PREMIUM</span>
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    
+    <!-- Section Upload -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="bi bi-cloud-upload"></i> Analyser un nouveau document
+                    </h3>
+                    
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="upload-area" id="uploadArea">
+                            <i class="bi bi-file-earmark-pdf" style="font-size: 48px; color: #ccc;"></i>
+                            <h5 class="mt-3">Glissez-déposez votre PDF ici</h5>
+                            <p class="text-muted">ou</p>
+                            <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none;">
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                Choisir un fichier
+                            </button>
+                            <p class="text-muted mt-2">PDF jusqu'à 50MB</p>
+                        </div>
+                        
+                        <div class="row mt-3" id="fileDetails" style="display: none;">
+                            <div class="col-md-6">
+                                <label class="form-label">Commune</label>
+                                <input type="text" name="commune" class="form-control" placeholder="Ex: Genève">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Type de document</label>
+                                <select name="document_type" class="form-select">
+                                    <option value="reglement">Règlement d'urbanisme</option>
+                                    <option value="cadastre">Extrait de cadastre</option>
+                                    <option value="autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-upload"></i> Analyser le document
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section Documents -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="bi bi-folder"></i> Mes documents
+            </h3>
+            
+            {% if documents %}
+                <div class="row">
+                    {% for doc in documents %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card document-card" onclick="viewDocument({{ doc.id }})">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                        {{ doc.original_filename }}
+                                    </h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            {% if doc.commune %}Commune: {{ doc.commune }}<br>{% endif %}
+                                            Uploadé le {{ doc.upload_date.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-secondary">{{ doc.document_type }}</span>
+                                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); analyzeDocument({{ doc.id }})">
+                                            <i class="bi bi-search"></i> Analyser
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> Aucun document uploadé pour le moment.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Section Analyses récentes -->
+    {% if analyses %}
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4">
+                    <i class="bi bi-clock-history"></i> Analyses récentes
+                </h3>
+                
+                <div class="card">
+                    <div class="card-body">
+                        {% for analysis in analyses %}
+                            <div class="analysis-item">
+                                <div class="d-flex justify-content-between">
+                                    <h6>
+                                        {% if analysis.analysis_type == 'summary' %}
+                                            <i class="bi bi-file-text"></i> Résumé
+                                        {% elif analysis.analysis_type == 'feasibility_table' %}
+                                            <i class="bi bi-table"></i> Tableau de faisabilité
+                                        {% else %}
+                                            <i class="bi bi-chat-dots"></i> Question personnalisée
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">{{ analysis.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                </div>
+                                <p class="mb-0 text-truncate">{{ analysis.result[:100] }}...</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal d'analyse -->
+<div class="modal fade" id="analysisModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Analyse du document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="analysisContent">
+                    <!-- Le contenu sera injecté dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Gestion du drag & drop
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadForm = document.getElementById('uploadForm');
+    const fileDetails = document.getElementById('fileDetails');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.add('dragover');
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.classList.remove('dragover');
+        });
+    });
+    
+    uploadArea.addEventListener('drop', handleDrop);
+    
+    function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    }
+    
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type === 'application/pdf') {
+                fileDetails.style.display = 'block';
+                uploadArea.innerHTML = `
+                    <i class="bi bi-file-earmark-check text-success" style="font-size: 48px;"></i>
+                    <h5 class="mt-3">${file.name}</h5>
+                    <p class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                `;
+            } else {
+                alert('Veuillez sélectionner un fichier PDF');
+            }
+        }
+    }
+    
+    // Soumission du formulaire
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(uploadForm);
+        const submitBtn = uploadForm.querySelector('button[type="submit"]');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analyse en cours...';
+        
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                alert('Document analysé avec succès !');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Erreur lors de l\'analyse');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la connexion au serveur');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-upload"></i> Analyser le document';
+        }
+    });
+    
+    // Fonctions pour visualiser et analyser les documents
+    function viewDocument(docId) {
+        window.location.href = `/document/${docId}`;
+    }
+    
+    async function analyzeDocument(docId) {
+        const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
+        const content = document.getElementById('analysisContent');
+        
+        content.innerHTML = '<div class="text-center"><div class="spinner-border"></div><p>Chargement des données...</p></div>';
+        modal.show();
+        
+        try {
+            const response = await fetch(`/api/document/${docId}/data`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                displayAnalysisOptions(data, content);
+            } else {
+                content.innerHTML = '<div class="alert alert-danger">Erreur lors du chargement</div>';
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            content.innerHTML = '<div class="alert alert-danger">Erreur de connexion</div>';
+        }
+    }
+    
+    function displayAnalysisOptions(docData, container) {
+        const isPremium = {{ 'true' if current_user.is_premium else 'false' }};
+        
+        let html = `
+            <h5>${docData.filename}</h5>
+            <div class="mb-4">
+                <h6>Données extraites (Gratuit)</h6>
+                <pre class="bg-light p-3">${JSON.stringify(docData.extracted_data, null, 2)}</pre>
+            </div>
+        `;
+        
+        if (isPremium) {
+            html += `
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-primary w-100" onclick="generateSummary(${docData.id})">
+                            <i class="bi bi-file-text"></i> Générer un résumé
+                        </button>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-primary w-100" onclick="generateFeasibilityTable(${docData.id})">
+                            <i class="bi bi-table"></i> Tableau de faisabilité
+                        </button>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <button class="btn btn-primary w-100" onclick="askQuestion(${docData.id})">
+                            <i class="bi bi-chat-dots"></i> Poser une question
+                        </button>
+                    </div>
+                </div>
+                <div id="aiResults" class="mt-4"></div>
+            `;
+        } else {
+            html += `
+                <div class="alert alert-warning">
+                    <i class="bi bi-lock"></i> Les fonctionnalités IA sont réservées aux membres Premium
+                    <button class="btn btn-warning btn-sm float-end" onclick="subscribeToPremium()">
+                        Passer Premium
+                    </button>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = html;
+    }
+    
+    // Fonctions IA Premium
+    async function generateSummary(docId) {
+        const resultsDiv = document.getElementById('aiResults');
+        resultsDiv.innerHTML = '<div class="spinner-border"></div> Génération du résumé...';
+        
+        try {
+            const response = await fetch('/api/generate-summary', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({document_id: docId})
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-file-text"></i> Résumé généré par l'IA
+                        </div>
+                        <div class="card-body">
+                            <p>${data.summary}</p>
+                            <small class="text-muted">Chunks traités: ${data.chunks_processed}</small>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        } catch (error) {
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Erreur de connexion</div>';
+        }
+    }
+    
+    async function generateFeasibilityTable(docId) {
+        const resultsDiv = document.getElementById('aiResults');
+        resultsDiv.innerHTML = '<div class="spinner-border"></div> Génération du tableau...';
+        
+        try {
+            const response = await fetch('/api/generate-feasibility-table', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({document_id: docId})
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-table"></i> Tableau de faisabilité
+                        </div>
+                        <div class="card-body">
+                            ${marked.parse(data.table)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        } catch (error) {
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Erreur de connexion</div>';
+        }
+    }
+    
+    async function askQuestion(docId) {
+        const question = prompt('Quelle est votre question sur ce document ?');
+        if (!question) return;
+        
+        const resultsDiv = document.getElementById('aiResults');
+        resultsDiv.innerHTML = '<div class="spinner-border"></div> L\'IA analyse votre question...';
+        
+        try {
+            const response = await fetch('/api/ask-question', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    document_id: docId,
+                    question: question
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                resultsDiv.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-chat-dots"></i> Question & Réponse
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Q:</strong> ${question}</p>
+                            <p><strong>R:</strong> ${data.answer}</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        } catch (error) {
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Erreur de connexion</div>';
+        }
+    }
+</script>
+
+<!-- Marked.js pour le rendu Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+{% endblock %} 

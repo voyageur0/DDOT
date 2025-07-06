@@ -302,3 +302,175 @@ npm start  # Lance le serveur en production
 ## 👥 Développé par
 
 Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz 
+
+# Urban IA - Analyse Intelligente de Documents d'Urbanisme
+
+Application web Node.js pour l'analyse automatique de documents d'urbanisme (règlements, extraits de cadastre) avec intelligence artificielle.
+
+## Fonctionnalités
+
+### Version Gratuite
+- 📄 **Extraction PDF** : Extraction automatique du texte et des tableaux
+- 📊 **Données structurées** : Affichage des règles d'urbanisme extraites (IBUS, hauteurs, distances)
+- 🔍 **Recherche sémantique** : Recherche intelligente dans vos documents
+- 📈 **Analyse de base** : Visualisation des coefficients et contraintes
+
+### Version Premium (19,99€/mois)
+- 🤖 **Synthèse IA** : Résumés intelligents générés par GPT
+- 📋 **Tableau de faisabilité** : Analyse automatique de conformité
+- 💬 **Questions-Réponses** : Posez vos questions à l'IA sur vos documents
+- 📑 **Rapports détaillés** : Exportez des analyses complètes
+
+## Technologies utilisées
+
+- **Backend** : Node.js, Express.js
+- **Base de données** : SQLite (Sequelize ORM)
+- **Authentification** : Passport.js
+- **IA** : OpenAI API (GPT-3.5)
+- **Recherche vectorielle** : Embeddings OpenAI + recherche en mémoire
+- **Extraction PDF** : pdf-parse, Tesseract.js (OCR)
+- **Paiements** : Stripe
+- **Frontend** : EJS, Bootstrap 5
+
+## Installation
+
+### Prérequis
+- Node.js 18+
+- npm ou yarn
+- Clé API OpenAI
+- Compte Stripe (pour les paiements)
+
+### Configuration
+
+1. Cloner le projet
+```bash
+git clone https://github.com/votre-repo/urban-ia.git
+cd urban-ia
+```
+
+2. Installer les dépendances
+```bash
+npm install
+```
+
+3. Créer un fichier `.env` à partir de l'exemple
+```bash
+cp .env.example .env
+```
+
+4. Configurer les variables d'environnement dans `.env`
+```env
+# Configuration Node.js
+NODE_ENV=development
+PORT=5000
+
+# Session Secret
+SESSION_SECRET=votre-secret-de-session-très-sécurisé
+
+# OpenAI API Key
+OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_votre_clé_stripe_secrète
+STRIPE_WEBHOOK_SECRET=whsec_votre_secret_webhook_stripe
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:3000
+
+# Frontend URL (for redirects)
+FRONTEND_URL=http://localhost:5000
+```
+
+### Lancement
+
+En développement :
+```bash
+npm run dev
+```
+
+En production :
+```bash
+npm start
+```
+
+L'application sera accessible sur http://localhost:5000
+
+## Structure du projet
+
+```
+urban-ia/
+├── config/             # Configuration (Passport)
+├── data/               # Stockage de l'index vectoriel
+├── models-node/        # Modèles Sequelize
+├── routes-node/        # Routes Express
+│   ├── auth.js         # Authentification
+│   ├── documents.js    # Gestion des documents
+│   ├── analysis.js     # Analyses IA (premium)
+│   └── payment.js      # Paiements Stripe
+├── services-node/      # Services métier
+│   ├── pdfService.js   # Extraction PDF
+│   ├── openaiService.js # Intégration OpenAI
+│   └── vectorService.js # Recherche vectorielle
+├── uploads/            # Stockage des PDFs uploadés
+├── views/              # Templates EJS
+├── server.js           # Serveur principal
+└── package.json
+```
+
+## API Endpoints
+
+### Authentification
+- `POST /api/auth/register` - Inscription
+- `POST /api/auth/login` - Connexion
+- `POST /api/auth/logout` - Déconnexion
+- `GET /api/auth/status` - Statut de connexion
+
+### Documents
+- `GET /api/documents` - Liste des documents
+- `GET /api/documents/:id` - Détails d'un document
+- `DELETE /api/documents/:id` - Supprimer un document
+- `POST /api/documents/search` - Recherche sémantique
+- `POST /api/upload` - Upload d'un document
+
+### Analyses (Premium)
+- `POST /api/analysis/summary` - Générer un résumé
+- `POST /api/analysis/feasibility-table` - Tableau de faisabilité
+- `POST /api/analysis/ask-question` - Poser une question
+- `GET /api/analysis/history` - Historique des analyses
+
+### Paiements
+- `POST /api/payment/create-checkout-session` - Créer une session Stripe
+- `POST /api/payment/webhook` - Webhook Stripe
+- `GET /api/payment/subscription-status` - Statut de l'abonnement
+- `POST /api/payment/cancel-subscription` - Annuler l'abonnement
+
+## Déploiement
+
+### Heroku
+1. Créer une application Heroku
+2. Ajouter les variables d'environnement
+3. Déployer avec Git
+
+### Docker
+Un Dockerfile peut être créé pour containeriser l'application.
+
+## Sécurité
+
+- Sessions sécurisées avec express-session
+- Mots de passe hashés avec bcrypt
+- Protection CSRF
+- Validation des entrées utilisateur
+- Limitation du taux de requêtes recommandée
+
+## Contribution
+
+Les contributions sont les bienvenues ! Merci de :
+1. Fork le projet
+2. Créer une branche feature
+3. Commiter vos changements
+4. Pusher vers la branche
+5. Ouvrir une Pull Request
+
+## Licence
+
+Ce projet est sous licence MIT. 

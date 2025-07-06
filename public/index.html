@@ -237,6 +237,86 @@
             background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
         }
 
+        .action-btn.ai-analysis-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            animation: ai-glow 2s ease-in-out infinite alternate;
+        }
+
+        .action-btn.ai-analysis-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #667eea, #764ba2);
+            border-radius: inherit;
+            z-index: -1;
+            animation: ai-border 3s linear infinite;
+        }
+
+        @keyframes ai-glow {
+            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6), 0 0 40px rgba(118, 75, 162, 0.4); }
+        }
+
+        @keyframes ai-border {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ai-analysis-result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-analysis-result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: ai-scan 2s ease-in-out infinite;
+        }
+
+        @keyframes ai-scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .constraint-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .constraint-severity-high {
+            border-left-color: #dc3545;
+        }
+
+        .constraint-severity-medium {
+            border-left-color: #ffc107;
+        }
+
+        .constraint-severity-low {
+            border-left-color: #28a745;
+        }
+
         .loading {
             text-align: center;
             padding: 40px;
@@ -392,6 +472,65 @@
             margin-top: 30px;
             border-top: 1px solid #e9ecef;
         }
+
+        /* Animation de chargement */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .floating-ai-btn {
+            position: fixed;
+            top: 50%;
+            right: 25px;
+            transform: translateY(-50%);
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            font-size: 32px;
+            display: none; /* par défaut */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1500;
+            box-shadow: 0 10px 25px rgba(102,126,234,0.45);
+            animation: floaty 4s ease-in-out infinite;
+        }
+        @keyframes floaty {
+            0% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(calc(-50% - 6px)) translateX(-4px); }
+            100% { transform: translateY(-50%) translateX(0); }
+        }
+        .floating-ai-btn:hover { box-shadow: 0 15px 35px rgba(102,126,234,0.6); }
+        /* bulle de dialogue */
+        .floating-ai-btn .ai-bubble {
+            position: absolute;
+            right: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .floating-ai-btn.show-bubble .ai-bubble { opacity: 1; }
+
+        /* Tableau des contraintes */
+        .constraints-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .constraints-table th, .constraints-table td { padding: 10px 12px; border: 1px solid #dee2e6; text-align: left; }
+        .constraints-table th { background: #f1f3f5; font-weight: 600; }
+        .severity-high { background: #f8d7da; color: #721c24; }
+        .severity-medium { background: #fff3cd; color: #856404; }
+        .severity-low { background: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
@@ -416,6 +555,8 @@
                 <button class="search-btn" id="searchBtn">🔍</button>
                 <div class="suggestions" id="suggestions"></div>
             </div>
+            
+
         </div>
 
         <div class="results-container" id="resultsContainer">
@@ -472,8 +613,8 @@
 
                 <!-- Actions -->
                 <div class="actions-container">
-                    <button class="action-btn" onclick="generatePDF()">
-                        📄 Générer Rapport PDF
+                    <button class="action-btn ai-analysis-btn" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
+                        🤖 Analyse IA Contraintes
                     </button>
                     <button class="action-btn secondary" id="rdppfBtn">
                         📋 Télécharger RDPPF
@@ -485,13 +626,24 @@
                         🔄 Nouvelle Recherche
                     </button>
                 </div>
+                
+                <!-- Résultats de l'analyse IA -->
+                <div id="aiAnalysisResults" style="display: none;"></div>
             </div>
         </div>
     </div>
 
+    <!-- Bouton flottant IA -->
+    <button id="floatingAiBtn" class="floating-ai-btn" onclick="performAIAnalysis()" title="Analyse IA">
+        🤖
+        <span class="ai-bubble" id="aiBubble">Je peux analyser cette parcelle :)</span>
+    </button>
+
     <footer class="footer">
         DDOT - Projet en cours de développement.<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
     </footer>
+
+
 
     <!-- Modal Authentification -->
     <div class="modal" id="authModal">
@@ -508,32 +660,23 @@
     </div>
 
     <script>
-        // Base de données des règlements communaux
-        const communalRegulations = {
-            'Sion': 'https://www.sion.ch/_doc/5100898',
-            'Martigny': 'https://www.martigny.ch/files/Constructions-Reglement.pdf',
-            'Chamoson': 'https://www.chamoson.net/files/49/construction-1.pdf',
-            'Collonges': 'https://www.vs.ch/documents/17311/5745820/19910612_coll_rccz.pdf',
-            'Savièse': 'https://www.saviese.ch/data/documents/reglements/communaux-bourgeoisiaux/reglement-constructions-zones.pdf',
-            'Val de Bagnes': 'https://www.valdebagnes.ch/_doc/3861622',
-            'Vollèges': 'https://www.valdebagnes.ch/_doc/3013939',
-            'Monthey': 'https://www.monthey.ch/documents/reglement-constructions.pdf',
-            'Sierre': 'https://www.sierre.ch/documents/reglement-urbanisme.pdf',
-            'Vétroz': 'https://www.vetroz.ch/documents/reglement-construction.pdf',
-            'Conthey': 'https://www.conthey.ch/documents/reglement-zones.pdf',
-            'Fully': 'https://www.fully.ch/documents/reglement-constructions.pdf',
-            'Ayent': 'https://www.ayent.ch/documents/reglement-construction.pdf',
-            'Nendaz': 'https://www.nendaz.ch/documents/reglement-urbanisme.pdf',
-            'Leytron': 'https://www.leytron.ch/documents/reglement-constructions.pdf',
-            'Riddes': 'https://www.riddes.ch/documents/reglement-zones.pdf',
-            'Saxon': 'https://www.saxon.ch/documents/reglement-construction.pdf',
-            'Orsières': 'https://www.orsieres.ch/documents/reglement-communal.pdf',
-            'Bovernier': 'https://www.bovernier.ch/documents/reglement-constructions.pdf'
-        };
+
 
         // Variables globales
         let currentData = null;
         let searchTimeout = null;
+
+        /**
+         * Extrait un numéro EGRID complet à partir du label d'une suggestion.
+         * Exemple de label : "Vétroz 2450 (CH 9952 1900 3076)"  →  "CH995219003076"
+         */
+        function extractEgridFromLabel(label) {
+            const match = label.match(/\(\s*CH\s*([0-9\s]+)\s*\)/i);
+            if (match && match[1]) {
+                return 'CH' + match[1].replace(/\s+/g, '');
+            }
+            return null;
+        }
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
@@ -562,6 +705,159 @@
             updateUserUI();
             if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
             if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+            // Afficher la barre des communes disponibles (23 communes VS) dès le chargement
+            const communesBarId = 'communesAvailableBar';
+            if (!document.getElementById(communesBarId)) {
+                const communes = ['Arbaz','Ardon','Ayent','Chamoson','Charrat','Conthey','Martigny','Mase','Mollens','Nax','Nendaz','Riddes','Saillon','Saint-Léonard','Salgesch','Savièse','Saxon','Sierre','Sion','Vernamiège','Vérrossaz','Vétroz'];
+                
+                // Créer le conteneur principal
+                const container = document.createElement('div');
+                container.id = communesBarId;
+                container.style.cssText = `
+                    background: #f8f9fa;
+                    border-bottom: 1px solid #e9ecef;
+                    padding: 30px 40px;
+                    margin: 0 0 30px 0;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                    animation: slideInFromTop 0.6s ease-out;
+                `;
+
+                // Tutoriel
+                const tutorial = document.createElement('div');
+                tutorial.style.cssText = `
+                    background: white;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    padding: 16px;
+                    margin-bottom: 16px;
+                    font-size: 0.9rem;
+                    line-height: 1.5;
+                    color: #495057;
+                    animation: fadeInUp 0.8s ease-out 0.2s both;
+                `;
+                tutorial.innerHTML = `
+                    <h4 style="margin: 0 0 8px 0; font-size: 1rem; font-weight: 600; color: #2c3e50;">
+                        Comment utiliser DDOT
+                    </h4>
+                    <p style="margin: 0 0 8px 0;">
+                        1. Saisissez une adresse, un numéro de parcelle ou une commune dans la barre de recherche
+                    </p>
+                    <p style="margin: 0 0 8px 0;">
+                        2. Consultez gratuitement les informations de base (parcelle, adresse, coordonnées)
+                    </p>
+                    <p style="margin: 0;">
+                        3. Utilisez les boutons d'action pour accéder aux analyses avancées et documents officiels
+                    </p>
+                `;
+
+                // Bandeau communes
+                const communesBar = document.createElement('div');
+                communesBar.style.cssText = `
+                    background: white;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    padding: 16px;
+                    font-size: 0.9rem;
+                    animation: fadeInUp 0.8s ease-out 0.4s both;
+                `;
+                communesBar.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: #2c3e50;">
+                            Communes du Valais Romand
+                        </h4>
+                        <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; color: #6c757d;">
+                            23 communes disponibles
+                        </span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        ${communes.map((commune, index) => `
+                            <button style="background: #f8f9fa; 
+                                         border: 1px solid #dee2e6; 
+                                         padding: 6px 12px; 
+                                         border-radius: 4px; 
+                                         font-size: 0.85rem; 
+                                         color: #495057;
+                                         cursor: pointer;
+                                         transition: all 0.3s ease;
+                                         font-family: inherit;
+                                         animation: fadeInScale 0.5s ease-out ${0.1 * index}s both;
+                                         transform: translateY(0);"
+                                  onmouseover="this.style.background='#e9ecef'; this.style.borderColor='#adb5bd'; this.style.transform='translateY(-2px) scale(1.05)';"
+                                  onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6'; this.style.transform='translateY(0) scale(1)';"
+                                   onclick="document.getElementById('searchInput').value='${commune}'; document.getElementById('searchInput').focus();">
+                                ${commune}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+
+                container.appendChild(tutorial);
+                container.appendChild(communesBar);
+
+                // Insérer juste après le header (ou en haut du corps si header absent)
+                const header = document.querySelector('.header');
+                if (header && header.parentElement) {
+                    // Insérer dans le même conteneur que le reste pour l'alignement
+                    const searchSection = document.querySelector('.search-section');
+                    if (searchSection) {
+                        searchSection.parentElement.insertBefore(container, searchSection);
+                    } else {
+                        header.parentElement.insertBefore(container, header.nextSibling);
+                    }
+                } else {
+                    document.body.insertBefore(container, document.body.firstChild);
+                }
+
+                // Ajouter les animations CSS
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideInFromTop {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    
+                    @keyframes fadeInUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(20px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    
+                    @keyframes fadeInScale {
+                        from {
+                            opacity: 0;
+                            transform: scale(0.8);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+                    
+                    /* Animation pour les suggestions */
+                    .suggestion-item {
+                        animation: fadeInUp 0.3s ease-out;
+                    }
+                    
+                    /* Animation pour les résultats */
+                    .analysis-section {
+                        animation: fadeInUp 0.6s ease-out;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         });
 
         function handleSearchInput() {
@@ -656,10 +952,52 @@
             showLoading();
 
             try {
+                // Tentative d'extraction directe de l'EGRID depuis le label
+                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
+
+                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
+                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
+                    try {
+                        // Utiliser l'API parcellaire suisse directe
+                        const response = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
+                        );
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Données parcelle:', data); // Pour debug
+                        }
+                        
+                        // Essayer avec l'API cadastre
+                        const cadastreResponse = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
+                        );
+                        
+                        if (cadastreResponse.ok) {
+                            const cadastreData = await cadastreResponse.json();
+                            console.log('Données cadastre:', cadastreData); // Pour debug
+                            
+                            if (cadastreData.results && cadastreData.results.length > 0) {
+                                for (let cadastreResult of cadastreData.results) {
+                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
+                                        egridComplet = cadastreResult.attributes.egrid;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Erreur récupération EGRID:', error);
+                    }
+                }
+
                 // Créer les données directement avec le résultat de la suggestion
+                const parcelNumber = result.attrs.number || extractParcelNumber(result.attrs.label);
+                const cleanedAddress = cleanAddress(result.attrs);
+
                 currentData = {
                     general: {
-                        adresse: result.attrs.label.replace(/<[^>]*>/g, ''),
+                        adresse: cleanedAddress || 'Adresse non disponible',
                         coordonnees: result.attrs.x && result.attrs.y ? 
                             `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
                             'Coordonnées non disponibles',
@@ -668,7 +1006,8 @@
                         type_objet: result.attrs.origin || 'Parcelle'
                     },
                     cadastral: {
-                        id_federal: result.attrs.featureId || result.id || 'Non disponible',
+                        id_federal: egridComplet,
+                        parcel_number: parcelNumber || 'Indisponible',
                         commune: extractCommune(result.attrs.label),
                         canton: 'Valais (VS)',
                         statut: 'Données publiques GeoAdmin',
@@ -680,6 +1019,12 @@
                     }
                 };
                 
+                // Chercher adresse officielle
+                if (result.attrs.x && result.attrs.y) {
+                    const officialAddress = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
+                    if (officialAddress) currentData.general.adresse = officialAddress;
+                }
+
                 displayResults(currentData);
 
             } catch (error) {
@@ -716,10 +1061,52 @@
 
                 const result = searchData.results[0];
                 
+                // Tentative d'extraction directe de l'EGRID depuis le label
+                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
+
+                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
+                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
+                    try {
+                        // Utiliser l'API parcellaire suisse directe
+                        const response = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
+                        );
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Données parcelle:', data); // Pour debug
+                        }
+                        
+                        // Essayer avec l'API cadastre
+                        const cadastreResponse = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
+                        );
+                        
+                        if (cadastreResponse.ok) {
+                            const cadastreData = await cadastreResponse.json();
+                            console.log('Données cadastre:', cadastreData); // Pour debug
+                            
+                            if (cadastreData.results && cadastreData.results.length > 0) {
+                                for (let cadastreResult of cadastreData.results) {
+                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
+                                        egridComplet = cadastreResult.attributes.egrid;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Erreur récupération EGRID:', error);
+                    }
+                }
+                
                 // Créer les données avec les informations GeoAdmin
+                const parcelNumber2 = result.attrs.number || extractParcelNumber(result.attrs.label);
+                const cleanedAddress2 = cleanAddress(result.attrs);
+
                 currentData = {
                     general: {
-                        adresse: result.attrs.label.replace(/<[^>]*>/g, ''),
+                        adresse: cleanedAddress2 || 'Adresse non disponible',
                         coordonnees: result.attrs.x && result.attrs.y ? 
                             `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
                             'Coordonnées non disponibles',
@@ -728,7 +1115,8 @@
                         type_objet: result.attrs.origin || 'Parcelle'
                     },
                     cadastral: {
-                        id_federal: result.attrs.featureId || result.id || 'Non disponible',
+                        id_federal: egridComplet,
+                        parcel_number: parcelNumber2 || 'Indisponible',
                         commune: extractCommune(result.attrs.label),
                         canton: 'Valais (VS)',
                         statut: 'Données publiques GeoAdmin',
@@ -740,6 +1128,12 @@
                     }
                 };
                 
+                // Chercher adresse officielle
+                if (result.attrs.x && result.attrs.y) {
+                    const officialAddress2 = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
+                    if (officialAddress2) currentData.general.adresse = officialAddress2;
+                }
+
                 displayResults(currentData);
 
             } catch (error) {
@@ -781,93 +1175,93 @@
             // Informations générales
             generalInfo.innerHTML = `
                 <div class="info-item">
-                    <div class="info-label">Adresse/Localisation</div>
-                    <div class="info-value">${data.general.adresse}</div>
+                    <div class="info-label">N° de parcelle</div>
+                    <div class="info-value">${data.cadastral.parcel_number}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Adresse postale</div>
+                    <div class="info-value" id="addressValue">${data.general.adresse}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Commune / Canton</div>
+                    <div class="info-value">${data.cadastral.commune} (${data.cadastral.canton})</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Coordonnées</div>
                     <div class="info-value">${data.general.coordonnees}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Système de référence</div>
-                    <div class="info-value">${data.general.systeme_ref}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Date d'analyse</div>
-                    <div class="info-value">${data.general.date_analyse}</div>
-                </div>
             `;
 
-            // Informations cadastrales publiques
-            ownersInfo.innerHTML = `
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">ID Fédéral</div>
-                        <div class="info-value">${data.cadastral.id_federal}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Commune</div>
-                        <div class="info-value">${data.cadastral.commune}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Canton</div>
-                        <div class="info-value">${data.cadastral.canton}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Source des données</div>
-                        <div class="info-value">${data.cadastral.statut}</div>
-                    </div>
-                </div>
-                <div style="margin-top: 15px; padding: 15px; background: #e3f2fd; border-radius: 10px; border-left: 4px solid #2196f3;">
-                    <p><strong>ℹ️ Informations importantes :</strong></p>
-                    <ul style="margin: 10px 0; padding-left: 20px;">
-                        <li>Les données de propriétaires ne sont pas publiques</li>
-                        <li>Pour les informations détaillées : contactez le cadastre communal</li>
-                        <li>Consultez le règlement communal pour les contraintes de construction</li>
-                    </ul>
-                </div>
-            `;
+            // Carte Google Maps / Street View
+            const mapContainerId = 'streetViewContainer';
+            let latLngUrl = '';
+            let mapContainer = document.getElementById(mapContainerId);
+            if (!mapContainer) {
+                mapContainer = document.createElement('div');
+                mapContainer.id = mapContainerId;
+                mapContainer.style.marginTop = '25px';
+                generalInfo.parentElement?.appendChild(mapContainer);
+            }
 
-            // Détails de la parcelle
-            cadastralInfo.innerHTML = `
-                <div class="info-item">
-                    <div class="info-label">Bounding Box</div>
-                    <div class="info-value">${data.cadastral.bbox}</div>
-                </div>
-                <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 10px; border-left: 4px solid #ffc107;">
-                    <p><strong>📋 Informations complémentaires disponibles :</strong></p>
-                    <ul style="margin: 10px 0; padding-left: 20px;">
-                        <li>Surface exacte de la parcelle</li>
-                        <li>Limites cadastrales précises</li>
-                        <li>Servitudes et charges foncières</li>
-                        <li>Données de propriétaire</li>
-                    </ul>
-                    <p><em>Contactez le service du cadastre de ${data.cadastral.commune} pour ces informations.</em></p>
-                </div>
-            `;
+            // Conversion LV95 -> WGS84 pour Google Maps
+            function lv95toWgs(easting, northing) {
+                const y = (easting - 2600000) / 1000000;
+                const x = (northing - 1200000) / 1000000;
+                let lat = 16.9023892 + 3.238272 * x - 0.270978 * y * y - 0.002528 * x * x - 0.0447 * y * y * x - 0.0140 * x * x * x;
+                let lng = 2.6779094 + 4.728982 * y + 0.791484 * y * x + 0.1306 * y * x * x - 0.0436 * y * y * y;
+                lat = (lat * 100) / 36;
+                lng = (lng * 100) / 36;
+                return { lat, lng };
+            }
 
-            // Zonage public
-            zoningInfo.innerHTML = `
-                <div class="info-item">
-                    <div class="info-label">Source d'information</div>
-                    <div class="info-value">${data.zonage.source}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Recommandation</div>
-                    <div class="info-value">${data.zonage.note}</div>
-                </div>
-                <div style="margin-top: 15px; padding: 15px; background: #d4edda; border-radius: 10px; border-left: 4px solid #28a745;">
-                    <p><strong>🏗️ Informations d'aménagement disponibles dans le règlement :</strong></p>
-                    <ul style="margin: 10px 0; padding-left: 20px;">
-                        <li>Zone d'affectation</li>
-                        <li>Indice d'utilisation du sol</li>
-                        <li>Hauteur maximale des constructions</li>
-                        <li>Distance aux limites</li>
-                        <li>Coefficient d'occupation du sol</li>
-                        <li>Prescriptions architecturales</li>
-                    </ul>
-                </div>
-            `;
+            let coordParts = data.general.coordonnees.split(',').map(p => parseFloat(p.trim()));
+            if (coordParts.length === 2 && !isNaN(coordParts[0]) && !isNaN(coordParts[1])) {
+                // Identifier est/nord : l'est est généralement > 2 500 000
+                let east = coordParts[0];
+                let north = coordParts[1];
+                if (coordParts[0] < coordParts[1]) { // inverser si nécessaire
+                    east = coordParts[1];
+                    north = coordParts[0];
+                }
+
+                const { lat, lng } = lv95toWgs(east, north);
+                latLngUrl = `${lat},${lng}`;
+            } else {
+                // Fallback à l'adresse si conversion impossible
+                latLngUrl = encodeURIComponent(data.general.adresse);
+            }
+
+            mapContainer.innerHTML = `
+                <iframe width="100%" height="450" style="border:0; border-radius:10px;" loading="lazy"
+                    src="https://www.google.com/maps?q=${latLngUrl}&layer=c&output=svembed&z=17">
+                </iframe>`;
+
+            // Mise à jour adresse via reverse-geocoding OSM
+            if (latLngUrl.includes(',')) {
+                const [latStr,lngStr] = latLngUrl.split(',');
+                fetchReverseAddress(latStr.trim(), lngStr.trim()).then(addr => {
+                    if (addr) {
+                        const span = document.getElementById('addressValue');
+                        if (span) span.textContent = addr;
+                    } else {
+                        fetchGoogleAddress(latStr.trim(),lngStr.trim()).then(ga=>{
+                            if(ga){
+                                const span=document.getElementById('addressValue');
+                                if(span) span.textContent=ga;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Masquer complètement les sections détaillées inutiles
+            ['ownersInfo', 'cadastralInfo', 'zoningInfo'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const section = el.closest('.analysis-section');
+                    if (section) section.style.display = 'none';
+                }
+            });
 
             // Cacher la section potentiel de développement
             const developmentSection = document.querySelector('#developmentInfo');
@@ -883,12 +1277,41 @@
         }
 
         function setupActionButtons(data) {
+            // Liste des communes éligibles
+            const allowed=["Arbaz","Ardon","Ayent","Chamoson","Charrat","Conthey","Martigny","Mase","Mollens","Nax","Nendaz","Riddes","Saillon","Saint-Léonard","Salgesch","Savièse","Saxon","Sierre","Sion","Vernamiège","Vérrossaz","Vétroz"];
+
+            // Gérer le bouton flottant
+            const floatBtn=document.getElementById('floatingAiBtn');
+            if(floatBtn){
+                if(allowed.includes(data.cadastral.commune)){
+                    floatBtn.style.display='flex';
+                    floatBtn.classList.add('show-bubble');
+                }else{
+                    floatBtn.style.display='none';
+                    floatBtn.classList.remove('show-bubble');
+                }
+            }
+
+            // masquer l'ancien bouton IA
+            const aiAnalysisBtn=document.getElementById('aiAnalysisBtn');
+            if(aiAnalysisBtn) aiAnalysisBtn.style.display='none';
+
             // Bouton RDPPF
             const rdppfBtn = document.getElementById('rdppfBtn');
             if (rdppfBtn) {
-                rdppfBtn.onclick = () => {
-                    window.open(`https://www.rdppf.admin.ch/`, '_blank');
-                };
+                const egridVal = data.cadastral.id_federal;
+
+                if (egridVal && egridVal !== 'Non disponible') {
+                    rdppfBtn.onclick = () => {
+                        window.open(`https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egridVal}&LANG=fr`, '_blank');
+                    };
+                    rdppfBtn.innerHTML = '📋 Télécharger RDPPF';
+                } else {
+                    rdppfBtn.onclick = () => {
+                        window.open('https://www.rdppf.admin.ch/', '_blank');
+                    };
+                    rdppfBtn.innerHTML = '📋 RDPPF Général';
+                }
             }
 
             // Bouton Règlement Communal
@@ -896,9 +1319,10 @@
             if (regulationBtn) {
                 const communeKey = data.cadastral.commune;
                 
-                if (communalRegulations[communeKey]) {
+                // Utiliser l'API route pour télécharger les PDFs locaux
+                if (communeKey) {
                     regulationBtn.onclick = () => {
-                        window.open(communalRegulations[communeKey], '_blank');
+                        window.open(`/api/regulation/${communeKey}`, '_blank');
                     };
                     regulationBtn.style.display = 'inline-flex';
                     regulationBtn.innerHTML = '📚 Règlement Communal';
@@ -957,6 +1381,132 @@
             doc.save(`parcelle-${currentData.cadastral.commune}-${currentData.general.date_analyse}.pdf`);
         }
 
+
+
+        // Fonction pour l'analyse IA automatique des contraintes
+        async function performAIAnalysis() {
+            if (!currentData) {
+                alert('Aucune parcelle sélectionnée');
+                return;
+            }
+
+            const actionBtn = document.getElementById('floatingAiBtn') || document.getElementById('aiAnalysisBtn');
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            
+            if (actionBtn) {
+                actionBtn.disabled = true;
+                actionBtn.innerHTML = '🔄';
+            }
+
+            // Afficher loader dans la zone résultats
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `
+                <div class="ai-analysis-result">
+                    <div class="section-header">
+                        <div class="section-icon">🤖</div>
+                        <h2 class="section-title">Analyse IA des Contraintes</h2>
+                    </div>
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #667eea; border-radius: 50%; border-top: 3px solid transparent; animation: spin 1s linear infinite;"></div>
+                        <h4 style="margin-top: 20px; color: #667eea;">Analyse en cours...</h4>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        searchQuery: currentData.general?.adresse || currentData.cadastral?.id_federal || currentData.cadastral?.commune
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'analyse');
+                }
+
+                const analysisResult = await response.json();
+                
+                displayAIAnalysisResults(analysisResult);
+
+            } catch (error) {
+                console.error('Erreur analyse IA:', error);
+                resultsDiv.innerHTML = `
+                    <div class="ai-analysis-result">
+                        <div class="section-header">
+                            <div class="section-icon">❌</div>
+                            <h2 class="section-title">Erreur</h2>
+                        </div>
+                        <div style="padding: 20px; color: #dc3545;">
+                            <p>${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            } finally {
+                if (actionBtn) {
+                    actionBtn.disabled = false;
+                    actionBtn.innerHTML = '🤖';
+                }
+            }
+        }
+
+        function displayAIAnalysisResults(result) {
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            
+            if (typeof result.constraints === 'string') {
+                // Afficher la synthèse telle quelle
+                resultsDiv.innerHTML = `
+                    <div class="ai-analysis-result">
+                        <div class="section-header">
+                            <div class="section-icon">🤖</div>
+                            <h2 class="section-title">Synthèse IA</h2>
+                        </div>
+                        <div style="white-space:pre-wrap;line-height:1.6;padding:15px;">${result.constraints}</div>
+                    </div>`;
+                return;
+            }
+
+            let rows = '';
+            if (Array.isArray(result.constraints) && result.constraints.length) {
+                result.constraints.forEach(c => {
+                    const sevClass = c.severity ? `severity-${c.severity}` : '';
+                    rows += `<tr class="${sevClass}"><td>${c.title || ''}</td><td>${c.severity || ''}</td><td>${c.description || ''}</td></tr>`;
+                });
+            } else {
+                rows = '<tr><td colspan="3" style="text-align:center;">Aucune contrainte détectée.</td></tr>';
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="ai-analysis-result">
+                    <div class="section-header">
+                        <div class="section-icon">🤖</div>
+                        <h2 class="section-title">Contraintes de la parcelle</h2>
+                    </div>
+                    <table class="constraints-table">
+                        <thead>
+                            <tr>
+                                <th>Contrainte</th>
+                                <th>Niveau</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    ${result.recommendations ? `
+                        <div style="margin-top:20px;background:#e8f5e8;padding:15px;border-left:4px solid #28a745;border-radius:10px;">
+                            <h4 style="color: #155724; margin-bottom: 15px;">💡 Recommandations</h4>
+                            <div style="line-height: 1.6; color: #155724;">
+                                ${result.recommendations}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
         function showLoading() {
             const resultsContainer = document.getElementById('resultsContainer');
             const loading = document.getElementById('loading');
@@ -989,11 +1539,16 @@
         function newSearch() {
             const resultsContainer = document.getElementById('resultsContainer');
             const searchInput = document.getElementById('searchInput');
+            const floatBtn = document.getElementById('floatingAiBtn');
             
             if (resultsContainer) resultsContainer.style.display = 'none';
             if (searchInput) {
                 searchInput.value = '';
                 searchInput.focus();
+            }
+            if (floatBtn) {
+                floatBtn.style.display = 'none';
+                floatBtn.classList.remove('show-bubble');
             }
             currentData = null;
         }
@@ -1085,6 +1640,102 @@
                 closeAuthModal();
                 updateUserUI();
             }
+        }
+
+        // === Fonctions utilitaires ===
+        function extractParcelNumber(label) {
+            const match = label.replace(/<[^>]+>/g, '').match(/Parcelle\s*(\d+[a-zA-Z0-9\-]*)/i);
+            if (match) return match[1];
+            const num = label.replace(/<[^>]+>/g, '').match(/\b(\d{3,})\b/);
+            return num ? num[1] : null;
+        }
+
+        function cleanAddress(attrs) {
+            // On privilégie le champ detail si disponible
+            if (attrs.detail && attrs.detail.length > 3) return attrs.detail;
+
+            let txt = attrs.label.replace(/<[^>]+>/g, '');
+
+            // Supprimer la mention Parcelle xxx
+            txt = txt.replace(/Parcelle\s*\d+[a-zA-Z0-9\-]*,?/i, '');
+
+            // Supprimer un éventuel code EGRID (CH + chiffres)
+            txt = txt.replace(/\bCH?\d{8,}\b/gi, '');
+
+            // Supprimer un identifiant numérique (5+ chiffres) en début ou fin de chaîne
+            txt = txt.replace(/^\d{5,}\s*/, '').replace(/\s*\d{5,}$/,'');
+
+            // Supprimer les doubles espaces et virgules inutiles
+            txt = txt.replace(/\s{2,}/g, ' ').replace(/,\s*,/g, ',').trim();
+
+            return txt;
+        }
+
+        // Récupérer l'adresse officielle via la couche des adresses GEOAdmin
+        async function fetchOfficialAddress(easting, northing) {
+            try {
+                const url = `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?geometry=${easting},${northing}&geometryFormat=geojson&geometryType=esriGeometryPoint&layers=all:ch.swisstopo.amtliches-gebaeudeadressverzeichnis&tolerance=10&mapExtent=${easting-100},${northing-100},${easting+100},${northing+100}&imageDisplay=100,100,96&lang=fr`;
+                const response = await fetch(url);
+                if (!response.ok) return null;
+                const data = await response.json();
+                if (data.results && data.results.length > 0) {
+                    const attrs = data.results[0].attributes || {};
+                    // Champs possibles : "strname1", "strname2", "streetname", "number", "plz", "zip", "localname"...
+                    const street = attrs.strname1 || attrs.streetname || '';
+                    const num = attrs.number || attrs.hausnr || '';
+                    const zip = attrs.plz || attrs.zip || '';
+                    const city = attrs.localname || attrs.locality || attrs.city || '';
+                    if (street && num && zip && city) {
+                        return `${street} ${num}, ${zip} ${city}`;
+                    }
+                }
+            } catch (err) {
+                console.error('Erreur fetchOfficialAddress:', err);
+            }
+            return null;
+        }
+
+        async function fetchReverseAddress(lat, lng) {
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=fr`);
+                if (!resp.ok) return null;
+                const json = await resp.json();
+                if (json && json.address) {
+                    const a = json.address;
+                    const street = a.road || a.street || a.residential || a.path || '';
+                    const num = a.house_number || '';
+                    const postcode = a.postcode || '';
+                    const city = a.city || a.town || a.village || a.hamlet || a.municipality || '';
+                    if (street && num && postcode && city) {
+                        return `${street} ${num}, ${postcode} ${city}`;
+                    }
+                    if (street && postcode && city) {
+                        return `${street}, ${postcode} ${city}`;
+                    }
+                    if (street && city) {
+                        return `${street}, ${city}`;
+                    }
+                    if (json.display_name) {
+                        // fallback: prendre les deux premiers éléments du display_name
+                        const parts = json.display_name.split(',').map(p=>p.trim());
+                        return parts.slice(0,3).join(', ');
+                    }
+                }
+                return null;
+            } catch(e) {console.error('reverse geocode err',e); return null;}
+        }
+
+        async function fetchGoogleAddress(lat,lng){
+            try{
+                const url=`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=fr&sensor=false`;
+                const resp=await fetch(url);
+                if(!resp.ok) return null;
+                const j=await resp.json();
+                if(j.status==='OK'&&j.results&&j.results.length){
+                    return j.results[0].formatted_address;
+                }
+            }catch(e){console.error('google geocode err',e);}
+            return null;
         }
     </script>
 </body>

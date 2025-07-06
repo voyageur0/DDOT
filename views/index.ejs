@@ -1,0 +1,172 @@
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Analyse Intelligente de Documents d'Urbanisme</h1>
+        <p class="lead mb-4">Exploitez la puissance de l'IA pour analyser vos règlements d'urbanisme et extraits de cadastre</p>
+        <% if (!user) { %>
+            <a href="/register" class="btn btn-light btn-lg me-3">
+                <i class="bi bi-person-plus"></i> Commencer Gratuitement
+            </a>
+            <a href="/login" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-box-arrow-in-right"></i> Se Connecter
+            </a>
+        <% } else { %>
+            <a href="/dashboard" class="btn btn-light btn-lg">
+                <i class="bi bi-speedometer2"></i> Accéder au Tableau de Bord
+            </a>
+        <% } %>
+    </div>
+</div>
+
+<!-- Communes Valais Section -->
+<div class="bg-warning py-4 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="mb-2 text-dark">
+                    <i class="bi bi-mountain"></i> Règlements du Valais Romand disponibles
+                </h4>
+                <p class="mb-0 text-dark">
+                    Analyse complète disponible pour <strong>23 communes</strong> : 
+                    Arbaz, Ardon, Ayent, Chamoson, Charrat, Conthey, Martigny, Mase, Mollens, 
+                    Nax, Nendaz, Riddes, Saillon, Saint-Léonard, Salgesch, Savièse, Saxon, 
+                    Sierre, Sion, Vernamiège, Vérrossaz, Vétroz et plus...
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <span class="badge bg-success fs-6 p-2">
+                    <i class="bi bi-check-circle"></i> Base de données complète
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">Nos Fonctionnalités</h2>
+    
+    <div class="row">
+        <!-- Fonctionnalités Gratuites -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-4">Version Gratuite</h3>
+                    <div class="row">
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-file-earmark-pdf feature-icon"></i>
+                            <h5>Extraction PDF</h5>
+                            <p>Extraction automatique du texte et des tableaux</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-table feature-icon"></i>
+                            <h5>Données Structurées</h5>
+                            <p>Affichage des règles d'urbanisme extraites</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-search feature-icon"></i>
+                            <h5>Recherche Sémantique</h5>
+                            <p>Trouvez rapidement les informations pertinentes</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-graph-up feature-icon"></i>
+                            <h5>Analyse de Base</h5>
+                            <p>Visualisation des coefficients et contraintes</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="text-success">Gratuit</h4>
+                        <p>Accès illimité aux fonctionnalités de base</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fonctionnalités Premium -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-4">
+                        Version Premium
+                        <span class="premium-badge">PREMIUM</span>
+                    </h3>
+                    <div class="row">
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-robot feature-icon text-warning"></i>
+                            <h5>Synthèse IA</h5>
+                            <p>Résumés intelligents générés par GPT</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-clipboard-check feature-icon text-warning"></i>
+                            <h5>Tableau de Faisabilité</h5>
+                            <p>Analyse automatique de conformité</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-chat-dots feature-icon text-warning"></i>
+                            <h5>Questions-Réponses</h5>
+                            <p>Posez vos questions à l'IA</p>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <i class="bi bi-file-earmark-richtext feature-icon text-warning"></i>
+                            <h5>Rapports Détaillés</h5>
+                            <p>Exportez des analyses complètes</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h4 class="text-warning">19,99€/mois</h4>
+                        <p>Accès illimité à toutes les fonctionnalités IA</p>
+                        <% if (user && !user.isPremium) { %>
+                            <button class="btn btn-warning btn-lg" onclick="subscribeToPremium()">
+                                <i class="bi bi-star-fill"></i> Passer Premium
+                            </button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">Comment ça marche ?</h2>
+    <div class="row">
+        <div class="col-md-4 text-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                <h3 class="mb-0">1</h3>
+            </div>
+            <h4 class="mt-3">Uploadez votre PDF</h4>
+            <p>Téléchargez votre règlement d'urbanisme ou extrait de cadastre</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                <h3 class="mb-0">2</h3>
+            </div>
+            <h4 class="mt-3">Analyse Automatique</h4>
+            <p>Notre système extrait et structure les données importantes</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                <h3 class="mb-0">3</h3>
+            </div>
+            <h4 class="mt-3">Exploitez les Résultats</h4>
+            <p>Consultez les données extraites et utilisez l'IA pour approfondir</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Prêt à simplifier vos analyses d'urbanisme ?</h2>
+        <% if (!user) { %>
+            <a href="/register" class="btn btn-primary btn-lg">
+                <i class="bi bi-rocket-takeoff"></i> Commencer Maintenant
+            </a>
+        <% } else { %>
+            <a href="/dashboard" class="btn btn-primary btn-lg">
+                <i class="bi bi-upload"></i> Analyser un Document
+            </a>
+        <% } %>
+    </div>
+</div> 

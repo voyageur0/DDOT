@@ -1,0 +1,1313 @@
+{
+  "analysis": {
+    "searchQuery": "12558 vetroz 6025 ch773017495270",
+    "searchResult": {
+      "egrid": "CH773017495270",
+      "number": "<b>Vétroz</b> 12558 (CH 7730 1749 5270)",
+      "municipality": "",
+      "canton": "VS",
+      "center": {
+        "x": 2586790,
+        "y": 1118777.25
+      }
+    },
+    "parcelDetails": null,
+    "geocodeResult": null,
+    "zones": {},
+    "geologicalInfo": {},
+    "buildingZone": {},
+    "plrData": null,
+    "communalRegulations": [],
+    "hazardAssessment": {
+      "coordinates": {
+        "x": 2586790,
+        "y": 1118777.25
+      },
+      "municipality": "Vétroz",
+      "dangerZones": [],
+      "generalRecommendations": [
+        "Aucun danger naturel majeur identifié"
+      ],
+      "mapUrls": [
+        "https://map.geo.vs.ch/?theme=dangers&E=2586790&N=1118777.25&zoom=6",
+        "https://map.geo.admin.ch/?topic=bafu&lang=fr&bgLayer=ch.swisstopo.pixelkarte-farbe&E=2586790&N=1118777.25&zoom=6&layers=ch.bafu.gefahren-steinschlag,ch.bafu.gefahren-rutschung,ch.bafu.gefahren-ueberschwemmung"
+      ],
+      "seismicZone": "Zone sismique à déterminer",
+      "radonRisk": "Risque radon à déterminer"
+    },
+    "additionalData": [],
+    "communalConstraints": [
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le présent règlement a pour but d'organiser la construction afin de préserver le bien être de tous les habitants par une conception et une exécution des bâtiments conformes aux règles de la sécurité, de l'hygiène et de l'esthétique.",
+        "article": "Art 1"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Il définit les droits et les devoirs en matière de constructions, d'utilisation du sol, de qualité du milieu bâti et de protection de son environnement.",
+        "article": "Art 1"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les présentes dispositions sont valables pour l'ensemble du territoire de la Commune de Vétroz.",
+        "article": "Art 4"
+      },
+      {
+        "zone": "*",
+        "theme": "Procédure",
+        "rule": "Sont subordonnés à une autorisation de construire toutes les constructions, installations et objets auxquels s'appliquent les dispositions relatives au droit des constructions et de l'aménagement du territoire.",
+        "article": "Art 5"
+      },
+      {
+        "zone": "*",
+        "theme": "Procédure",
+        "rule": "Cette exigence est applicable aux projets tels que la construction, la reconstruction, la transformation ainsi que l'agrandissement de bâtiments, de corps de bâtiments et de leurs annexes.",
+        "article": "Art 5"
+      },
+      {
+        "zone": "*",
+        "theme": "Procédure",
+        "rule": "La démolition totale ou partielle de constructions et installations existantes est également soumise à autorisation.",
+        "article": "Art 5"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les places de stationnement doivent être conformes aux prescriptions en matière de circulation et d'accès à la voie publique.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les places de jeux pour enfants et les espaces extérieurs doivent être aménagés conformément aux normes de sécurité et d'accessibilité.",
+        "article": "Art 32"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les constructions doivent respecter les distances minimales à la limite de propriété et les gabarits définis par le règlement.",
+        "article": "Art 104"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les toitures doivent être conçues en respectant les normes esthétiques et fonctionnelles définies par le règlement.",
+        "article": "Art 109"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "L'indice d'utilisation (densité) est défini pour chaque zone et doit être respecté lors de la construction.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les constructions doivent respecter les prescriptions architecturales en matière d'esthétique, d'orientation et d'ordonnance des façades.",
+        "article": "Art 45"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "La demande d'autorisation doit être adressée à l'autorité communale sous forme de dossier plié au format A4.",
+        "article": "Art 8"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Une demande de renseignements sur les possibilités de construire sur un fonds déterminé peut être déposée auprès de l'autorité communale.",
+        "article": "Art 6"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les modifications apportées à des bâtiments ou parties de bâtiments classés ou inventoriés doivent respecter les prescriptions applicables à la zone.",
+        "article": "5.2 g)"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les projets qui échappent totalement ou partiellement à la souveraineté cantonale en matière de construction ne sont pas soumis à autorisation.",
+        "article": "5.3 a)"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Le calcul justificatif de l'indice d'utilisation du sol doit être inclus dans la demande d'autorisation.",
+        "article": "Art 8 e)"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les modifications de toiture ainsi que l'apport de matériaux nouveaux lors de travaux de rénovation nécessitent une autorisation.",
+        "article": "5.2 g)"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les modifications de l'aspect extérieur telles que la modification des façades et le changement de couleur des façades nécessitent une autorisation.",
+        "article": "5.2 g)"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Le plan de situation doit indiquer les places de parc existantes ou projetées.",
+        "article": "Art 9 d)"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les installations de jeux pour enfants à caractère temporaire ne nécessitent pas d'autorisation si elles sont considérées comme petites constructions.",
+        "article": "5.3 c) 3 a)"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les aménagements extérieurs de jardins privés tels que les installations de jeux pour enfants ne nécessitent pas d'autorisation si elles respectent certaines conditions.",
+        "article": "5.3 c) 3 b)"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les plans de construction doivent être établis et dessinés dans les règles de l'art, à l'échelle 1:50 ou 1:100.",
+        "article": "Art 10"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les plans de construction doivent inclure les aménagements extérieurs avec les mouvements de terre, talus, murs de soutènement, clôtures fixes, places et accès.",
+        "article": "Art 10 d)"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les documents à joindre à la demande incluent des mesures pour l'accès aux personnes handicapées et âgées, des détails pour les places de camping, des informations sur les lieux d'extraction de matériaux, et d'autres documents utiles à l'examen de la demande.",
+        "article": "Art 11"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les projets situés à l'extérieur de la zone à bâtir nécessitent une autorisation de la Commission cantonale des constructions, sauf pour la zone des mayens de compétence communale.",
+        "article": "Art 17"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Pour les constructions industrielles, commerciales et hôtelières, le nombre probable de places de travail doit être indiqué dans la demande.",
+        "article": "Art 11"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La pose de gabarits est obligatoire avant l'ouverture de l'enquête publique pour indiquer l'implantation et les dimensions extérieures de la construction projetée.",
+        "article": "Art 13"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les gabarits doivent indiquer la hauteur des façades aux angles du bâtiment, y compris la hauteur de l'acrotère pour les toits plats et la hauteur du garde-corps pour les toitures accessibles.",
+        "article": "Art 13"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les places de camping, la surface totale du terrain et le nombre d'emplacements doivent être précisés dans la demande.",
+        "article": "Art 11"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les documents utiles à l'examen de la législation sur l'énergie et sur la protection de l'environnement doivent être fournis, ce qui peut inclure des espaces de jeux ou de détente.",
+        "article": "Art 11"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Pour des projets de constructions importants ou complexes, l'Administration communale peut exiger des documents supplémentaires, y compris des maquettes et des relevés topographiques.",
+        "article": "Art 13"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les décisions communales et/ou cantonales peuvent faire l'objet d'un recours motivé au Conseil d'Etat, dans les 30 jours dès leur notification.",
+        "article": "art. 18"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le recours n'a pas d'effet suspensif ; celui-ci peut toutefois être ordonné d'office ou sur requête.",
+        "article": "art. 18b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le bénéficiaire d'une autorisation de démolition totale ou partielle d'une construction ne peut en faire usage avant qu'elle ne soit exécutoire.",
+        "article": "art. 18b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "L’autorisation de construire est valable trois ans à partir de son entrée en force. La construction doit être commencée dans ce délai.",
+        "article": "art. 19a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Lorsqu'il s'agit d'un ensemble de constructions autorisées sous la forme d'une seule autorisation de construire, les constructions non commencées dans un délai de cinq ans doivent faire l'objet d'une nouvelle mise à l'enquête publique.",
+        "article": "art. 19b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Pour de justes motifs, le Conseil municipal peut prolonger de deux ans au plus la durée de validité d'une autorisation de construire.",
+        "article": "art. 19c"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les travaux peuvent être entrepris immédiatement après la notification de l'autorisation de construire, en l'absence d'opposition.",
+        "article": "art. 20a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Tout entrepreneur chargé d’une construction doit s'assurer que les autorisations requises ont été accordées.",
+        "article": "art. 20b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le bénéficiaire d'une autorisation de construire doit afficher, dès le début et pour la durée des travaux, l'attestation de l'autorisation à l'entrée du chantier.",
+        "article": "art. 20c"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le début anticipé des travaux peut être autorisé par l'autorité compétente, aux risques et périls du requérant.",
+        "article": "art. 20d"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "L'utilisation du domaine public pendant les travaux de construction nécessite une autorisation spéciale du Conseil Municipal.",
+        "article": "art. 21a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les travaux doivent être exécutés rapidement et sans interruption dans le délai imparti par l'autorité compétente.",
+        "article": "art. 21c"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les services communaux doivent être avisés par écrit du début et de la fin des travaux ainsi que de l'état d'avancement des constructions.",
+        "article": "art. 22a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Une modification du projet est possible lorsque les caractéristiques principales du projet demeurent inchangées.",
+        "article": "art. 23a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les services de l'administration communale veillent à l'exécution conforme des projets, ceci avant, pendant et après les travaux.",
+        "article": "art. 24a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "S'ils constatent des irrégularités, ils les signalent au maître de l'ouvrage en l'invitant à y remédier dans un délai déterminé.",
+        "article": "art. 24b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Sauf justes motifs, les travaux doivent être poursuivis sans interruption jusqu'à leur achèvement.",
+        "article": "art. 25a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Une construction neuve ou transformée, destinée à l'habitation ou au travail, ne peut être occupée ou exploitée sans l’obtention d'un permis d'habiter ou d'exploiter.",
+        "article": "art. 26a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les compétences de la Commission cantonale des constructions demeurent réservées.",
+        "article": "art. 26e"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Toute construction nouvelle ne peut être érigée que sur un terrain équipé.",
+        "article": "art. 27a"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Un terrain est considéré comme équipé lorsqu'il dispose de voies d'accès suffisantes et que les conduites d'eau, d'énergie et les égouts arrivent jusqu'au bien-fonds ou à proximité immédiate.",
+        "article": "art. 27b"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les zones à bâtir sont classées selon l'état de leur équipement en terrains propres à la construction, terrains propres à la construction dans les 5 ans, et autres terrains.",
+        "article": "art. 27d"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les routes communales se divisent en deux catégories : les routes principales et les routes secondaires.",
+        "article": "Art 29"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le Conseil municipal est compétent pour fixer ou procéder à un changement de catégorie des routes communales.",
+        "article": "Art 29"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Chaque propriétaire est tenu d'aménager, sur son terrain privé, un nombre de places de stationnement suffisant pour assurer le parcage de ses propres véhicules à moteur et ceux de ses clients ou visiteurs.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les habitations, il est exigé 2 places par 150 m2 de plancher utile de logement, mais au minimum 2 places par unité de logement.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les bureaux et commerces, il est exigé 1 place par 20 m2 de plancher utile, mais au minimum 1 place par unité d'exploitation.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les cafés-restaurants, il est exigé 1 place par 8 m2 de surface brute, mais au minimum 1 place pour 4 places assises.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les terrasses exploitées, il est exigé 1 place par 20 m2 de surface, mais au minimum 1 place pour 8 places assises.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les immeubles, il est exigé 1 place par logement avec en plus 1 place 'visiteur' par 3 logements.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour d'autres commerces, exploitations, industries ou écoles, le nombre de places sera calculé selon les normes de l'Union Suisse des Professionnels de la Route (USPR).",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "L'affectation des places de parc exigées peut être garantie par la constitution d'une servitude, inscrite au Registre foncier, en faveur de la Commune.",
+        "article": "Art 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "L'accès à la voie publique ne doit pas présenter de danger ou d'entrave pour la circulation des piétons et véhicules.",
+        "article": "Art 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les sorties de garages sur les voies publiques ne doivent pas avoir une déclivité supérieure à 15% et devront comporter un secteur horizontal d'au moins 3 m avant la limite de la chaussée et d'au moins 1 m avant celle du trottoir.",
+        "article": "Art 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La distance minimale d'un garage s'ouvrant du côté d'une voie publique est de 5 m de la limite de la chaussée ou du trottoir.",
+        "article": "Art 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La distance minimale entre un garage-atelier, un atelier mécanique ou une carrosserie et le bord de la chaussée ou du trottoir est de 20 m le long de la route cantonale et de 15 m le long des autres voies publiques.",
+        "article": "Art 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Des places de jeux pour enfants doivent être aménagées à l'écart de la circulation pour toute habitation collective de 4 appartements et plus, à raison de 20m2 au moins par logement, et de 80m2 au minimum.",
+        "article": "Art 32"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Ces places de jeux ne pourront pas servir à d'autres fins et peuvent être garanties par la constitution d'une servitude, inscrite au Registre foncier, en faveur de la Commune.",
+        "article": "Art 32"
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les espaces extérieurs doivent être aménagés en fonction des exigences d'un habitat de qualité.",
+        "article": "Art 32"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Toute pièce devant servir à l'habitation ou au travail doit correspondre aux exigences de l'hygiène concernant l'espace, l'éclairage, l'aération et l'accès.",
+        "article": "Art 40"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Les locaux d'habitation et les locaux de travail doivent être isolés, selon les règles de l'art, contre l'humidité, le bruit et le froid.",
+        "article": "Art 40"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Les constructions et installations doivent être réalisées et aménagées de façon à économiser l'énergie.",
+        "article": "Art 40"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Les locaux destinés à l’habitation doivent bénéficier d’installations de WC ventilés et de locaux de toilettes en nombre suffisant.",
+        "article": "Art 41"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Les locaux de travail doivent être pourvus d'au moins un WC pour 10 personnes et, dans la règle, un pour chaque entreprise ou preneur de bail.",
+        "article": "Art 41"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Dans les cafés, lieux de réunions ouverts au public ou autres établissements publics, le nombre de WC, urinoirs et lavabos, sera proportionné à l'importance des locaux.",
+        "article": "Art 41"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Les écuries, étables, porcheries, poulaillers et autres locaux qui abritent des animaux, doivent former des corps de bâtiments distincts de ceux destinés à l'habitation.",
+        "article": "Art 42"
+      },
+      {
+        "zone": "*",
+        "theme": "Salubrité",
+        "rule": "Tout dépôt de fumier ou autres substances en décomposition dans les zones autorisées doit être établi à une distance d'au moins 10m des habitations ou locaux de travail.",
+        "article": "Art 43"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les constructions doivent présenter un aspect architectural satisfaisant et respecter l'environnement naturel et bâti, notamment du point de vue du volume, de l'emplacement, de la forme, des matériaux et de leur couleur.",
+        "article": "Art 44"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Le Conseil municipal a le droit de s'opposer à toute construction qui compromet l'aspect ou le caractère d'un site, d'une localité, d'un quartier, d'une rue ou nuit à l'aspect d'un édifice de valeur historique, artistique ou pittoresque.",
+        "article": "Art 44"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Toutes les façades d’un bâtiment doivent être parallèles ou perpendiculaires à l'alignement ou à l'orientation générale du quartier.",
+        "article": "Art 45a"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Le Conseil municipal peut déterminer des zones de même orientation des bâtiments, en fonction de l'exposition, de l'ensoleillement, des vents et de la pente naturelle des terrains.",
+        "article": "Art 45b"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Le Conseil municipal peut prescrire l'organisation et l'architecture d'un quartier, notamment fixer l'implantation, l'orientation, le volume, l'échelle, les matériaux, la couleur et l'aspect des bâtiments par des plans de quartier ou de structuration.",
+        "article": "Art 45c"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Toute installation d'antenne est soumise à autorisation de construire et doit être intégrée au bâti.",
+        "article": "Art 46a"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les panneaux solaires doivent être intégrés aux façades, toitures ou aménagements extérieurs.",
+        "article": "Art 46b"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les cages d'ascenseurs, ventilation et autres superstructures hors gabarit ne doivent pas dépasser 1/20 de la surface du toit et rester en-dessous de la hauteur maximum au faîte.",
+        "article": "Art 46c"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Il est interdit de porter atteinte au paysage, à l'environnement, aux sites bâtis, par des constructions et/ou installations non terminées, mal entretenues ou endommagées.",
+        "article": "Art 47a"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les propriétaires sont tenus de maintenir les constructions et leurs abords dans un état convenable.",
+        "article": "Art 47b"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "L'implantation de constructions légères telles que maisonnettes de jardin, cabanons, etc. est réalisable à une distance minimum de 2 m du fonds voisin.",
+        "article": "Art 49a"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La construction sera érigée sur un seul niveau avec une hauteur maximum de 3m à la faîtière. Toit à un ou deux pans obligatoire.",
+        "article": "Art 49a"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Le Conseil Municipal interdit les constructions et les enseignes, les murs de soutènement, les terrassements et déboisements, ainsi que tous ouvrages de nature à compromettre l'aspect ou le caractère d'un site.",
+        "article": "Art 50"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "L'ordre des constructions, leur destination, leurs dimensions et distances ainsi que le nombre de niveaux sont déterminés pour chaque zone à bâtir.",
+        "article": "Art 57a"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "L'ordre dispersé est caractérisé par des constructions implantées en fonction des distances aux limites et entre bâtiments.",
+        "article": "Art 57b"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "L'ordre contigu est caractérisé par des constructions attenantes et implantées le long d'une voie publique ou privée, et qui ont dans la règle une limite commune.",
+        "article": "Art 57c"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les constructions en limite de propriété sont autorisées pour les constructions jumelles ou en bande sous certaines conditions.",
+        "article": "Art 58a"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La longueur totale des bâtiments n'excédera pas 40m, sauf en zone artisanale et en zone industrielle.",
+        "article": "Art 58b"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Lorsque la contiguïté est prévue, le propriétaire qui désire renoncer à cette contiguïté doit respecter une distance à la limite égale au double de la distance normale prévue par le règlement.",
+        "article": "Art 59a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les prescriptions générales définies dans ce chapitre s'appliquent à tout le territoire communal.",
+        "article": "Art 77"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les zones sont des surfaces de terrain dont le périmètre peut être tracé sur une carte et auxquelles, pour une même affectation, s'appliquent des prescriptions identiques.",
+        "article": "Art 78"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "On distingue plusieurs types de zones, y compris les zones à bâtir, la zone agricole, la zone agricole protégée, la zone des mayens, les zones à protéger, les zones d'affectation différée, et les zones de constructions et d'installations publiques.",
+        "article": "Art 79"
+      },
+      {
+        "zone": "zone agricole",
+        "theme": "Destination de zone",
+        "rule": "La zone agricole comprend les terrains qui se prêtent à l'exploitation agricole, viticole et horticole, et les constructions n'y sont autorisées que si elles sont conformes à l'affectation de la zone et ont un lien étroit avec l'exploitation agricole.",
+        "article": "Art 80"
+      },
+      {
+        "zone": "zone agricole protégée",
+        "theme": "Destination de zone",
+        "rule": "La zone agricole protégée comprend des terrains remarquables pour leur qualité du paysage naturel et construit, et le maintien des caractéristiques essentielles du paysage doit être sauvegardé.",
+        "article": "Art 81"
+      },
+      {
+        "zone": "zone des mayens",
+        "theme": "Destination de zone",
+        "rule": "La zone des mayens n'a jamais été homologuée par le Canton.",
+        "article": "Art 82"
+      },
+      {
+        "zone": "zones à protéger",
+        "theme": "Destination de zone",
+        "rule": "Les zones à protéger ont pour but de protéger les sites naturels, et seules des constructions dont l'emplacement est imposé par leur destination sont autorisées, à condition qu'elles ne portent pas préjudice au site.",
+        "article": "Art 83"
+      },
+      {
+        "zone": "zones de protection des eaux souterraines",
+        "theme": "Destination de zone",
+        "rule": "Les zones de protection des eaux souterraines comprennent les terrains sur lesquels l'occupation du sol et les activités doivent être organisées de manière à ne pas perturber la qualité des eaux utilisées pour l'alimentation.",
+        "article": "Art 84"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les zones d'affectation différée sont entourées d'un liseré sur le plan de zones, et tout projet de construction sera traité en vertu des dispositions de la Loi fédérale sur l'aménagement du territoire.",
+        "article": "Art 84"
+      },
+      {
+        "zone": "zones de constructions et d'installations publiques",
+        "theme": "Destination de zone",
+        "rule": "Ces zones délimitent des terrains que la Commune possède ou se propose d'acquérir pour des aménagements et installations d'intérêt général.",
+        "article": "Art 85"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La rectification de limite a pour effet de modifier, dans l'intérêt d'une utilisation rationnelle du sol, le tracé de la limite entre fonds voisins.",
+        "article": "Art 75"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La procédure de remembrement est introduite sur requête des propriétaires ou par décision du Conseil municipal, et doit permettre la réalisation de constructions conformes au présent règlement.",
+        "article": "*"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les mesures particulières d'aménagement applicables et l'affectation du sol sont précisées dans le plan d'aménagement détaillé.",
+        "article": "Art 76"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les prescriptions relatives aux constructions sont celles de la zone résidentielle 0.3.",
+        "article": "Art 80"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les rénovations, constructions, et démolitions ayant un effet important sur le paysage de la zone agricole protégée sont soumises à autorisation cantonale.",
+        "article": "Art 81"
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Toute modification sensible du caractère et de l'aspect général du paysage dans les zones de protection du paysage est interdite.",
+        "article": "Art 83"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les zones dangereuses figurent sur le plan des zones à titre indicatif.",
+        "article": "Art 86"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "En cas de sinistre, le rétablissement des accès n'est pas garanti et les frais de déblaiement des installations privées sont entièrement à la charge des propriétaires.",
+        "article": "Art 86"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les zones de construction comprennent la zone de village et hameaux, la zone résidentielle 0.7, la zone résidentielle 0.5, la zone résidentielle 0.3, la zone mixte commerces, logements 0.6, la zone artisanale, et la zone industrielle.",
+        "article": "Art 88"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée à la conservation du caractère des villages de Vétroz et Magnot. Y sont admis les bâtiments agricoles ainsi que les entreprises artisanales sans nuisances.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Gabarits & reculs",
+        "rule": "La hauteur des bâtiments nouveaux, restaurés ou transformés, n'excédera pas le gabarit actuel et devra être adaptée aux autres bâtiments voisins.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Prescriptions architecturales",
+        "rule": "En principe, seuls les matériaux naturels peuvent être utilisés et doivent être adaptés aux constructions anciennes.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Prescriptions architecturales",
+        "rule": "Les surfaces vitrées des rez-de-chaussée seront limitées en proportion de la surface totale des façades.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Gabarits & reculs",
+        "rule": "Le propriétaire est tenu d'autoriser les services compétents à effectuer les fouilles et sondages nécessaires avant ou pendant les travaux.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Gabarits & reculs",
+        "rule": "Les particularités du parcellement dignes d'intérêt doivent être respectées, mais les réunions de parcelles sont possibles sous certaines conditions.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Destination de zone",
+        "rule": "La Commune veillera à maintenir un équilibre entre les locaux destinés à l'habitation, à l'artisanat, au commerce, etc., en exigeant une part minimale de logement de 50% par bâtiment.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "village et hameaux",
+        "theme": "Toiture",
+        "rule": "Les modifications des façades et toitures seront tolérées seulement si le caractère architectural initial est maintenu pour les bâtiments classés.",
+        "article": "Art 89"
+      },
+      {
+        "zone": "résidentielle 0.7",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux habitations collectives et peut comprendre des constructions affectées aux commerces et au petit artisanat ne comportant pas de nuisances pour le voisinage.",
+        "article": "Art 90"
+      },
+      {
+        "zone": "résidentielle 0.5",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux petites habitations collectives permettant la mixité avec les constructions individuelles.",
+        "article": "Art 91"
+      },
+      {
+        "zone": "résidentielle 0.3",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux habitations individuelles et peut comprendre les constructions agricoles à condition qu'elles ne provoquent pas de nuisances pour le voisinage.",
+        "article": "Art 92"
+      },
+      {
+        "zone": "mixte 0.6",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux constructions liées aux logements, aux commerces, expositions, ateliers sans nuisances, ainsi qu'aux bureaux.",
+        "article": "Art 93"
+      },
+      {
+        "zone": "artisanale",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux constructions à caractère artisanal, dépôts et ateliers non polluants et peu bruyants, ainsi qu'aux logements liés à l'exploitation.",
+        "article": "Art 94"
+      },
+      {
+        "zone": "industrielle",
+        "theme": "Destination de zone",
+        "rule": "Cette zone est destinée aux constructions industrielles et artisanales. Les logements ne seront autorisés qu'à condition qu'ils soient directement liés à l'exploitation.",
+        "article": "Art 95"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La hauteur d'une façade se mesure pour tous les points de chaque façade dès le terrain naturel non aménagé jusqu'à l'intersection avec la face supérieure de la panne faîtière pour les toits en pente.",
+        "article": "Art 97"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les hauteurs maximales sont appliquées : en zone résidentielle 0.3 (7.50m), en zone résidentielle 0.5 (9.00m), en zone résidentielle 0.7 (12.00m).",
+        "article": "Art 97"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les lucarnes et autres superstructures ne sont pas prises en considération pour le calcul de la hauteur, sous certaines conditions.",
+        "article": "Art 97"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Sur un terrain en pente, la hauteur d'un bâtiment se mesure sur la façade aval.",
+        "article": "Art 97"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La hauteur maximum d'une construction est la plus grande des hauteurs mesurées sur chaque façade.",
+        "article": "Art 97"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Pour toutes les zones, en cas de construction en ordre contigu, l'alignement des corniches et parapets est obligatoire si les constructions ont le même nombre de niveaux.",
+        "article": "Art 98"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Tout sous-sol ou rez-de-chaussée doit être compté comme niveau si la surface des façades émerge de plus de 2/3 au-dessus du niveau du terrain naturel, ou aménagé s'il est plus bas.",
+        "article": "Art 98"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les combles habitables et les attiques doivent aussi être comptés comme niveau complet si leur surface brute de plancher excède les 2/3 de celle de l'étage complet au-dessus duquel ils se trouvent.",
+        "article": "Art 98"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "L'indice d'utilisation (u) est le rapport entre la surface brute de plancher utile et la surface constructible du terrain.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "La surface brute de plancher utile se compose de la somme de toutes les surfaces d'étages, au-dessus et au-dessous du sol, y compris les surfaces des murs et des parois dans leurs sections horizontales, qui servent directement à l'habitation ou à l'exercice d'une activité professionnelle.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "N'entrent pas en considération les locaux de service situés hors du logement tels que caves, greniers, séchoirs et buanderies, locaux de chauffage, soutes à bois, à charbon ou à mazout.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "La surface constructible du terrain est la surface de la (des) parcelle (s), comprise (s) dans la zone à bâtir, faisant l'objet de l'autorisation de construire, après déduction des surfaces déjà utilisées et des surfaces non constructibles.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Pour le calcul de l'indice d'utilisation du sol sur les parcelles déjà partiellement bâties, les surfaces de plancher des bâtiments existants sont cumulées avec celles du projet.",
+        "article": "Art 99"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Une surface de terrains utilisée pour servir de base à des calculs de distances entre bâtiments, de distances à la limite ou d'indice d'utilisation ne peut servir à ces mêmes fins, pour une construction ultérieure.",
+        "article": "Art 100"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Des restrictions de droit public sous forme de mentions seront inscrites au Registre foncier en faveur de la Commune, pour garantir le respect des dispositions réglementaires, notamment en matière de densité, de hauteur ou de distance.",
+        "article": "Art 100"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Les propriétaires fonciers concernés peuvent convenir, en constituant une servitude, de transférer sur la parcelle à bâtir l'indice non utilisé d'un fonds.",
+        "article": "Art 101"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "La servitude doit être inscrite au Registre foncier en faveur de la Commune avant le début des travaux.",
+        "article": "Art 101"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Dans le cadre d'un plan de structuration ou éventuellement de quartier, une majoration de l'indice d'utilisation peut être accordée en raison d'avantages évidents offerts par une solution d'ensemble.",
+        "article": "Art 102"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "La majoration de l'indice ne peut dépasser de plus de 0.3 l'indice prévu dans la zone.",
+        "article": "Art 102"
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Le taux d'occupation du sol (t) est le rapport numérique entre la surface construite (emprise au sol) et la surface constructible du terrain.",
+        "article": "Art 103"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La distance à la limite est proportionnelle à la hauteur de la façade et doit égaler le tiers de celle-ci au minimum.",
+        "article": "Art 104"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "La distance entre bâtiments est la distance horizontale la plus courte entre deux bâtiments, correspondant à la somme des distances légales par rapport à la limite.",
+        "article": "Art 105"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les distances prescrites entre bâtiments doivent dans tous les cas être respectées.",
+        "article": "Art 106"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Toutes les nouvelles constructions doivent respecter les distances aux limites.",
+        "article": "Art 107"
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Les distances par rapport aux routes sont fixées par les dispositions de la Loi cantonale sur les routes.",
+        "article": "Art 108"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "En règle générale, la couverture doit s'adapter aux constructions voisines.",
+        "article": "Art 109"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Le Conseil municipal peut imposer la forme ou l'orientation d'une toiture, le genre et la couleur de la couverture, éventuellement l'aménagement d'un toit plat, afin d'adapter la dite toiture au caractère de ce lieu.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les toits à pans auront une pente comprise entre 30 et 60%.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les lucarnes et les ouvertures dans la toiture sont autorisées. La longueur totale de ces ouvrages est limitée au tiers de la longueur de la façade du dernier étage.",
+        "article": "Art 110a"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les lucarnes auront en principe une forme adaptée à l'architecture du bâtiment d'une part, au caractère du quartier d'autre part.",
+        "article": "Art 110b"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les toits et les flancs des lucarnes seront en principe recouverts du même matériau que la toiture.",
+        "article": "Art 110c"
+      },
+      {
+        "zone": "*",
+        "theme": "Toiture",
+        "rule": "Les superstructures servant à l'éclairage ou contribuant à l'économie d'énergie peuvent avoir une pente de toiture allant jusqu'à 100 % (verrières).",
+        "article": "Art 110d"
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "Les activités artisanales compatibles avec l’habitat sont autorisées uniquement au rez-de-chaussée.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Destination de zone",
+        "rule": "En zone artisanale, seul le logement de gardiennage ou de l’exploitant est admis. En zone industrielle, seul un logement de gardiennage est admis.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "Taux d’occupation du sol: jusqu'à 3000 m2, le taux est de 40% dès 4000 m2. Le taux est de 50% entre 3000 et 4000 m2, le taux va croissant de 40 à 50% à raison de 1% pour 100 m2 de terrain.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Pour les constructions individuelles, les distances de la zone résidentielle 0.3 peuvent être appliquées.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Gabarits & reculs",
+        "rule": "Pour la transformation de constructions existantes dans leur gabarit actuel, la densité, le taux d’occupation au sol, la hauteur et les distances ne sont pas applicables.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Espaces de jeux / détente",
+        "rule": "Des plantations et l’entretien d’arbres à raison d’un arbre pour 100 m2 de plancher construit sont exigés.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Prescriptions architecturales",
+        "rule": "Ardoises naturelles ou artificielles, tuiles vieillies. Les teintes selon les couleurs dominantes de la zone.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les constructions existantes au moment de l'entrée en vigueur du présent règlement restent au bénéfice des droits acquis, sauf en cas de transformation avec modification du gabarit, de démolition, de changement d'affectation, de cas en cas lors d'un incendie ou pour les constructions jugées insalubres et nuisant à la qualité du site.",
+        "article": "Art 112"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le Conseil municipal peut déroger aux dispositions du présent règlement lorsque des circonstances exceptionnelles ou des motifs importants le justifient, si l'application stricte des prescriptions légales ne s'adapte pas aux conditions d'un terrain ou d'un programme particulier.",
+        "article": "Art 113a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "L'autorisation peut être assortie de charges et conditions particulières susceptibles d'être mentionnées au Registre foncier comme restrictions de droit public à la propriété foncière.",
+        "article": "Art 113b"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les contrevenants au présent règlement sont passibles d’une amende allant de Fr. 1'000.-- à Fr. 100'000.-- à prononcer par le Conseil municipal.",
+        "article": "Art 116a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Les maîtres d’ouvrage (propriétaires, requérants ou leur mandataire) sont responsables de l’observation du présent règlement.",
+        "article": "Art 117a"
+      },
+      {
+        "zone": "*",
+        "theme": "Identification",
+        "rule": "Le présent règlement entre en vigueur dès son approbation par le Conseil général et après homologation par le Conseil d'Etat.",
+        "article": "Art 119a"
+      },
+      {
+        "zone": "ZONE VILLAGE-HAMEAUX",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 10,50 m et distance minimale de 3,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE 0.7",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 13,50 m, distance minimale de 5,00 m et 10,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE Œ5",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 10,50 m, distance minimale de 4,00 m et 10,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE 0.3",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 9,00 m, distance minimale de 3,00 m et 6,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE ARTISANALE",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 10,50 m, distance minimale de 5,00 m et 8,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE INDUSTRIELLE",
+        "theme": "Gabarits & reculs",
+        "rule": "Hauteur maximale de 13,50 m, distance minimale de 5,00 m et 8,00 m.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Chaque propriétaire doit aménager un nombre suffisant de places de stationnement sur son terrain privé selon les critères établis.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour l'habitation familiale, 1 place par 65 m2 de surface brute de plancher utile, minimum 2 places par unité de logement.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour l'habitation collective, 2 places par unité de logement et 1 place de parc pour visiteurs par 2 unités de logement.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les bureaux, commerces et services, 1 place par 20 m2 de surface brute de plancher utile, minimum 1 place par unité d'exploitation.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les cafés et cafés-restaurants, 1 place par 8 m2 de surface brute réservée au public, minimum 1 place pour 4 places assises.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Pour les terrasses exploitées, 1 place par 20 m2 de surface, minimum 1 place pour 8 places assises.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Le nombre de places nécessaires est arrondi à l'entier supérieur.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "En cas d'impossibilité de respecter les exigences, la commune exige une servitude permettant d'assurer le nombre de places manquantes sur un fonds privé situé à moins de 150 m.",
+        "article": "Art. 30"
+      },
+      {
+        "zone": "ZONE VILLAGE-HAMEAUX",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions de type village et hameaux.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE 0.7",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions résidentielles.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE Œ5",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions résidentielles.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE RESIDENTIELLE 0.3",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions résidentielles.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE ARTISANALE",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions artisanales.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "ZONE INDUSTRIELLE",
+        "theme": "Destination de zone",
+        "rule": "La zone est destinée à des constructions industrielles.",
+        "article": "non spécifié"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les places de stationnement nécessaires à une habitation collective devront faire l’objet d’une inscription au Registre foncier en faveur de la commune en ce qui concerne leur affectation et le fait qu’elles sont obligatoirement rattachées à cette habitation collective.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les places de stationnement ne pourront pas servir à d’autres fins (dépôt ou autre) ou être vendues à une personne ou société n’étant pas propriétaire d’un appartement dans l’habitation collective.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les dimensions des places de stationnement seront définies selon les normes VSS.",
+        "article": ""
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "L'accès à la voie publique ne doit pas présenter de danger ou d’entrave pour la circulation des piétons et véhicules.",
+        "article": "Art. 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les sorties de garages sur les voies publiques ne doivent pas avoir une déclivité supérieure à 15%. Elles devront comporter un secteur horizontal d’au moins 3 m avant la limite de la chaussée et d’au moins 1 m avant celle du trottoir.",
+        "article": "Art. 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "La distance minimale d’un garage s’ouvrant du côté d’une voie publique est de 5 m de la limite de la parcelle.",
+        "article": "Art. 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "La distance minimale entre un garage-atelier, un atelier mécanique ou une carrosserie et le bord de la chaussée ou du trottoir est de 20 m le long de la route cantonale et de 15 m le long des autres voies publiques.",
+        "article": "Art. 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Un local existant ne pourra être converti en garage qu'en respectant les dispositions qui précèdent.",
+        "article": "Art. 31"
+      },
+      {
+        "zone": "*",
+        "theme": "Stationnement",
+        "rule": "Les portails automatiques coulissants ou ouvrants vers l’intérieur de la parcelle sont autorisés en limite de propriété pour autant qu’ils soient situés à plus de 1.20 m du bord de la chaussée le long des voies publiques cantonales et à plus de 60 cm le long des voies publiques communales.",
+        "article": "Art. 31"
+      }
+    ],
+    "rdppfConstraints": [
+      {
+        "theme": "Identification",
+        "rule": "Immeuble n° 12558, Commune de Vétroz, Surface 862 m², E-GRID CH773017495270"
+      },
+      {
+        "theme": "Destination de zone",
+        "rule": "Affectation primaire en vigueur: Zone résidentielle 0.5 (3) sur une surface de 862 m², 100.0 %."
+      },
+      {
+        "theme": "Indice d'utilisation (IBUS)",
+        "rule": "L'indice d'utilisation n'est pas spécifiquement mentionné dans le document."
+      },
+      {
+        "theme": "Gabarits & reculs",
+        "rule": "Les gabarits et reculs ne sont pas spécifiquement mentionnés dans le document."
+      },
+      {
+        "theme": "Toiture",
+        "rule": "Les prescriptions concernant la toiture ne sont pas spécifiquement mentionnées dans le document."
+      },
+      {
+        "theme": "Stationnement",
+        "rule": "Les dispositions relatives au stationnement ne sont pas spécifiquement mentionnées dans le document."
+      },
+      {
+        "theme": "Espaces de jeux / détente",
+        "rule": "Les espaces de jeux ou de détente ne sont pas spécifiquement mentionnés dans le document."
+      },
+      {
+        "theme": "Prescriptions architecturales",
+        "rule": "Les prescriptions architecturales ne sont pas spécifiquement mentionnées dans le document."
+      }
+    ],
+    "processingTime": 190859,
+    "completeness": 40,
+    "errors": [],
+    "formattedForAI": "# ANALYSE COMPLÈTE DE PARCELLE\n\n**Recherche:** 12558 vetroz 6025 ch773017495270\n**Complétude des données:** 40%\n**Temps de traitement:** 190859ms\n\n## 4b. SYNTHÈSE DES CONTRAINTES\n\n| Thème | Points relevés |\n| --- | --- |\n| **Identification** | Le présent règlement a pour but d'organiser la construction afin de préserver le bien être de tous les habitants par une conception et une exécution des bâtiments conformes aux règles de la sécurité, de l'hygiène et de l'esthétique.; Il définit les droits et les devoirs en matière de constructions, d'utilisation du sol, de qualité du milieu bâti et de protection de son environnement.; La demande d'autorisation doit être adressée à l'autorité communale sous forme de dossier plié au format A4.; Une demande de renseignements sur les possibilités de construire sur un fonds déterminé peut être déposée auprès de l'autorité communale.; Les documents à joindre à la demande incluent des mesures pour l'accès aux personnes handicapées et âgées, des détails pour les places de camping, des informations sur les lieux d'extraction de matériaux, et d'autres documents utiles à l'examen de la demande.; Les décisions communales et/ou cantonales peuvent faire l'objet d'un recours motivé au Conseil d'Etat, dans les 30 jours dès leur notification.; Le recours n'a pas d'effet suspensif ; celui-ci peut toutefois être ordonné d'office ou sur requête.; Le bénéficiaire d'une autorisation de démolition totale ou partielle d'une construction ne peut en faire usage avant qu'elle ne soit exécutoire.; L’autorisation de construire est valable trois ans à partir de son entrée en force. La construction doit être commencée dans ce délai.; Lorsqu'il s'agit d'un ensemble de constructions autorisées sous la forme d'une seule autorisation de construire, les constructions non commencées dans un délai de cinq ans doivent faire l'objet d'une nouvelle mise à l'enquête publique.; Pour de justes motifs, le Conseil municipal peut prolonger de deux ans au plus la durée de validité d'une autorisation de construire.; Les travaux peuvent être entrepris immédiatement après la notification de l'autorisation de construire, en l'absence d'opposition.; Tout entrepreneur chargé d’une construction doit s'assurer que les autorisations requises ont été accordées.; Le bénéficiaire d'une autorisation de construire doit afficher, dès le début et pour la durée des travaux, l'attestation de l'autorisation à l'entrée du chantier.; Le début anticipé des travaux peut être autorisé par l'autorité compétente, aux risques et périls du requérant.; L'utilisation du domaine public pendant les travaux de construction nécessite une autorisation spéciale du Conseil Municipal.; Les travaux doivent être exécutés rapidement et sans interruption dans le délai imparti par l'autorité compétente.; Les services communaux doivent être avisés par écrit du début et de la fin des travaux ainsi que de l'état d'avancement des constructions.; Une modification du projet est possible lorsque les caractéristiques principales du projet demeurent inchangées.; Les services de l'administration communale veillent à l'exécution conforme des projets, ceci avant, pendant et après les travaux.; S'ils constatent des irrégularités, ils les signalent au maître de l'ouvrage en l'invitant à y remédier dans un délai déterminé.; Sauf justes motifs, les travaux doivent être poursuivis sans interruption jusqu'à leur achèvement.; Une construction neuve ou transformée, destinée à l'habitation ou au travail, ne peut être occupée ou exploitée sans l’obtention d'un permis d'habiter ou d'exploiter.; Les compétences de la Commission cantonale des constructions demeurent réservées.; Les routes communales se divisent en deux catégories : les routes principales et les routes secondaires.; Le Conseil municipal est compétent pour fixer ou procéder à un changement de catégorie des routes communales.; Les prescriptions générales définies dans ce chapitre s'appliquent à tout le territoire communal.; Les zones dangereuses figurent sur le plan des zones à titre indicatif.; En cas de sinistre, le rétablissement des accès n'est pas garanti et les frais de déblaiement des installations privées sont entièrement à la charge des propriétaires.; Les constructions existantes au moment de l'entrée en vigueur du présent règlement restent au bénéfice des droits acquis, sauf en cas de transformation avec modification du gabarit, de démolition, de changement d'affectation, de cas en cas lors d'un incendie ou pour les constructions jugées insalubres et nuisant à la qualité du site.; Le Conseil municipal peut déroger aux dispositions du présent règlement lorsque des circonstances exceptionnelles ou des motifs importants le justifient, si l'application stricte des prescriptions légales ne s'adapte pas aux conditions d'un terrain ou d'un programme particulier.; L'autorisation peut être assortie de charges et conditions particulières susceptibles d'être mentionnées au Registre foncier comme restrictions de droit public à la propriété foncière.; Les contrevenants au présent règlement sont passibles d’une amende allant de Fr. 1'000.-- à Fr. 100'000.-- à prononcer par le Conseil municipal.; Les maîtres d’ouvrage (propriétaires, requérants ou leur mandataire) sont responsables de l’observation du présent règlement.; Le présent règlement entre en vigueur dès son approbation par le Conseil général et après homologation par le Conseil d'Etat.; Immeuble n° 12558, Commune de Vétroz, Surface 862 m², E-GRID CH773017495270 |\n| **Destination de zone** | Les présentes dispositions sont valables pour l'ensemble du territoire de la Commune de Vétroz.; Les modifications apportées à des bâtiments ou parties de bâtiments classés ou inventoriés doivent respecter les prescriptions applicables à la zone.; Les projets qui échappent totalement ou partiellement à la souveraineté cantonale en matière de construction ne sont pas soumis à autorisation.; Les projets situés à l'extérieur de la zone à bâtir nécessitent une autorisation de la Commission cantonale des constructions, sauf pour la zone des mayens de compétence communale.; Toute construction nouvelle ne peut être érigée que sur un terrain équipé.; Un terrain est considéré comme équipé lorsqu'il dispose de voies d'accès suffisantes et que les conduites d'eau, d'énergie et les égouts arrivent jusqu'au bien-fonds ou à proximité immédiate.; Les zones à bâtir sont classées selon l'état de leur équipement en terrains propres à la construction, terrains propres à la construction dans les 5 ans, et autres terrains.; Le Conseil Municipal interdit les constructions et les enseignes, les murs de soutènement, les terrassements et déboisements, ainsi que tous ouvrages de nature à compromettre l'aspect ou le caractère d'un site.; L'ordre des constructions, leur destination, leurs dimensions et distances ainsi que le nombre de niveaux sont déterminés pour chaque zone à bâtir.; L'ordre dispersé est caractérisé par des constructions implantées en fonction des distances aux limites et entre bâtiments.; L'ordre contigu est caractérisé par des constructions attenantes et implantées le long d'une voie publique ou privée, et qui ont dans la règle une limite commune.; Les zones sont des surfaces de terrain dont le périmètre peut être tracé sur une carte et auxquelles, pour une même affectation, s'appliquent des prescriptions identiques.; On distingue plusieurs types de zones, y compris les zones à bâtir, la zone agricole, la zone agricole protégée, la zone des mayens, les zones à protéger, les zones d'affectation différée, et les zones de constructions et d'installations publiques.; zone agricole: La zone agricole comprend les terrains qui se prêtent à l'exploitation agricole, viticole et horticole, et les constructions n'y sont autorisées que si elles sont conformes à l'affectation de la zone et ont un lien étroit avec l'exploitation agricole.; zone agricole protégée: La zone agricole protégée comprend des terrains remarquables pour leur qualité du paysage naturel et construit, et le maintien des caractéristiques essentielles du paysage doit être sauvegardé.; zone des mayens: La zone des mayens n'a jamais été homologuée par le Canton.; zones à protéger: Les zones à protéger ont pour but de protéger les sites naturels, et seules des constructions dont l'emplacement est imposé par leur destination sont autorisées, à condition qu'elles ne portent pas préjudice au site.; zones de protection des eaux souterraines: Les zones de protection des eaux souterraines comprennent les terrains sur lesquels l'occupation du sol et les activités doivent être organisées de manière à ne pas perturber la qualité des eaux utilisées pour l'alimentation.; Les zones d'affectation différée sont entourées d'un liseré sur le plan de zones, et tout projet de construction sera traité en vertu des dispositions de la Loi fédérale sur l'aménagement du territoire.; zones de constructions et d'installations publiques: Ces zones délimitent des terrains que la Commune possède ou se propose d'acquérir pour des aménagements et installations d'intérêt général.; Les zones de construction comprennent la zone de village et hameaux, la zone résidentielle 0.7, la zone résidentielle 0.5, la zone résidentielle 0.3, la zone mixte commerces, logements 0.6, la zone artisanale, et la zone industrielle.; village et hameaux: Cette zone est destinée à la conservation du caractère des villages de Vétroz et Magnot. Y sont admis les bâtiments agricoles ainsi que les entreprises artisanales sans nuisances.; village et hameaux: La Commune veillera à maintenir un équilibre entre les locaux destinés à l'habitation, à l'artisanat, au commerce, etc., en exigeant une part minimale de logement de 50% par bâtiment.; résidentielle 0.7: Cette zone est destinée aux habitations collectives et peut comprendre des constructions affectées aux commerces et au petit artisanat ne comportant pas de nuisances pour le voisinage.; résidentielle 0.5: Cette zone est destinée aux petites habitations collectives permettant la mixité avec les constructions individuelles.; résidentielle 0.3: Cette zone est destinée aux habitations individuelles et peut comprendre les constructions agricoles à condition qu'elles ne provoquent pas de nuisances pour le voisinage.; mixte 0.6: Cette zone est destinée aux constructions liées aux logements, aux commerces, expositions, ateliers sans nuisances, ainsi qu'aux bureaux.; artisanale: Cette zone est destinée aux constructions à caractère artisanal, dépôts et ateliers non polluants et peu bruyants, ainsi qu'aux logements liés à l'exploitation.; industrielle: Cette zone est destinée aux constructions industrielles et artisanales. Les logements ne seront autorisés qu'à condition qu'ils soient directement liés à l'exploitation.; Les activités artisanales compatibles avec l’habitat sont autorisées uniquement au rez-de-chaussée.; En zone artisanale, seul le logement de gardiennage ou de l’exploitant est admis. En zone industrielle, seul un logement de gardiennage est admis.; ZONE VILLAGE-HAMEAUX: La zone est destinée à des constructions de type village et hameaux.; ZONE RESIDENTIELLE 0.7: La zone est destinée à des constructions résidentielles.; ZONE RESIDENTIELLE Œ5: La zone est destinée à des constructions résidentielles.; ZONE RESIDENTIELLE 0.3: La zone est destinée à des constructions résidentielles.; ZONE ARTISANALE: La zone est destinée à des constructions artisanales.; ZONE INDUSTRIELLE: La zone est destinée à des constructions industrielles.; Affectation primaire en vigueur: Zone résidentielle 0.5 (3) sur une surface de 862 m², 100.0 %. |\n| **Indice d'utilisation (IBUS)** | L'indice d'utilisation (densité) est défini pour chaque zone et doit être respecté lors de la construction.; Le calcul justificatif de l'indice d'utilisation du sol doit être inclus dans la demande d'autorisation.; Pour les constructions industrielles, commerciales et hôtelières, le nombre probable de places de travail doit être indiqué dans la demande.; L'indice d'utilisation (u) est le rapport entre la surface brute de plancher utile et la surface constructible du terrain.; La surface brute de plancher utile se compose de la somme de toutes les surfaces d'étages, au-dessus et au-dessous du sol, y compris les surfaces des murs et des parois dans leurs sections horizontales, qui servent directement à l'habitation ou à l'exercice d'une activité professionnelle.; N'entrent pas en considération les locaux de service situés hors du logement tels que caves, greniers, séchoirs et buanderies, locaux de chauffage, soutes à bois, à charbon ou à mazout.; La surface constructible du terrain est la surface de la (des) parcelle (s), comprise (s) dans la zone à bâtir, faisant l'objet de l'autorisation de construire, après déduction des surfaces déjà utilisées et des surfaces non constructibles.; Pour le calcul de l'indice d'utilisation du sol sur les parcelles déjà partiellement bâties, les surfaces de plancher des bâtiments existants sont cumulées avec celles du projet.; Une surface de terrains utilisée pour servir de base à des calculs de distances entre bâtiments, de distances à la limite ou d'indice d'utilisation ne peut servir à ces mêmes fins, pour une construction ultérieure.; Des restrictions de droit public sous forme de mentions seront inscrites au Registre foncier en faveur de la Commune, pour garantir le respect des dispositions réglementaires, notamment en matière de densité, de hauteur ou de distance.; Les propriétaires fonciers concernés peuvent convenir, en constituant une servitude, de transférer sur la parcelle à bâtir l'indice non utilisé d'un fonds.; La servitude doit être inscrite au Registre foncier en faveur de la Commune avant le début des travaux.; Dans le cadre d'un plan de structuration ou éventuellement de quartier, une majoration de l'indice d'utilisation peut être accordée en raison d'avantages évidents offerts par une solution d'ensemble.; La majoration de l'indice ne peut dépasser de plus de 0.3 l'indice prévu dans la zone.; Le taux d'occupation du sol (t) est le rapport numérique entre la surface construite (emprise au sol) et la surface constructible du terrain.; Taux d’occupation du sol: jusqu'à 3000 m2, le taux est de 40% dès 4000 m2. Le taux est de 50% entre 3000 et 4000 m2, le taux va croissant de 40 à 50% à raison de 1% pour 100 m2 de terrain.; L'indice d'utilisation n'est pas spécifiquement mentionné dans le document. |\n| **Gabarits & reculs** | Les constructions doivent respecter les distances minimales à la limite de propriété et les gabarits définis par le règlement.; Les modifications de toiture ainsi que l'apport de matériaux nouveaux lors de travaux de rénovation nécessitent une autorisation.; Les modifications de l'aspect extérieur telles que la modification des façades et le changement de couleur des façades nécessitent une autorisation.; La pose de gabarits est obligatoire avant l'ouverture de l'enquête publique pour indiquer l'implantation et les dimensions extérieures de la construction projetée.; L'accès à la voie publique ne doit pas présenter de danger ou d'entrave pour la circulation des piétons et véhicules.; Les sorties de garages sur les voies publiques ne doivent pas avoir une déclivité supérieure à 15% et devront comporter un secteur horizontal d'au moins 3 m avant la limite de la chaussée et d'au moins 1 m avant celle du trottoir.; La distance minimale d'un garage s'ouvrant du côté d'une voie publique est de 5 m de la limite de la chaussée ou du trottoir.; La distance minimale entre un garage-atelier, un atelier mécanique ou une carrosserie et le bord de la chaussée ou du trottoir est de 20 m le long de la route cantonale et de 15 m le long des autres voies publiques.; Toutes les façades d’un bâtiment doivent être parallèles ou perpendiculaires à l'alignement ou à l'orientation générale du quartier.; Le Conseil municipal peut déterminer des zones de même orientation des bâtiments, en fonction de l'exposition, de l'ensoleillement, des vents et de la pente naturelle des terrains.; Le Conseil municipal peut prescrire l'organisation et l'architecture d'un quartier, notamment fixer l'implantation, l'orientation, le volume, l'échelle, les matériaux, la couleur et l'aspect des bâtiments par des plans de quartier ou de structuration.; Toute installation d'antenne est soumise à autorisation de construire et doit être intégrée au bâti.; Les panneaux solaires doivent être intégrés aux façades, toitures ou aménagements extérieurs.; Les cages d'ascenseurs, ventilation et autres superstructures hors gabarit ne doivent pas dépasser 1/20 de la surface du toit et rester en-dessous de la hauteur maximum au faîte.; L'implantation de constructions légères telles que maisonnettes de jardin, cabanons, etc. est réalisable à une distance minimum de 2 m du fonds voisin.; La construction sera érigée sur un seul niveau avec une hauteur maximum de 3m à la faîtière. Toit à un ou deux pans obligatoire.; Les constructions en limite de propriété sont autorisées pour les constructions jumelles ou en bande sous certaines conditions.; La longueur totale des bâtiments n'excédera pas 40m, sauf en zone artisanale et en zone industrielle.; Lorsque la contiguïté est prévue, le propriétaire qui désire renoncer à cette contiguïté doit respecter une distance à la limite égale au double de la distance normale prévue par le règlement.; La rectification de limite a pour effet de modifier, dans l'intérêt d'une utilisation rationnelle du sol, le tracé de la limite entre fonds voisins.; La procédure de remembrement est introduite sur requête des propriétaires ou par décision du Conseil municipal, et doit permettre la réalisation de constructions conformes au présent règlement.; Les mesures particulières d'aménagement applicables et l'affectation du sol sont précisées dans le plan d'aménagement détaillé.; village et hameaux: La hauteur des bâtiments nouveaux, restaurés ou transformés, n'excédera pas le gabarit actuel et devra être adaptée aux autres bâtiments voisins.; village et hameaux: Le propriétaire est tenu d'autoriser les services compétents à effectuer les fouilles et sondages nécessaires avant ou pendant les travaux.; village et hameaux: Les particularités du parcellement dignes d'intérêt doivent être respectées, mais les réunions de parcelles sont possibles sous certaines conditions.; La hauteur d'une façade se mesure pour tous les points de chaque façade dès le terrain naturel non aménagé jusqu'à l'intersection avec la face supérieure de la panne faîtière pour les toits en pente.; Les hauteurs maximales sont appliquées : en zone résidentielle 0.3 (7.50m), en zone résidentielle 0.5 (9.00m), en zone résidentielle 0.7 (12.00m).; Les lucarnes et autres superstructures ne sont pas prises en considération pour le calcul de la hauteur, sous certaines conditions.; Sur un terrain en pente, la hauteur d'un bâtiment se mesure sur la façade aval.; La hauteur maximum d'une construction est la plus grande des hauteurs mesurées sur chaque façade.; Pour toutes les zones, en cas de construction en ordre contigu, l'alignement des corniches et parapets est obligatoire si les constructions ont le même nombre de niveaux.; Tout sous-sol ou rez-de-chaussée doit être compté comme niveau si la surface des façades émerge de plus de 2/3 au-dessus du niveau du terrain naturel, ou aménagé s'il est plus bas.; Les combles habitables et les attiques doivent aussi être comptés comme niveau complet si leur surface brute de plancher excède les 2/3 de celle de l'étage complet au-dessus duquel ils se trouvent.; La distance à la limite est proportionnelle à la hauteur de la façade et doit égaler le tiers de celle-ci au minimum.; La distance entre bâtiments est la distance horizontale la plus courte entre deux bâtiments, correspondant à la somme des distances légales par rapport à la limite.; Les distances prescrites entre bâtiments doivent dans tous les cas être respectées.; Toutes les nouvelles constructions doivent respecter les distances aux limites.; Les distances par rapport aux routes sont fixées par les dispositions de la Loi cantonale sur les routes.; Pour les constructions individuelles, les distances de la zone résidentielle 0.3 peuvent être appliquées.; Pour la transformation de constructions existantes dans leur gabarit actuel, la densité, le taux d’occupation au sol, la hauteur et les distances ne sont pas applicables.; ZONE VILLAGE-HAMEAUX: Hauteur maximale de 10,50 m et distance minimale de 3,00 m.; ZONE RESIDENTIELLE 0.7: Hauteur maximale de 13,50 m, distance minimale de 5,00 m et 10,00 m.; ZONE RESIDENTIELLE Œ5: Hauteur maximale de 10,50 m, distance minimale de 4,00 m et 10,00 m.; ZONE RESIDENTIELLE 0.3: Hauteur maximale de 9,00 m, distance minimale de 3,00 m et 6,00 m.; ZONE ARTISANALE: Hauteur maximale de 10,50 m, distance minimale de 5,00 m et 8,00 m.; ZONE INDUSTRIELLE: Hauteur maximale de 13,50 m, distance minimale de 5,00 m et 8,00 m.; Les gabarits et reculs ne sont pas spécifiquement mentionnés dans le document. |\n| **Toiture** | Les toitures doivent être conçues en respectant les normes esthétiques et fonctionnelles définies par le règlement.; Les gabarits doivent indiquer la hauteur des façades aux angles du bâtiment, y compris la hauteur de l'acrotère pour les toits plats et la hauteur du garde-corps pour les toitures accessibles.; village et hameaux: Les modifications des façades et toitures seront tolérées seulement si le caractère architectural initial est maintenu pour les bâtiments classés.; En règle générale, la couverture doit s'adapter aux constructions voisines.; Le Conseil municipal peut imposer la forme ou l'orientation d'une toiture, le genre et la couleur de la couverture, éventuellement l'aménagement d'un toit plat, afin d'adapter la dite toiture au caractère de ce lieu.; Les toits à pans auront une pente comprise entre 30 et 60%.; Les lucarnes et les ouvertures dans la toiture sont autorisées. La longueur totale de ces ouvrages est limitée au tiers de la longueur de la façade du dernier étage.; Les lucarnes auront en principe une forme adaptée à l'architecture du bâtiment d'une part, au caractère du quartier d'autre part.; Les toits et les flancs des lucarnes seront en principe recouverts du même matériau que la toiture.; Les superstructures servant à l'éclairage ou contribuant à l'économie d'énergie peuvent avoir une pente de toiture allant jusqu'à 100 % (verrières).; Les prescriptions concernant la toiture ne sont pas spécifiquement mentionnées dans le document. |\n| **Stationnement** | Les places de stationnement doivent être conformes aux prescriptions en matière de circulation et d'accès à la voie publique.; Le plan de situation doit indiquer les places de parc existantes ou projetées.; Pour les places de camping, la surface totale du terrain et le nombre d'emplacements doivent être précisés dans la demande.; Chaque propriétaire est tenu d'aménager, sur son terrain privé, un nombre de places de stationnement suffisant pour assurer le parcage de ses propres véhicules à moteur et ceux de ses clients ou visiteurs.; Pour les habitations, il est exigé 2 places par 150 m2 de plancher utile de logement, mais au minimum 2 places par unité de logement.; Pour les bureaux et commerces, il est exigé 1 place par 20 m2 de plancher utile, mais au minimum 1 place par unité d'exploitation.; Pour les cafés-restaurants, il est exigé 1 place par 8 m2 de surface brute, mais au minimum 1 place pour 4 places assises.; Pour les terrasses exploitées, il est exigé 1 place par 20 m2 de surface, mais au minimum 1 place pour 8 places assises.; Pour les immeubles, il est exigé 1 place par logement avec en plus 1 place 'visiteur' par 3 logements.; Pour d'autres commerces, exploitations, industries ou écoles, le nombre de places sera calculé selon les normes de l'Union Suisse des Professionnels de la Route (USPR).; L'affectation des places de parc exigées peut être garantie par la constitution d'une servitude, inscrite au Registre foncier, en faveur de la Commune.; Les prescriptions relatives aux constructions sont celles de la zone résidentielle 0.3.; Chaque propriétaire doit aménager un nombre suffisant de places de stationnement sur son terrain privé selon les critères établis.; Pour l'habitation familiale, 1 place par 65 m2 de surface brute de plancher utile, minimum 2 places par unité de logement.; Pour l'habitation collective, 2 places par unité de logement et 1 place de parc pour visiteurs par 2 unités de logement.; Pour les bureaux, commerces et services, 1 place par 20 m2 de surface brute de plancher utile, minimum 1 place par unité d'exploitation.; Pour les cafés et cafés-restaurants, 1 place par 8 m2 de surface brute réservée au public, minimum 1 place pour 4 places assises.; Pour les terrasses exploitées, 1 place par 20 m2 de surface, minimum 1 place pour 8 places assises.; Le nombre de places nécessaires est arrondi à l'entier supérieur.; En cas d'impossibilité de respecter les exigences, la commune exige une servitude permettant d'assurer le nombre de places manquantes sur un fonds privé situé à moins de 150 m.; Les places de stationnement nécessaires à une habitation collective devront faire l’objet d’une inscription au Registre foncier en faveur de la commune en ce qui concerne leur affectation et le fait qu’elles sont obligatoirement rattachées à cette habitation collective.; Les places de stationnement ne pourront pas servir à d’autres fins (dépôt ou autre) ou être vendues à une personne ou société n’étant pas propriétaire d’un appartement dans l’habitation collective.; Les dimensions des places de stationnement seront définies selon les normes VSS.; L'accès à la voie publique ne doit pas présenter de danger ou d’entrave pour la circulation des piétons et véhicules.; Les sorties de garages sur les voies publiques ne doivent pas avoir une déclivité supérieure à 15%. Elles devront comporter un secteur horizontal d’au moins 3 m avant la limite de la chaussée et d’au moins 1 m avant celle du trottoir.; La distance minimale d’un garage s’ouvrant du côté d’une voie publique est de 5 m de la limite de la parcelle.; La distance minimale entre un garage-atelier, un atelier mécanique ou une carrosserie et le bord de la chaussée ou du trottoir est de 20 m le long de la route cantonale et de 15 m le long des autres voies publiques.; Un local existant ne pourra être converti en garage qu'en respectant les dispositions qui précèdent.; Les portails automatiques coulissants ou ouvrants vers l’intérieur de la parcelle sont autorisés en limite de propriété pour autant qu’ils soient situés à plus de 1.20 m du bord de la chaussée le long des voies publiques cantonales et à plus de 60 cm le long des voies publiques communales.; Les dispositions relatives au stationnement ne sont pas spécifiquement mentionnées dans le document. |\n| **Espaces de jeux / détente** | Les places de jeux pour enfants et les espaces extérieurs doivent être aménagés conformément aux normes de sécurité et d'accessibilité.; Les installations de jeux pour enfants à caractère temporaire ne nécessitent pas d'autorisation si elles sont considérées comme petites constructions.; Les aménagements extérieurs de jardins privés tels que les installations de jeux pour enfants ne nécessitent pas d'autorisation si elles respectent certaines conditions.; Les documents utiles à l'examen de la législation sur l'énergie et sur la protection de l'environnement doivent être fournis, ce qui peut inclure des espaces de jeux ou de détente.; Des places de jeux pour enfants doivent être aménagées à l'écart de la circulation pour toute habitation collective de 4 appartements et plus, à raison de 20m2 au moins par logement, et de 80m2 au minimum.; Ces places de jeux ne pourront pas servir à d'autres fins et peuvent être garanties par la constitution d'une servitude, inscrite au Registre foncier, en faveur de la Commune.; Les espaces extérieurs doivent être aménagés en fonction des exigences d'un habitat de qualité.; Des plantations et l’entretien d’arbres à raison d’un arbre pour 100 m2 de plancher construit sont exigés.; Les espaces de jeux ou de détente ne sont pas spécifiquement mentionnés dans le document. |\n| **Prescriptions architecturales** | Les constructions doivent respecter les prescriptions architecturales en matière d'esthétique, d'orientation et d'ordonnance des façades.; Les plans de construction doivent être établis et dessinés dans les règles de l'art, à l'échelle 1:50 ou 1:100.; Les plans de construction doivent inclure les aménagements extérieurs avec les mouvements de terre, talus, murs de soutènement, clôtures fixes, places et accès.; Pour des projets de constructions importants ou complexes, l'Administration communale peut exiger des documents supplémentaires, y compris des maquettes et des relevés topographiques.; Les constructions doivent présenter un aspect architectural satisfaisant et respecter l'environnement naturel et bâti, notamment du point de vue du volume, de l'emplacement, de la forme, des matériaux et de leur couleur.; Le Conseil municipal a le droit de s'opposer à toute construction qui compromet l'aspect ou le caractère d'un site, d'une localité, d'un quartier, d'une rue ou nuit à l'aspect d'un édifice de valeur historique, artistique ou pittoresque.; Il est interdit de porter atteinte au paysage, à l'environnement, aux sites bâtis, par des constructions et/ou installations non terminées, mal entretenues ou endommagées.; Les propriétaires sont tenus de maintenir les constructions et leurs abords dans un état convenable.; Les rénovations, constructions, et démolitions ayant un effet important sur le paysage de la zone agricole protégée sont soumises à autorisation cantonale.; Toute modification sensible du caractère et de l'aspect général du paysage dans les zones de protection du paysage est interdite.; village et hameaux: En principe, seuls les matériaux naturels peuvent être utilisés et doivent être adaptés aux constructions anciennes.; village et hameaux: Les surfaces vitrées des rez-de-chaussée seront limitées en proportion de la surface totale des façades.; Ardoises naturelles ou artificielles, tuiles vieillies. Les teintes selon les couleurs dominantes de la zone.; Les prescriptions architecturales ne sont pas spécifiquement mentionnées dans le document. |\n\n## 5. DANGERS NATURELS\n\n### ÉVALUATION DES DANGERS NATURELS\n\n**Localisation:** Vétroz (2586790, 1118777.25)\n\n#### Aucune zone de danger majeur identifiée\n\n**Zone sismique:** Zone sismique à déterminer\n**Risque radon:** Risque radon à déterminer\n\n#### RECOMMANDATIONS GÉNÉRALES\n- Aucun danger naturel majeur identifié\n## 8. CARTES ET VISUALISATIONS\n\n- [Visualisation des dangers](https://map.geo.vs.ch/?theme=dangers&E=2586790&N=1118777.25&zoom=6)\n- [Visualisation des dangers](https://map.geo.admin.ch/?topic=bafu&lang=fr&bgLayer=ch.swisstopo.pixelkarte-farbe&E=2586790&N=1118777.25&zoom=6&layers=ch.bafu.gefahren-steinschlag,ch.bafu.gefahren-rutschung,ch.bafu.gefahren-ueberschwemmung)\n\n---\n\n**INSTRUCTIONS POUR L'ANALYSE:**\nEn tant qu'expert en aménagement du territoire et construction en Suisse, analysez ces données et fournissez:\n1. Un résumé des principales contraintes et opportunités\n2. Les démarches administratives nécessaires\n3. Les points d'attention pour un projet de construction\n4. Une estimation des risques et défis potentiels\n5. Des recommandations spécifiques basées sur les données récoltées\n\n"
+  },
+  "cacheDate": "2025-07-06T20:55:39.290Z",
+  "expiryDate": "2025-08-05T20:55:39.290Z",
+  "cacheKey": "5833802ff069815ed3098dd63bcafa7d"
+}
