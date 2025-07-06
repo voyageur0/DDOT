@@ -46,7 +46,7 @@ testOpenAIConnection();
 
 // Nouvelle fonction d'appel OpenAI avec analyse approfondie
 async function callOpenAIWithDeepSearch(comprehensiveData: any): Promise<string> {
-  console.log('🚀 🧠 Démarrage analyse approfondie avec modèle o3');
+  console.log('🚀 🧠 Démarrage analyse approfondie avec modèle gpt-4o-mini');
   
   try {
     const parcelLabel = comprehensiveData.parcelDetails?.number ? `Parcelle ${comprehensiveData.parcelDetails.number}` : comprehensiveData.searchQuery;
@@ -178,7 +178,7 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
           completeness: comprehensiveData.completeness,
           processingTime: comprehensiveData.processingTime,
           elapsedMs: Math.round(elapsedMs),
-          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI o3 (recherche approfondie)'
+          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI gpt-4o-mini (recherche approfondie)'
         });
         
       } catch (error: any) {

@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
 import { exponentialRetry } from './retry';
 
+// Initialisation conditionnelle d'OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-dummy-key-for-development',
 });
 
 export async function chatCompletion(
@@ -13,16 +14,16 @@ export async function chatCompletion(
   // Fonction helper pour choisir le modèle avec fallback
   const getModel = async (): Promise<string> => {
     try {
-      // Test rapide avec o3
+      // Test rapide avec gpt-4o-mini
       await openai.chat.completions.create({
-        model: 'o3',
+        model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
       });
-      return 'o3';
+      return 'gpt-4o-mini';
     } catch (error: any) {
-      if (error.status === 404 || error.message?.includes('o3')) {
-        return 'o3-mini';
+      if (error.status === 404 || error.message?.includes('gpt-4o-mini')) {
+        return 'gpt-3.5-turbo';
       }
       throw error;
     }
@@ -67,18 +68,18 @@ export async function deepSearchAnalysis(
   // Fonction helper pour choisir le modèle avec fallback
   const getModel = async (): Promise<string> => {
     try {
-      // Test rapide avec o3
+      // Test rapide avec gpt-4o-mini
       await openai.chat.completions.create({
-        model: 'o3',
+        model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
       });
-      console.log('✅ Modèle o3 disponible');
-      return 'o3';
+      console.log('✅ Modèle gpt-4o-mini disponible');
+      return 'gpt-4o-mini';
     } catch (error: any) {
-      if (error.status === 404 || error.message?.includes('o3')) {
-        console.log('⚠️ Modèle o3 non disponible, utilisation de o3-mini');
-        return 'o3-mini';
+      if (error.status === 404 || error.message?.includes('gpt-4o-mini')) {
+        console.log('⚠️ Modèle gpt-4o-mini non disponible, utilisation de gpt-3.5-turbo');
+        return 'gpt-3.5-turbo';
       }
       throw error;
     }
@@ -178,7 +179,7 @@ export async function callOpenAI(params: {
   max_tokens?: number;
 }) {
   const {
-    model = 'o3-mini',
+    model = 'gpt-4o-mini',
     temperature = 0,
     messages,
     max_tokens = 1000
