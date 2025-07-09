@@ -76,13 +76,13 @@ export async function deepSearchAnalysis(
       });
       console.log('✅ Modèle gpt-4o-mini disponible');
       return 'gpt-4o-mini';
-    } catch (error: any) {
-      if (error.status === 404 || error.message?.includes('gpt-4o-mini')) {
-        console.log('⚠️ Modèle gpt-4o-mini non disponible, utilisation de gpt-3.5-turbo');
-        return 'gpt-3.5-turbo';
+          } catch (error: any) {
+        if (error.status === 404 || error.message?.includes('gpt-4o-mini')) {
+          console.log('⚠️ Modèle gpt-4o-mini non disponible, utilisation de gpt-3.5-turbo');
+          return 'gpt-3.5-turbo';
+        }
+        throw error;
       }
-      throw error;
-    }
   };
   
   try {

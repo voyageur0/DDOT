@@ -1,6 +1,5 @@
 const fs = require('fs').promises;
 const pdfParse = require('pdf-parse');
-const { createWorker } = require('tesseract.js');
 const { Document } = require('../models-node');
 const { generateEmbeddings } = require('./openaiService');
 const { indexDocument } = require('./vectorService');
@@ -24,22 +23,7 @@ async function extractPdfContent(filePath) {
   }
 }
 
-/**
- * OCR pour les PDFs scannés
- */
-async function performOCR(filePath) {
-  const worker = await createWorker('fra');
-  
-  try {
-    const { data: { text } } = await worker.recognize(filePath);
-    return text;
-  } catch (error) {
-    console.error('Erreur OCR:', error);
-    throw error;
-  } finally {
-    await worker.terminate();
-  }
-}
+
 
 /**
  * Extraire les données structurées d'urbanisme
@@ -134,21 +118,13 @@ async function extractDocument(documentId, filePath) {
     let text = '';
     let metadata = {};
     
-    // Extraction du PDF
-    try {
-      const pdfResult = await extractPdfContent(filePath);
-      text = pdfResult.text;
-      metadata = pdfResult.metadata;
-    } catch (error) {
-      console.log('PDF non lisible, tentative OCR...');
-      // Si le PDF n'est pas lisible, essayer l'OCR
-      text = await performOCR(filePath);
-    }
+    // Extraction du PDF (tous les règlements sont déjà OCR, pas besoin de fallback)
+    const pdfResult = await extractPdfContent(filePath);
+    text = pdfResult.text;
+    metadata = pdfResult.metadata;
     
-    // Si le texte est vide ou trop court
     if (!text || text.length < 100) {
-      console.log('Texte insuffisant, utilisation de l\'OCR...');
-      text = await performOCR(filePath);
+      throw new Error('Le fichier PDF ne contient pas de texte extractible');
     }
     
     // Extraction des données structurées
@@ -160,11 +136,11 @@ async function extractDocument(documentId, filePath) {
       extractedData: structuredData
     });
     
-    // Générer les chunks pour l'indexation
-    const chunks = splitTextIntoChunks(text);
+    // Avec GPT-4.1, plus besoin de chunking ! Indexer le document complet
+    console.log(`📊 Indexation document complet avec GPT-4.1 (${text.length} caractères)`);
     
-    // Indexer le document pour la recherche vectorielle
-    await indexDocument(documentId, chunks);
+    // Indexer le document entier pour la recherche vectorielle  
+    await indexDocument(documentId, [text]);
     
     console.log(`Document ${documentId} extrait et indexé avec succès`);
     

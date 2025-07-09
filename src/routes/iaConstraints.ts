@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
 import axios from 'axios';
 import { performComprehensiveAnalysis, performQuickAnalysis } from '../lib/parcelAnalysisOrchestrator';
@@ -46,7 +46,7 @@ testOpenAIConnection();
 
 // Nouvelle fonction d'appel OpenAI avec analyse approfondie
 async function callOpenAIWithDeepSearch(comprehensiveData: any): Promise<string> {
-  console.log('🚀 🧠 Démarrage analyse approfondie avec modèle gpt-4o-mini');
+  console.log('🚀 🧠 Démarrage analyse approfondie avec modèle gpt-4.1');
   
   try {
     const parcelLabel = comprehensiveData.parcelDetails?.number ? `Parcelle ${comprehensiveData.parcelDetails.number}` : comprehensiveData.searchQuery;
@@ -64,18 +64,19 @@ Exemples concrets trouvés dans les documents :
 - GABARITS : Si tu vois "hauteur max 12 m", utilise cette valeur exacte  
 - ZONES : Si tu vois "zone d'habitation R2", utilise cette désignation exacte
 
-STRUCTURE OBLIGATOIRE (8 thèmes numérotés) :
+STRUCTURE OBLIGATOIRE (9 thèmes numérotés) :
 1. **Identification** : Parcelle, commune, coordonnées
 2. **Destination de zone** : Type exact depuis RDPPF/règlement
 3. **Indice d'utilisation (IBUS)** : Valeur exacte si mentionnée
-4. **Gabarits & reculs** : Hauteurs et distances exactes
-5. **Toiture** : Contraintes exactes (pente, matériaux)
-6. **Stationnement** : Règles exactes (nombre places/m²)
-7. **Espaces de jeux/détente** : Obligations exactes si mentionnées
-8. **Prescriptions architecturales** : Contraintes exactes de style/matériaux`;
+4. **Densité constructible** : Surfaces constructibles calculées selon les règles valaisannes (indices U et IBUS)
+5. **Gabarits & reculs** : Hauteurs et distances exactes
+6. **Toiture** : Contraintes exactes (pente, matériaux)
+7. **Stationnement** : Règles exactes (nombre places/m²)
+8. **Espaces de jeux/détente** : Obligations exactes si mentionnées
+9. **Prescriptions architecturales** : Contraintes exactes de style/matériaux`;
 
     const analysisResponse = await callOpenAI({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1',
       temperature: 0,
       messages: [
         { role: 'system', content: 'Tu es un expert urbaniste suisse. En te basant STRICTEMENT sur les données fournies, rédige une synthèse vulgarisée à destination d\'un maître d\'ouvrage.' },
@@ -101,7 +102,7 @@ async function callOpenAISimple(userQuery: string, communeData: any, parcelData:
   
   try {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -134,7 +135,7 @@ Mentionner les vraies références légales (LAT, LCAT, règlements communaux).`
   }
 }
 
-router.post('/ia-constraints', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.post('/ia-constraints', async (req, res, next) => {
   try {
     console.log('📞 Requête IA reçue:', req.body);
     
@@ -178,7 +179,7 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
           completeness: comprehensiveData.completeness,
           processingTime: comprehensiveData.processingTime,
           elapsedMs: Math.round(elapsedMs),
-          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI gpt-4o-mini (recherche approfondie)'
+          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI gpt-4.1 (recherche approfondie)'
         });
         
       } catch (error: any) {
@@ -233,7 +234,7 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
         elapsedMs: Math.round(elapsedMs),
         commune: commune || 'À identifier',
         analysisType: 'basic',
-        source: 'OpenAI GPT-4o-mini avec connaissances de base'
+        source: 'OpenAI GPT-4.1 avec connaissances de base'
       });
       
     } catch (openaiError: any) {
@@ -252,4 +253,4 @@ router.post('/ia-constraints', async (req: express.Request, res: express.Respons
   }
 });
 
-module.exports = router; 
+export default router; 

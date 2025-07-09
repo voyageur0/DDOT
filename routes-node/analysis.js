@@ -498,7 +498,7 @@ async function fetchRDPPFData(x, y) {
 function determineRestrictionSeverity(result) {
     const layerName = (result.layerName || '').toLowerCase();
     
-    if (layerName.includes('militaer') || layerName.includes('belasteter') || layerName.includes('danger')) {
+    if (layerName.includes('militaer') || layerName.includes('belasteter')) {
         return 'high';
     } else if (layerName.includes('schutz') || layerName.includes('protection') || layerName.includes('bruit')) {
         return 'medium';

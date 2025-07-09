@@ -1,12 +1,12 @@
 import { searchParcel, getParcelDetails, identifyZonesAndConstraints, getGeologicalInfo, type ParcelSearchResult, type ParcelDetails } from './geoAdmin';
 import { getPLRRestrictions, getBuildingZoneInfo, formatPLRForAnalysis, type PLRData } from './plrCadastre';
 import { findCommunalRegulations, analyzeCommunalRegulation, formatRegulationsForAnalysis, type CommunalRegulation } from './communalRegulations';
-import { getHazardAssessment, formatHazardAssessment, type HazardAssessment } from './dangerMapsVS';
 import { geocodeAddress, getFallbackCoordinates, type GeocodeResult } from './geocodingVS';
 import { getAllAdditionalData, formatAdditionalDataForAI, type CantonalDataResult } from './additionalDataSources';
 import { buildConstraintTable } from './buildConstraintTable';
 import { analyzeRdppf, type RdppfConstraint } from './rdppfExtractor';
 import { RegulationConstraint } from './regulationExtractor';
+import { calculerDensiteValais, formaterResultatsValais, extraireIndicesReglement, type ValaisDensityCalculation } from './valaisDensityCalculator';
 
 export interface ComprehensiveParcelAnalysis {
   // Données de base
@@ -24,15 +24,15 @@ export interface ComprehensiveParcelAnalysis {
   plrData: PLRData | null;
   communalRegulations: CommunalRegulation[];
   
-  // Dangers naturels
-  hazardAssessment: HazardAssessment | null;
-  
   // Données supplémentaires
   additionalData: CantonalDataResult[];
   
   // Nouvelles données structurées à partir des règlements communaux
   communalConstraints: import('./regulationExtractor').RegulationConstraint[];
   rdppfConstraints: RdppfConstraint[];
+  
+  // Calculs de densité spécifiques au Valais
+  valaisDensity?: ValaisDensityCalculation;
   
   // Métadonnées
   processingTime: number;
@@ -60,10 +60,10 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     buildingZone: {},
     plrData: null,
     communalRegulations: [],
-    hazardAssessment: null,
     additionalData: [],
     communalConstraints: [],
     rdppfConstraints: [],
+    valaisDensity: undefined,
     processingTime: 0,
     completeness: 0,
     errors: [],
@@ -71,11 +71,11 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
   };
   
   let successCount = 0;
-  const totalSteps = 10; // Nombre total d'étapes (inclut contraintes structurées)
+  const totalSteps = 5; // Nombre total d'étapes simplifiées (sans dangers naturels)
   
   try {
     // ÉTAPE 1: Recherche de la parcelle
-    console.log('📍 Étape 1/10: Recherche parcelle...');
+    console.log('📍 Étape 1/5: Recherche parcelle...');
     try {
       analysis.searchResult = await searchParcel(searchQuery);
       if (analysis.searchResult) {
@@ -104,17 +104,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     const { x, y } = analysis.searchResult.center;
     const egrid = analysis.searchResult.egrid;
     
-    // ÉTAPE 2: Détails de la parcelle
-    console.log('📊 Étape 2/10: Détails parcelle...');
-    try {
-      analysis.parcelDetails = await getParcelDetails(x, y);
-      if (analysis.parcelDetails) successCount++;
-    } catch (error) {
-      analysis.errors.push(`Erreur détails parcelle: ${error}`);
-    }
-    
-    // ÉTAPE 3: RDPPF
-    console.log('📑 Étape 3/10: RDPPF...');
+    // ÉTAPE 2: RDPPF
+    console.log('📑 Étape 2/5: RDPPF...');
     try {
       // Construire l'URL RDPPF à partir de l'EGRID
       let rdppfUrl = null;
@@ -141,8 +132,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur RDPPF: ${error}`);
     }
     
-    // ÉTAPE 4: Zones et contraintes
-    console.log('🗺️ Étape 4/10: Zones et contraintes...');
+    // ÉTAPE 3: Zones et contraintes
+    console.log('🗺️ Étape 3/5: Zones et contraintes...');
     try {
       analysis.zones = await identifyZonesAndConstraints(x, y);
       if (Object.keys(analysis.zones).length > 0) successCount++;
@@ -150,37 +141,8 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       analysis.errors.push(`Erreur zones: ${error}`);
     }
     
-    // ÉTAPE 5: Informations géologiques
-    console.log('🗻 Étape 5/10: Infos géologiques...');
-    try {
-      analysis.geologicalInfo = await getGeologicalInfo(x, y);
-      if (Object.keys(analysis.geologicalInfo).length > 0) successCount++;
-    } catch (error) {
-      analysis.errors.push(`Erreur géologie: ${error}`);
-    }
-    
-    // ÉTAPE 6: Zone de construction
-    console.log('🏗️ Étape 6/10: Zone de construction...');
-    try {
-      analysis.buildingZone = await getBuildingZoneInfo(x, y);
-      if (Object.keys(analysis.buildingZone).length > 0) successCount++;
-    } catch (error) {
-      analysis.errors.push(`Erreur zone construction: ${error}`);
-    }
-    
-    // ÉTAPE 7: Restrictions PLR
-    console.log('📋 Étape 7/10: Restrictions PLR...');
-    if (egrid) {
-      try {
-        analysis.plrData = await getPLRRestrictions(egrid);
-        if (analysis.plrData) successCount++;
-      } catch (error) {
-        analysis.errors.push(`Erreur PLR: ${error}`);
-      }
-    }
-    
-    // ÉTAPE 8: Règlements communaux
-    console.log('🏛️ Étape 8/10: Règlements communaux...');
+    // ÉTAPE 4: Règlements communaux
+    console.log('🏛️ Étape 4/5: Règlements communaux...');
     // Extraire la commune depuis searchResult.number (format: "<b>Vétroz</b> 12558...")
     let municipality = analysis.parcelDetails?.municipality || analysis.searchResult?.municipality || '';
     if (!municipality && analysis.searchResult?.number) {
@@ -203,46 +165,19 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
           
           const fullPath = path.join(process.cwd(), localRegulationPath);
           
-          // Vérifier d'abord si un fichier JSON OCR existe
-          const jsonPath = localRegulationPath.replace('.pdf', '.json');
-          const fullJsonPath = path.join(process.cwd(), jsonPath);
-          
           let regulationText = '';
           
-          try {
-            console.log(`📖 Recherche fichier JSON OCR: ${jsonPath}`);
-            await fs.access(fullJsonPath);
-            
-            // Lire le fichier JSON avec OCR
-            console.log(`✅ Fichier JSON OCR trouvé: ${jsonPath}`);
-            const jsonContent = await fs.readFile(fullJsonPath, 'utf-8');
-            const parsedJson = JSON.parse(jsonContent);
-            
-            // Extraire tout le texte des pages
-            if (parsedJson.pages && Array.isArray(parsedJson.pages)) {
-              regulationText = parsedJson.pages
-                .map((page: any) => `=== PAGE ${page.page} ===\n${page.text}`)
-                .join('\n\n');
-              console.log(`✅ Texte extrait du JSON OCR: ${regulationText.length} caractères`);
-              console.log(`📄 Titre: ${parsedJson.title || 'Non spécifié'}`);
-              console.log(`📄 Pages: ${parsedJson.pages.length}`);
-            } else {
-              throw new Error('Format JSON invalide - pages manquantes');
-            }
-          } catch (jsonError: any) {
-            console.log(`⚠️ Fichier JSON OCR non trouvé (${jsonError.message}), fallback vers PDF...`);
-            
-            // Fallback vers extraction PDF
-            await fs.access(fullPath);
-            const { extractTextFromPDFWithOCR } = await import('./pdfOcrExtractor');
-            
-            console.log(`📖 Extraction intelligente PDF+OCR: ${localRegulationPath}`);
-            const result = await extractTextFromPDFWithOCR(fullPath, true);
-            regulationText = result.text;
-            
-            console.log(`✅ Extraction terminée en ${result.processingTime}ms`);
-            console.log(`📄 Méthode: ${result.method}, Confiance: ${result.confidence}%, Pages: ${result.pageCount}`);
-          }
+          // Extraction directe du PDF (tous les règlements sont déjà OCR)
+          await fs.access(fullPath);
+          
+          // Utiliser pdf-parse pour extraire le texte directement
+          const pdfParse = (await import('pdf-parse')).default;
+          const pdfBuffer = await fs.readFile(fullPath);
+          const pdfData = await pdfParse(pdfBuffer);
+          regulationText = pdfData.text;
+          
+          console.log(`✅ Texte extrait du PDF: ${regulationText.length} caractères`);
+          console.log(`📄 Pages: ${pdfData.numpages}`)
           
           if (regulationText && regulationText.length > 500) {
             // Extraire les contraintes structurées du règlement
@@ -274,15 +209,64 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       }
     }
     
-    // ÉTAPE 9: Dangers naturels
-    console.log('⚠️ Étape 9/10: Dangers naturels...');
+    // ÉTAPE 5: Calcul de densité constructible (Valais)
+    console.log('📏 Étape 5/5: Calcul densité constructible...');
     try {
-      analysis.hazardAssessment = await getHazardAssessment(x, y, municipality);
-      if (analysis.hazardAssessment) successCount++;
+      if (analysis.parcelDetails?.surface && municipality) {
+        console.log(`📏 Calcul densité pour terrain de ${analysis.parcelDetails.surface} m² (${municipality})`);
+        
+        // Extraire les indices depuis les règlements communaux
+        let indices: { indiceU?: number; indiceIBUS?: number } = {};
+        
+        // 1. Depuis les contraintes communales extraites
+        for (const constraint of analysis.communalConstraints) {
+          if (constraint.theme === "Indice d'utilisation (IBUS)" && constraint.rule) {
+            const extracted = extraireIndicesReglement(constraint.rule);
+            if (extracted.indiceU) indices.indiceU = extracted.indiceU;
+            if (extracted.indiceIBUS) indices.indiceIBUS = extracted.indiceIBUS;
+          }
+        }
+        
+        // 2. Depuis les contraintes RDPPF
+        for (const constraint of analysis.rdppfConstraints) {
+          if (constraint.theme === "Indice d'utilisation (IBUS)" && constraint.rule) {
+            const extracted = extraireIndicesReglement(constraint.rule);
+            if (extracted.indiceU) indices.indiceU = extracted.indiceU;
+            if (extracted.indiceIBUS) indices.indiceIBUS = extracted.indiceIBUS;
+          }
+        }
+        
+        // 3. Depuis la zone de construction (buildingZone) - commenté car on n'utilise plus cette étape
+        // if (analysis.buildingZone?.ibus && !indices.indiceIBUS) {
+        //   indices.indiceIBUS = parseFloat(analysis.buildingZone.ibus);
+        // }
+        
+        console.log(`📏 Indices extraits: U=${indices.indiceU}, IBUS=${indices.indiceIBUS}`);
+        
+        // Calculer la densité si on a trouvé au moins un indice
+        if (indices.indiceU || indices.indiceIBUS) {
+          analysis.valaisDensity = calculerDensiteValais({
+            terrainSurface: analysis.parcelDetails.surface,
+            indiceU: indices.indiceU,
+            indiceIBUS: indices.indiceIBUS,
+            commune: municipality,
+            projetCECB: false, // Par défaut, peut être modifié par l'utilisateur
+            projetMINERGIE: false // Par défaut, peut être modifié par l'utilisateur
+          });
+          
+          console.log(`✅ Densité calculée: U=${analysis.valaisDensity.surfaceUtileU} m², IBUS=${analysis.valaisDensity.surfaceUtileIBUS} m²`);
+        } else {
+          console.log('⚠️ Aucun indice de construction trouvé dans les documents');
+        }
+      }
     } catch (error) {
-      analysis.errors.push(`Erreur dangers: ${error}`);
+      analysis.errors.push(`Erreur calcul densité: ${error}`);
+      console.error('❌ Erreur calcul densité:', error);
     }
     
+    // Pas d'analyse des dangers naturels pour l'instant (à implémenter plus tard)
+    console.log('⚠️ Dangers naturels désactivés temporairement...');
+
     // Calcul de la complétude
     analysis.completeness = Math.round((successCount / totalSteps) * 100);
     analysis.processingTime = Date.now() - startTime;
@@ -352,13 +336,13 @@ function formatForOpenAI(analysis: ComprehensiveParcelAnalysis): string {
     formatted += '\n';
   }
   
-  // 5. DANGERS NATURELS
-  if (analysis.hazardAssessment) {
-    formatted += `## 5. DANGERS NATURELS\n\n`;
-    formatted += formatHazardAssessment(analysis.hazardAssessment);
+  // 4c. CALCULS DE DENSITÉ CONSTRUCTIBLE (VALAIS)
+  if (analysis.valaisDensity) {
+    formatted += `## 4c. DENSITÉ CONSTRUCTIBLE (VALAIS)\n\n`;
+    formatted += formaterResultatsValais(analysis.valaisDensity);
   }
   
-  // 6. CONTRAINTES GÉOGRAPHIQUES
+  // 5. CONTRAINTES GÉOGRAPHIQUES
   if (Object.keys(analysis.zones).length > 0 || Object.keys(analysis.geologicalInfo).length > 0) {
     formatted += `## 6. CONTRAINTES GÉOGRAPHIQUES ET GÉOLOGIQUES\n\n`;
     
@@ -385,15 +369,6 @@ function formatForOpenAI(analysis: ComprehensiveParcelAnalysis): string {
     formatted += `**Données manquantes ou erreurs rencontrées:**\n`;
     for (const error of analysis.errors) {
       formatted += `- ${error}\n`;
-    }
-    formatted += '\n';
-  }
-  
-  // 8. LIENS UTILES
-  if (analysis.hazardAssessment?.mapUrls?.length) {
-    formatted += `## 8. CARTES ET VISUALISATIONS\n\n`;
-    for (const url of analysis.hazardAssessment.mapUrls) {
-      formatted += `- [Visualisation des dangers](${url})\n`;
     }
     formatted += '\n';
   }
@@ -445,10 +420,10 @@ export async function performQuickAnalysis(searchQuery: string): Promise<Compreh
     buildingZone: {},
     plrData: null,
     communalRegulations: [],
-    hazardAssessment: null,
     additionalData: [],
     communalConstraints: [],
     rdppfConstraints: [],
+    valaisDensity: undefined,
     processingTime: 0,
     completeness: 0,
     errors: [],

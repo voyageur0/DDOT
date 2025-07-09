@@ -1,7 +1,6 @@
 import axios from 'axios';
 // @ts-ignore: type definitions optionally installed via @types/cheerio
 import * as cheerio from 'cheerio';
-import { extractTextFromPdfUrl, extractUrbanismRules, getCachedOCR, setCachedOCR } from './ocrService';
 import { extractRegulationConstraints, RegulationConstraint, extractConstraintsFromLargeText } from './regulationExtractor';
 
 export interface CommunalRegulation {
@@ -204,48 +203,11 @@ function determineDocumentType(title: string): 'règlement' | 'plan_zones' | 'pr
  * Extrait et analyse le contenu d'un règlement communal
  */
 export async function analyzeCommunalRegulation(regulation: CommunalRegulation, targetZone?: string): Promise<CommunalRegulation> {
-  console.log(`📖 Analyse du règlement: ${regulation.title}`);
+  console.log(`📖 Analyse du règlement: ${regulation.title} (Fonctionnalité désactivée - utiliser les PDFs locaux)`);
   
-  try {
-    // Vérifier le cache OCR d'abord
-    let ocrResult = getCachedOCR(regulation.url);
-    
-    if (!ocrResult) {
-      // Faire l'OCR du document
-      ocrResult = await extractTextFromPdfUrl(regulation.url);
-      if (ocrResult.confidence > 30) { // Seuil minimal de confiance
-        setCachedOCR(regulation.url, ocrResult);
-      }
-    } else {
-      console.log('📋 Utilisation cache OCR');
-    }
-    
-    if (ocrResult.text.length > 100) {
-      regulation.textContent = ocrResult.text;
-      
-      // Extraire les sections pertinentes pour l'urbanisme
-      const relevantText = extractUrbanismRules(ocrResult.text, targetZone);
-      if (relevantText.length > 50) {
-        regulation.relevantSections = [relevantText];
-      }
-      
-      // NEW: Extraction structurée des contraintes avec fallback chunké
-      const constraintsSource = relevantText.length > 50 ? relevantText : ocrResult.text;
-      let constraints = await extractRegulationConstraints(constraintsSource);
-      if (constraints.length < 5 && ocrResult.text.length > 12000) {
-        console.log('⬆️ Relance extraction par segments pour plus de contraintes...');
-        constraints = await extractConstraintsFromLargeText(ocrResult.text);
-      }
-      regulation.structuredConstraints = constraints;
-      
-      console.log(`✅ Analyse terminée - ${ocrResult.text.length} caractères extraits`);
-    } else {
-      console.log('⚠️ OCR peu fiable ou document non textuel');
-    }
-    
-  } catch (error) {
-    console.error('❌ Erreur analyse règlement:', error);
-  }
+  // Fonctionnalité d'extraction web désactivée car tous les règlements sont maintenant locaux
+  // et analysés directement par parcelAnalysisOrchestrator
+  console.log('⚠️ Extraction web désactivée - utiliser les règlements locaux dans le dossier reglements/');
   
   return regulation;
 }

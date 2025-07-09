@@ -7,8 +7,8 @@ const openai = new OpenAI({
 });
 
 const EMBEDDING_MODEL = "text-embedding-ada-002";
-// Modèle de chat avancé
-const CHAT_MODEL = "o3";
+// Modèle de chat avancé - GPT-4.1
+const CHAT_MODEL = "gpt-4.1";
 
 /**
  * Générer un embedding pour un texte
@@ -45,42 +45,34 @@ async function generateEmbeddings(texts) {
 }
 
 /**
- * Générer un résumé du texte
+ * Générer un résumé du texte avec GPT-4.1 (sans chunking)
  */
-async function generateSummary(text, maxTokens = 500) {
+async function generateSummary(text, maxTokens = 1000) {
   try {
-    // Si le texte est trop long, le diviser en chunks
-    const chunks = splitTextIntoTokenChunks(text, 3000);
+    // Avec GPT-4.1, nous pouvons traiter le document entier d'un coup !
+    console.log(`📊 Génération résumé avec GPT-4.1 pour ${text.length} caractères (sans chunking)`);
     
-    if (chunks.length > 1) {
-      // Résumer chaque chunk
-      const summaries = [];
-      
-      for (const chunk of chunks.slice(0, 10)) { // Limiter à 10 chunks
-        const chunkSummary = await generateChunkSummary(chunk);
-        if (chunkSummary) {
-          summaries.push(chunkSummary);
+    const response = await openai.chat.completions.create({
+      model: "gpt-4.1", // Utiliser GPT-4.1 directement
+      messages: [
+        {
+          role: "system",
+          content: "Tu es un assistant spécialisé en urbanisme qui produit des résumés clairs et exhaustifs des règlements d'urbanisme. Analyse le document complet et fournis une synthèse structurée couvrant : zones, coefficients (IBUS, COS, CES), hauteurs maximales, distances aux limites, stationnement, et toutes autres contraintes importantes."
+        },
+        {
+          role: "user",
+          content: `Résume de façon complète et structurée ce règlement d'urbanisme:\n\n${text}`
         }
-      }
-      
-      // Combiner les résumés
-      const combinedText = summaries.join('\n\n');
-      const finalSummary = await generateFinalSummary(combinedText);
-      
-      return {
-        summary: finalSummary,
-        chunksProcessed: summaries.length,
-        tokensUsed: estimateTokens(text)
-      };
-    } else {
-      // Texte court, résumer directement
-      const summary = await generateChunkSummary(text);
-      return {
-        summary,
-        chunksProcessed: 1,
-        tokensUsed: estimateTokens(text)
-      };
-    }
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.3
+    });
+    
+    return {
+      summary: response.choices[0].message.content,
+      chunksProcessed: 1, // Plus de chunks !
+      tokensUsed: estimateTokens(text)
+    };
   } catch (error) {
     console.error('Erreur génération résumé:', error);
     return {

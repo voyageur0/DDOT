@@ -1277,7 +1277,7 @@
         }
 
         function setupActionButtons(data) {
-            // Liste des communes éligibles
+            // Liste des communes éligibles - mise à jour pour correspondre aux fichiers disponibles
             const allowed=["Arbaz","Ardon","Ayent","Chamoson","Charrat","Conthey","Martigny","Mase","Mollens","Nax","Nendaz","Riddes","Saillon","Saint-Léonard","Salgesch","Savièse","Saxon","Sierre","Sion","Vernamiège","Vérrossaz","Vétroz"];
 
             // Gérer le bouton flottant
@@ -1319,10 +1319,10 @@
             if (regulationBtn) {
                 const communeKey = data.cadastral.commune;
                 
-                // Utiliser l'API route pour télécharger les PDFs locaux
-                if (communeKey) {
+                // Vérifier si la commune est dans la liste des communes éligibles
+                if (communeKey && allowed.includes(communeKey)) {
                     regulationBtn.onclick = () => {
-                        window.open(`/api/regulation/${communeKey}`, '_blank');
+                        window.open(`/api/regulation/${encodeURIComponent(communeKey)}`, '_blank');
                     };
                     regulationBtn.style.display = 'inline-flex';
                     regulationBtn.innerHTML = '📚 Règlement Communal';

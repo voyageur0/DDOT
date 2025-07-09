@@ -54,21 +54,24 @@ Exemple:
 
 /**
  * Analyse le texte du RDPPF et renvoie un tableau de contraintes structurées.
+ * Avec GPT-4.1, analyse du document RDPPF complet sans limitation.
  */
 export async function extractRdppfConstraints(rawText: string): Promise<RdppfConstraint[]> {
   if (!rawText || rawText.length < 50) return [];
 
+  console.log(`🔍 Analyse RDPPF complète avec GPT-4.1: ${rawText.length} caractères`);
+
   const messages: any = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'user', content: rawText.slice(0, 16000) }
+    { role: 'user', content: rawText } // Analyse du document RDPPF complet !
   ];
 
   try {
     const response = await callOpenAI({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1',
       temperature: 0,
       messages,
-      max_tokens: 1200
+      max_tokens: 2000 // Augmenter pour une analyse plus détaillée
     });
 
     const content = response.choices[0].message?.content ?? '[]';
