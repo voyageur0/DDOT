@@ -9,23 +9,145 @@ export interface RdppfConstraint {
   rule: string;  // Description textuelle de la contrainte
 }
 
+// Cache temporaire pour éviter les conflits avec les clics utilisateur
+interface CacheEntry {
+  data: Buffer;
+  timestamp: number;
+  egrid: string;
+}
+
+const rdppfCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 /**
- * Télécharge le fichier PDF RDPPF dans un dossier temporaire et renvoie le chemin local.
+ * Nettoie le cache des entrées expirées
+ */
+function cleanExpiredCache(): void {
+  const now = Date.now();
+  for (const [key, entry] of rdppfCache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL_MS) {
+      rdppfCache.delete(key);
+    }
+  }
+}
+
+/**
+ * Télécharge le fichier PDF RDPPF avec gestion de cache et de conflits.
+ * Implémente un délai intelligent si le PDF a été récemment accédé par l'utilisateur.
  */
 export async function downloadRdppf(pdfUrl: string): Promise<string> {
   console.log(`🔗 Début téléchargement: ${pdfUrl}`);
-  const response = await axios.get(pdfUrl, { 
-    responseType: 'arraybuffer',
-    timeout: 30000 
-  });
-  console.log(`✅ PDF téléchargé, taille: ${response.data.byteLength} bytes`);
-  const buffer = Buffer.from(response.data);
-  const tmpDir = path.join(process.cwd(), 'uploads');
-  await fs.mkdir(tmpDir, { recursive: true });
-  const filePath = path.join(tmpDir, `rdppf-${Date.now()}.pdf`);
-  await fs.writeFile(filePath, buffer);
-  console.log(`💾 PDF sauvegardé: ${filePath}`);
-  return filePath;
+  
+  // Extraire l'EGRID de l'URL pour le cache
+  const egridMatch = pdfUrl.match(/EGRID=([A-Z0-9]+)/);
+  const egrid = egridMatch ? egridMatch[1] : '';
+  
+  // Nettoyer le cache expiré
+  cleanExpiredCache();
+  
+  // Vérifier si le PDF est déjà en cache
+  const cacheKey = egrid || pdfUrl;
+  const cachedEntry = rdppfCache.get(cacheKey);
+  
+  if (cachedEntry) {
+    const ageMinutes = (Date.now() - cachedEntry.timestamp) / (1000 * 60);
+    console.log(`💾 PDF trouvé en cache (âge: ${ageMinutes.toFixed(1)} min)`);
+    
+    // Utiliser le cache directement
+    const tmpDir = path.join(process.cwd(), 'uploads');
+    await fs.mkdir(tmpDir, { recursive: true });
+    const filePath = path.join(tmpDir, `rdppf-cached-${Date.now()}.pdf`);
+    await fs.writeFile(filePath, cachedEntry.data);
+    console.log(`✅ PDF restauré depuis le cache: ${filePath}`);
+    return filePath;
+  }
+  
+  try {
+    // Premier essai de téléchargement
+    const buffer = await downloadWithRetry(pdfUrl);
+    
+    // Sauvegarder en cache pour éviter les futurs conflits
+    rdppfCache.set(cacheKey, {
+      data: buffer,
+      timestamp: Date.now(),
+      egrid
+    });
+    
+    const tmpDir = path.join(process.cwd(), 'uploads');
+    await fs.mkdir(tmpDir, { recursive: true });
+    const filePath = path.join(tmpDir, `rdppf-${Date.now()}.pdf`);
+    await fs.writeFile(filePath, buffer);
+    console.log(`💾 PDF sauvegardé: ${filePath}`);
+    return filePath;
+    
+  } catch (error: any) {
+    // Si erreur 500, probablement un conflit avec le navigateur
+    if (error.response?.status === 500) {
+      console.log(`⚠️ Erreur 500 détectée - possible conflit utilisateur. Tentative avec délai...`);
+      
+      // Attendre quelques secondes pour laisser le serveur se libérer
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      try {
+        const buffer = await downloadWithRetry(pdfUrl, 2); // Retry réduit
+        
+        // Sauvegarder en cache
+        rdppfCache.set(cacheKey, {
+          data: buffer,
+          timestamp: Date.now(),
+          egrid
+        });
+        
+        const tmpDir = path.join(process.cwd(), 'uploads');
+        await fs.mkdir(tmpDir, { recursive: true });
+        const filePath = path.join(tmpDir, `rdppf-delayed-${Date.now()}.pdf`);
+        await fs.writeFile(filePath, buffer);
+        console.log(`✅ PDF téléchargé après délai: ${filePath}`);
+        return filePath;
+        
+      } catch (retryError) {
+        console.log(`❌ Échec même après délai. RDPPF temporairement indisponible.`);
+        throw retryError;
+      }
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * Télécharge le PDF avec retry automatique
+ */
+async function downloadWithRetry(pdfUrl: string, maxRetries = 3): Promise<Buffer> {
+  let lastError: any;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await axios.get(pdfUrl, { 
+        responseType: 'arraybuffer',
+        timeout: 30000,
+        // Headers pour éviter les blocages
+        headers: {
+          'User-Agent': 'DDOT-Urban-Analysis/1.0 (Automated PDF Analysis)',
+          'Accept': 'application/pdf,*/*'
+        }
+      });
+      
+      console.log(`✅ PDF téléchargé (essai ${attempt}), taille: ${response.data.byteLength} bytes`);
+      return Buffer.from(response.data);
+      
+    } catch (error: any) {
+      lastError = error;
+      
+      if (attempt < maxRetries) {
+        const delay = attempt * 2000; // Délai croissant: 2s, 4s, 6s
+        console.log(`⚠️ Erreur essai ${attempt} (${error.response?.status || error.code}). Retry dans ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError;
 }
 
 /**

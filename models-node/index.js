@@ -1,12 +1,9 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
+const { getPostgreSQLConfig } = require('../config/supabase');
 
-// Configuration de Sequelize
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './urban_analysis.db',
-  logging: false
-});
+// Configuration de Sequelize pour PostgreSQL (Supabase)
+const sequelize = new Sequelize(getPostgreSQLConfig());
 
 // Modèle User
 const User = sequelize.define('User', {
@@ -85,7 +82,7 @@ const Document = sequelize.define('Document', {
     type: DataTypes.TEXT
   },
   extractedData: {
-    type: DataTypes.JSON
+    type: sequelize.getDialect() === 'postgres' ? DataTypes.JSONB : DataTypes.JSON
   },
   userId: {
     type: DataTypes.INTEGER,
@@ -123,10 +120,10 @@ const DocumentEmbedding = sequelize.define('DocumentEmbedding', {
     allowNull: false
   },
   embedding: {
-    type: DataTypes.BLOB  // Stockage des vecteurs en binaire
+    type: DataTypes.TEXT  // Stockage des vecteurs en JSON pour PostgreSQL
   },
   metadata: {
-    type: DataTypes.JSON
+    type: sequelize.getDialect() === 'postgres' ? DataTypes.JSONB : DataTypes.JSON
   }
 }, {
   timestamps: false
@@ -160,7 +157,7 @@ const Analysis = sequelize.define('Analysis', {
     allowNull: false
   },
   inputData: {
-    type: DataTypes.JSON
+    type: sequelize.getDialect() === 'postgres' ? DataTypes.JSONB : DataTypes.JSON
   },
   result: {
     type: DataTypes.TEXT

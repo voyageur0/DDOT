@@ -493,19 +493,7 @@
                     DDOT - Projet en cours de développement.<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
     </footer>
 
-    <!-- Modal Authentification -->
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <span class="close" id="closeAuth">&times;</span>
-            <h2 id="authTitle">Connexion</h2>
-            <input type="text" id="authUsername" placeholder="Nom d'utilisateur">
-            <input type="password" id="authPassword" placeholder="Mot de passe">
-            <button id="authSubmitBtn" class="action-btn" style="margin-top:15px;">Se connecter</button>
-            <p id="switchAuth" style="margin-top:10px; font-size: 0.9em;">
-                Pas de compte ? <a href="#" id="switchToRegister">Inscrivez-vous</a>
-            </p>
-        </div>
-    </div>
+    <!-- Authentification sécurisée gérée côté serveur -->
 
     <script>
         // Base de données des règlements communaux
@@ -559,7 +547,7 @@
             // === Auth UI ===
             const loginBtn = document.getElementById('loginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
-            updateUserUI();
+            // Authentification gérée côté serveur
             if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
             if (logoutBtn) logoutBtn.addEventListener('click', logout);
         });
@@ -989,93 +977,19 @@
             currentData = null;
         }
 
-        /* === Gestion locale des utilisateurs === */
-        function getUsers() {
-            return JSON.parse(localStorage.getItem('ddot_users') || '[]');
+        /* === Authentification sécurisée côté serveur === */
+        // L'authentification est gérée côté serveur avec Passport.js
+        // Redirection vers les pages d'authentification sécurisées
+        function redirectToLogin() {
+            window.location.href = '/login';
         }
-        function saveUsers(users) {
-            localStorage.setItem('ddot_users', JSON.stringify(users));
+        
+        function redirectToRegister() {
+            window.location.href = '/register';
         }
-        function setCurrentUser(username) {
-            localStorage.setItem('ddot_currentUser', username);
-        }
-        function getCurrentUser() {
-            return localStorage.getItem('ddot_currentUser');
-        }
-        function logout() {
-            localStorage.removeItem('ddot_currentUser');
-            updateUserUI();
-        }
-        function updateUserUI() {
-            const greeting = document.getElementById('userGreeting');
-            const loginBtn = document.getElementById('loginBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const user = getCurrentUser();
-            if (user) {
-                greeting.textContent = `👋 Bonjour, ${user}`;
-                if (loginBtn) loginBtn.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = 'inline-block';
-            } else {
-                greeting.textContent = '';
-                if (loginBtn) loginBtn.style.display = 'inline-block';
-                if (logoutBtn) logoutBtn.style.display = 'none';
-            }
-        }
-        let authMode = 'login';
-        function openAuthModal(mode='login') {
-            authMode = mode;
-            const modal = document.getElementById('authModal');
-            const title = document.getElementById('authTitle');
-            const submitBtn = document.getElementById('authSubmitBtn');
-            const switchAuth = document.getElementById('switchAuth');
-            title.textContent = mode === 'login' ? 'Connexion' : 'Inscription';
-            submitBtn.textContent = mode === 'login' ? 'Se connecter' : "S'inscrire";
-            switchAuth.innerHTML = mode === 'login'
-                ? 'Pas de compte ? <a href="#" id="switchToRegister">Inscrivez-vous</a>'
-                : 'Déjà un compte ? <a href="#" id="switchToLogin">Connectez-vous</a>';
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                const switchLink = mode === 'login' ? document.getElementById('switchToRegister') : document.getElementById('switchToLogin');
-                if (switchLink) switchLink.addEventListener('click', (e) => { e.preventDefault(); openAuthModal(mode === 'login' ? 'register' : 'login'); });
-            }, 0);
-        }
-        function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('authUsername').value = '';
-            document.getElementById('authPassword').value = '';
-        }
-        document.getElementById('closeAuth').addEventListener('click', closeAuthModal);
-        window.addEventListener('click', (e) => { if (e.target.id === 'authModal') closeAuthModal(); });
-        document.getElementById('authSubmitBtn').addEventListener('click', handleAuthSubmit);
-        function handleAuthSubmit() {
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!username || !password) {
-                alert('Veuillez remplir tous les champs');
-                return;
-            }
-            const users = getUsers();
-            if (authMode === 'register') {
-                if (users.find(u => u.username === username)) {
-                    alert('Nom d\'utilisateur déjà pris');
-                    return;
-                }
-                users.push({ username, password });
-                saveUsers(users);
-                setCurrentUser(username);
-                closeAuthModal();
-                updateUserUI();
-                alert('Inscription réussie !');
-            } else {
-                const user = users.find(u => u.username === username && u.password === password);
-                if (!user) {
-                    alert('Identifiants invalides');
-                    return;
-                }
-                setCurrentUser(username);
-                closeAuthModal();
-                updateUserUI();
-            }
+        
+        function redirectToDashboard() {
+            window.location.href = '/dashboard';
         }
     </script>
 </body>

@@ -1,10 +1,17 @@
 const OpenAI = require('openai');
 require('dotenv').config();
 
-// Configuration OpenAI
+// Configuration OpenAI - SÉCURISÉE : lecture depuis les variables d'environnement uniquement
 const openai = new OpenAI({
-  apiKey: "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"
+  apiKey: process.env.OPENAI_API_KEY
 });
+
+// Validation de la clé API
+if (!process.env.OPENAI_API_KEY) {
+  console.error('❌ ERREUR CRITIQUE: OPENAI_API_KEY manquante dans les variables d\'environnement');
+  console.error('📝 Créez un fichier .env avec OPENAI_API_KEY=sk-votre-cle-api');
+  throw new Error('OPENAI_API_KEY manquante');
+}
 
 const EMBEDDING_MODEL = "text-embedding-ada-002";
 // Modèle de chat avancé - GPT-4.1

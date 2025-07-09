@@ -1,11 +1,45 @@
 const express = require('express');
 const passport = require('passport');
+const { body, validationResult } = require('express-validator');
 const { User } = require('../models-node');
 const router = express.Router();
 
+// Validation pour l'inscription
+const validateRegister = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email invalide'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Le mot de passe doit contenir au moins 8 caractères')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial')
+];
+
+// Validation pour la connexion
+const validateLogin = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Email invalide'),
+  body('password')
+    .notEmpty()
+    .withMessage('Mot de passe requis')
+];
+
 // Route d'inscription
-router.post('/register', async (req, res) => {
+router.post('/register', validateRegister, async (req, res) => {
   try {
+    // Vérifier les erreurs de validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Données invalides',
+        details: errors.array()
+      });
+    }
+
     const { email, password } = req.body;
     
     // Vérifier si l'email existe déjà
@@ -43,7 +77,15 @@ router.post('/register', async (req, res) => {
 });
 
 // Route de connexion
-router.post('/login', (req, res, next) => {
+router.post('/login', validateLogin, (req, res, next) => {
+  // Vérifier les erreurs de validation
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      error: 'Données invalides',
+      details: errors.array()
+    });
+  }
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la connexion' });

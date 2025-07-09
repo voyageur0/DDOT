@@ -1,4 +1,5 @@
 const express = require('express');
+const { body, validationResult, param } = require('express-validator');
 const { Document, Analysis } = require('../models-node');
 const { Op } = require('sequelize');
 const { generateSummary, generateFeasibilityTable, answerQuestion } = require('../services-node/openaiService');
@@ -15,8 +16,61 @@ function requirePremium(req, res, next) {
   next();
 }
 
+// Validateurs
+const validateSummary = [
+  body('documentId')
+    .isInt({ min: 1 })
+    .withMessage('ID document invalide')
+];
+
+const validateQuestion = [
+  body('question')
+    .isLength({ min: 5, max: 500 })
+    .trim()
+    .escape()
+    .withMessage('Question requise (5-500 caractères)'),
+  body('documentId')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('ID document invalide')
+];
+
+const validateSearch = [
+  body('query')
+    .isLength({ min: 3, max: 200 })
+    .trim()
+    .escape()
+    .withMessage('Requête requise (3-200 caractères)'),
+  body('commune')
+    .optional()
+    .isLength({ min: 2, max: 50 })
+    .trim()
+    .escape()
+    .withMessage('Nom de commune invalide')
+];
+
+const validateParcelConstraints = [
+  body('searchQuery')
+    .isLength({ min: 3, max: 200 })
+    .trim()
+    .escape()
+    .withMessage('Requête de recherche requise (3-200 caractères)')
+];
+
+// Middleware de validation générique
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ 
+      error: 'Données invalides',
+      details: errors.array()
+    });
+  }
+  next();
+};
+
 // Générer un résumé
-router.post('/summary', requirePremium, async (req, res) => {
+router.post('/summary', validateSummary, handleValidationErrors, requirePremium, async (req, res) => {
   try {
     const { documentId } = req.body;
     
@@ -98,7 +152,7 @@ router.post('/feasibility-table', requirePremium, async (req, res) => {
 });
 
 // Répondre à une question
-router.post('/ask-question', requirePremium, async (req, res) => {
+router.post('/ask-question', validateQuestion, handleValidationErrors, requirePremium, async (req, res) => {
   try {
     const { question, documentId } = req.body;
     
@@ -180,7 +234,7 @@ router.get('/history', async (req, res) => {
 });
 
 // Route pour rechercher dans les règlements du Valais (accessible sans authentification pour la démo)
-router.post('/search', async (req, res) => {
+router.post('/search', validateSearch, handleValidationErrors, async (req, res) => {
     try {
         const { query, commune } = req.body;
         
@@ -304,7 +358,7 @@ Réponds de manière précise et cite les sources appropriées (communes et règ
 });
 
 // Route pour l'analyse IA automatique des contraintes de parcelle
-router.post('/parcel-constraints', async (req, res) => {
+router.post('/parcel-constraints', validateParcelConstraints, handleValidationErrors, async (req, res) => {
     try {
         const { parcelData, coordinates } = req.body;
         

@@ -324,13 +324,15 @@ Application web Node.js pour l'analyse automatique de documents d'urbanisme (rè
 ## Technologies utilisées
 
 - **Backend** : Node.js, Express.js
-- **Base de données** : SQLite (Sequelize ORM)
-- **Authentification** : Passport.js
+- **Base de données** : PostgreSQL (Supabase) avec fallback SQLite
+- **Authentification** : Passport.js + Supabase Auth (optionnel)
+- **Sécurité** : Row Level Security (RLS), Helmet.js, CSRF, Rate Limiting
 - **IA** : OpenAI API (GPT-3.5)
 - **Recherche vectorielle** : Embeddings OpenAI + recherche en mémoire
 - **Extraction PDF** : pdf-parse, Tesseract.js (OCR)
 - **Paiements** : Stripe
 - **Frontend** : EJS, Bootstrap 5
+- **Cloud** : Supabase (PostgreSQL, Storage, Auth)
 
 ## Installation
 
