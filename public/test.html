@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>Test API DDOT</h1>
+    
+    <h2>Test Analyse IA</h2>
+    <button id="testAnalysis">Tester Analyse IA</button>
+    <pre id="analysisResult"></pre>
+    
+    <h2>Test Téléchargement Règlement</h2>
+    <button id="testRegulation">Télécharger Règlement Sion</button>
+    
+    <script>
+        document.getElementById('testAnalysis').onclick = async () => {
+            try {
+                console.log('Test API - URL:', window.location.protocol + '//' + window.location.host + '/api/ia-constraints');
+                
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address: 'Test 1, Sion' })
+                });
+                
+                const data = await response.json();
+                document.getElementById('analysisResult').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('analysisResult').textContent = 'Erreur: ' + error.message;
+                console.error('Erreur:', error);
+            }
+        };
+        
+        document.getElementById('testRegulation').onclick = () => {
+            window.open('/api/regulation/Sion', '_blank');
+        };
+        
+        console.log('Page test chargée. Base URL:', window.location.origin);
+    </script>
+</body>
+</html>

@@ -692,7 +692,9 @@
             const logoutBtn = document.getElementById('logoutBtn');
             // Authentification gérée côté serveur
             if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
-            if (logoutBtn) logoutBtn.addEventListener('click', logout);
+            if (logoutBtn) logoutBtn.addEventListener('click', () => {
+                window.location.href = '/api/auth/logout';
+            });
 
             // Afficher la barre des communes disponibles (23 communes VS) dès le chargement
             const communesBarId = 'communesAvailableBar';
@@ -1418,6 +1420,10 @@
 
                 const analysisResult = await response.json();
                 
+                console.log('🔍 Réponse API complète:', analysisResult);
+                console.log('🔍 Structure data:', analysisResult.data);
+                console.log('🔍 Contraintes:', analysisResult.data?.constraints);
+                
                 displayAIAnalysisResults(analysisResult);
 
             } catch (error) {
@@ -1444,7 +1450,17 @@
         function displayAIAnalysisResults(result) {
             const resultsDiv = document.getElementById('aiAnalysisResults');
             
-            if (typeof result.constraints === 'string') {
+            // Extraire les contraintes depuis la nouvelle structure de données
+            let constraints = [];
+            if (result.data && result.data.constraints) {
+                constraints = result.data.constraints;
+            } else if (result.constraints) {
+                constraints = result.constraints;
+            }
+            
+            console.log('🔍 Contraintes reçues:', constraints);
+            
+            if (typeof constraints === 'string') {
                 // Afficher la synthèse telle quelle
                 resultsDiv.innerHTML = `
                     <div class="ai-analysis-result">
@@ -1452,16 +1468,16 @@
                             <div class="section-icon">🤖</div>
                             <h2 class="section-title">Synthèse IA</h2>
                         </div>
-                        <div style="white-space:pre-wrap;line-height:1.6;padding:15px;">${result.constraints}</div>
+                        <div style="white-space:pre-wrap;line-height:1.6;padding:15px;">${constraints}</div>
                     </div>`;
                 return;
             }
 
             let rows = '';
-            if (Array.isArray(result.constraints) && result.constraints.length) {
-                result.constraints.forEach(c => {
+            if (Array.isArray(constraints) && constraints.length) {
+                constraints.forEach(c => {
                     const sevClass = c.severity ? `severity-${c.severity}` : '';
-                    rows += `<tr class="${sevClass}"><td>${c.title || ''}</td><td>${c.severity || ''}</td><td>${c.description || ''}</td></tr>`;
+                    rows += `<tr class="${sevClass}"><td>${c.icon || '📋'} ${c.title || ''}</td><td>${c.severity || ''}</td><td>${c.description || ''}</td></tr>`;
                 });
             } else {
                 rows = '<tr><td colspan="3" style="text-align:center;">Aucune contrainte détectée.</td></tr>';

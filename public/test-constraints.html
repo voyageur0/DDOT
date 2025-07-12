@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Contraintes</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .ai-analysis-result { border: 1px solid #ddd; margin: 20px 0; }
+        .section-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #ddd; }
+        .section-title { margin: 0; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .severity-medium { background-color: #fff3cd; }
+        .severity-high { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Test Analyse Contraintes Vétroz</h1>
+    
+    <button onclick="testAnalysis()">Tester Parcelle 13455 Vétroz</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testAnalysis() {
+            try {
+                console.log('Démarrage test...');
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ searchQuery: '13455 Vétroz' })
+                });
+                
+                const result = await response.json();
+                console.log('Réponse API complète:', result);
+                
+                displayResults(result);
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('results').innerHTML = 'Erreur: ' + error.message;
+            }
+        }
+        
+        function displayResults(result) {
+            const resultsDiv = document.getElementById('results');
+            
+            // Extraire les contraintes
+            let constraints = [];
+            if (result.data && result.data.constraints) {
+                constraints = result.data.constraints;
+            } else if (result.constraints) {
+                constraints = result.constraints;
+            }
+            
+            console.log('Contraintes extraites:', constraints);
+            
+            let rows = '';
+            if (Array.isArray(constraints) && constraints.length) {
+                constraints.forEach(c => {
+                    const sevClass = c.severity ? `severity-${c.severity}` : '';
+                    rows += `<tr class="${sevClass}">
+                        <td>${c.icon || '📋'} ${c.title || ''}</td>
+                        <td>${c.severity || ''}</td>
+                        <td>${c.description || ''}</td>
+                        <td>${c.source || ''}</td>
+                    </tr>`;
+                });
+            } else {
+                rows = '<tr><td colspan="4" style="text-align:center;">Aucune contrainte détectée.</td></tr>';
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="ai-analysis-result">
+                    <div class="section-header">
+                        <h2 class="section-title">🤖 Contraintes d'urbanisme (${constraints.length} trouvées)</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Contrainte</th>
+                                <th>Sévérité</th>
+                                <th>Description</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+    </script>
+</body>
+</html>

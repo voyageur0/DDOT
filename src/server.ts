@@ -69,7 +69,7 @@ app.get('/api/geoadmin-search', async (req, res) => {
       },
       timeout: 10000,
       httpsAgent: new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: process.env.NODE_ENV === 'development' ? false : true
       })
     });
 

@@ -2,6 +2,7 @@ const express = require('express');
 const { Document } = require('../models-node');
 const router = express.Router();
 
+
 // Récupérer tous les documents de l'utilisateur
 router.get('/', async (req, res) => {
   try {

@@ -3,8 +3,8 @@ const { createClient } = require('@supabase/supabase-js');
 // === CONFIGURATION SUPABASE SÉCURISÉE ===
 
 // Variables d'environnement requises
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://firujzfswtatpjilgdry.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpcnVqemZzd3RhdHBqaWxnZHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIwNzk4NTMsImV4cCI6MjA2NzY1NTg1M30.PvAl1J6ndKwosJjnAm_ph1kWKqBBI0xXoVCIl4YOjlo';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 // Validation des variables
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -42,17 +42,24 @@ const getPostgreSQLConfig = () => {
   const projectRef = url.hostname.split('.')[0];
   
   return {
-    dialect: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
-    },
-    // Temporairement utiliser SQLite pendant la configuration PostgreSQL
-    // TODO: Réactiver PostgreSQL une fois la configuration correcte trouvée
-    dialect: 'sqlite',
-    storage: './urban_analysis.db',
+    // Utiliser PostgreSQL si mot de passe Supabase configuré
+    ...(process.env.SUPABASE_DB_PASSWORD ? {
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      },
+      host: `db.${projectRef}.supabase.co`,
+      port: 5432,
+      database: 'postgres', 
+      username: 'postgres',
+      password: process.env.SUPABASE_DB_PASSWORD,
+    } : {
+      dialect: 'sqlite',
+      storage: './urban_analysis.db'
+    }),
     
     // Configuration PostgreSQL pour plus tard (désactivée temporairement)
     // ...(process.env.SUPABASE_DB_PASSWORD ? {
@@ -82,6 +89,7 @@ const getPostgreSQLConfig = () => {
 
 // Test de connexion Supabase
 async function testSupabaseConnection() {
+  
   try {
     const { data, error } = await supabase.from('_health').select('*').limit(1);
     

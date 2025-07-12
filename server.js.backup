@@ -930,7 +930,7 @@ function extractCommuneFromText(text) {
 }
 
 // Route pour télécharger les règlements communaux locaux
-app.get('/api/documents/regulation/:commune', (req, res) => {
+app.get('/api/regulation/:commune', (req, res) => {
   console.log('📥 Téléchargement règlement demandé:', req.protocol, req.get('host'), req.originalUrl);
   const commune = req.params.commune;
   const fs = require('fs');
