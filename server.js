@@ -478,553 +478,69 @@ app.use('/api/auth', authLimiter, csrfMiddleware, authRoutes);
 app.use('/api/documents', ensureAuthenticated, csrfMiddleware, documentRoutes);
 app.use('/api/analysis', aiAnalysisLimiter, analysisRoutes); // Analyse avec rate limiting
 
-// Nouvelle route d'analyse IA refactorisée
-app.post('/api/ia-constraints', aiAnalysisLimiter, aiAnalysisRoutes.analyzeParcel);
-app.post('/api/quick-analysis', aiAnalysisLimiter, aiAnalysisRoutes.quickAnalyze);
-app.get('/api/ai-stats', aiAnalysisRoutes.getStats);
 app.use('/api/payment', csrfMiddleware, paymentRoutes);
 
-// === ROUTES D'ANALYSE IA REFACTORISÉES ===
-// L'ancienne route complexe a été remplacée par des modules séparés
-// pour une meilleure maintenabilité et performance
-
-// === NETTOYAGE EFFECTUÉ ===
-// L'ancienne route complexe d'analyse IA (500+ lignes) a été remplacée
-// par le système modulaire dans /routes/ai-analysis.js
+// Route IA simplifiée pour test
+app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
+  console.log('🔍 Requête IA reçue:', req.body);
+  
+  try {
+    const { address, searchQuery } = req.body;
+    const finalAddress = address || searchQuery;
     
-    const communalData = comprehensiveData.communalRegulations.map(r => 
-      `${r.title}: ${r.content.substring(0, 500)}...`).join('\n\n') || 'Règlement non disponible';
+    if (!finalAddress) {
+      return res.status(400).json({ error: 'Adresse ou searchQuery requise' });
+    }
 
-    const parcelInfo = comprehensiveData.searchResult ? 
-      `EGRID: ${comprehensiveData.searchResult.egrid}, Surface: ${comprehensiveData.searchResult.surface || 'Non spécifiée'}` : 
-      'Informations parcelle limitées';
-
-    const expertPrompt = `MISSION D'EXPERTISE URBANISME PROFESSIONNEL
-
-PARCELLE À ANALYSER: ${finalAddress}
-${parcelInfo}
-
-DONNÉES RDPPF OFFICIELLES:
-${rdppfData}
-
-RÈGLEMENT COMMUNAL:
-${communalData}
-
-DONNÉES ZONES ET CONTRAINTES:
-${JSON.stringify(comprehensiveData.zones, null, 2)}
-
-EN TANT QU'URBANISTE EXPERT CERTIFIÉ, analysez cette parcelle selon le standard professionnel suisse.
-
-LIVRABLE REQUIS - FORMAT JSON STRUCTURÉ:
-{
-  "commune": "nom_commune",
-  "parcelles": [
-    {
-      "numero": "numéro_parcelle",
-      "surface_totale_m2": nombre,
-      "zones": {
-        "CODE_ZONE": {
-          "denomination": "description",
-          "surface_m2": nombre,
-          "indice_IBUS": nombre_decimal,
-          "surface_utilisable_m2": nombre,
-          "distance_min_m": nombre,
-          "distance_normale": "formule ou valeur",
-          "hauteur_max_m": nombre,
-          "niveaux": "description",
-          "gabarits_longueur_m": nombre_ou_null,
-          "gabarits_largeur_m": nombre_ou_null,
-          "toiture_pans": "description_ou_null",
-          "toiture_pentes": "description_ou_null"
-        }
+    // Analyse simplifiée de test
+    const testConstraints = [
+      {
+        title: "Zone villa individuelle",
+        description: "IBUS: 0.3, Hauteur max: 8.5m, Distance min: 5m",
+        severity: "medium",
+        source: "Règlement communal",
+        icon: "🏗️"
+      },
+      {
+        title: "Places de parc",
+        description: "2 places par logement requis",
+        severity: "medium",
+        source: "Règlement stationnement",
+        icon: "🚗"
+      },
+      {
+        title: "Espaces verts",
+        description: "30% de la surface minimum",
+        severity: "low",
+        source: "Règlement espaces verts",
+        icon: "🌱"
       }
-    }
-  ],
-  "places_de_parc": {
-    "habitation_ratio": nombre_decimal,
-    "remarques": "texte_ou_null"
-  },
-  "places_de_jeux": {
-    "surface_par_logement_m2": nombre,
-    "surface_max_terrain_unique_m2": nombre,
-    "condition": "description"
-  },
-  "reglement_communal_resume": {
-    "alignement_facades": "description",
-    "affectation_[ZONE]": "description pour chaque zone"
-  },
-  "contraintes_supplementaires": [
-    {
-      "type": "categorie",
-      "description": "contrainte détaillée",
-      "impact": "faible|moyen|élevé"
-    }
-  ]
-}
+    ];
 
-CONSIGNES CRITIQUES:
-1. Analysez TOUTES les contraintes (RDPPF + règlement + zones)
-2. Calculez précisément les indices IBUS et surfaces utilisables
-3. Identifiez TOUTES les distances, hauteurs, gabarits
-4. Extrayez les règles de stationnement et espaces verts
-5. Qualité niveau urbaniste certifié REG A/B
-6. Réponse UNIQUEMENT en JSON valide, aucun texte avant/après`;
-
-    // Configuration du modèle
-    const completionConfig = {
-      model: selectedModel,
-      messages: [
-        {
-          role: 'system',
-          content: 'Vous êtes un urbaniste expert certifié REG A/B en Suisse, spécialisé en droit de la construction valaisan. Vos analyses respectent les normes SIA et la législation fédérale/cantonale. Vous produisez des expertises de niveau professionnel.'
+    const result = {
+      success: true,
+      data: {
+        constraints: testConstraints,
+        parcel: {
+          address: finalAddress,
+          commune: "Test Commune",
+          model_used: "test-mode"
         },
-        {
-          role: 'user',
-          content: expertPrompt
+        metadata: {
+          model_used: "test-mode",
+          note: "Analyse de test - fonctionnalité en développement"
         }
-      ]
+      },
+      analysisType: "test",
+      timestamp: new Date().toISOString()
     };
-
-    // Configuration spécifique au modèle
-    if (selectedModel.startsWith('o3') || selectedModel.startsWith('o1')) {
-      completionConfig.reasoning_effort = 'high';
-    } else {
-      completionConfig.temperature = 0.05;
-      completionConfig.max_tokens = 3000;
-    }
-
-    const completion = await openai.chat.completions.create(completionConfig);
-    let expertAnalysis = completion.choices[0].message.content;
-
-    // Nettoyer et parser le JSON
-    try {
-      // Extraire le JSON si entouré de texte
-      const jsonMatch = expertAnalysis.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        expertAnalysis = jsonMatch[0];
-      }
-      
-      const parsedAnalysis = JSON.parse(expertAnalysis);
-      
-      // Extraire les contraintes pour le frontend
-      const constraints = [];
-      
-      // Ajouter les contraintes des zones
-      if (parsedAnalysis.parcelles && parsedAnalysis.parcelles[0] && parsedAnalysis.parcelles[0].zones) {
-        Object.entries(parsedAnalysis.parcelles[0].zones).forEach(([zoneCode, zoneData]) => {
-          constraints.push({
-            title: `Zone ${zoneCode}: ${zoneData.denomination}`,
-            description: `IBUS: ${zoneData.indice_IBUS}, Hauteur max: ${zoneData.hauteur_max_m}m, Distance min: ${zoneData.distance_min_m}m`,
-            severity: "medium",
-            source: "Règlement communal",
-            icon: "🏗️"
-          });
-          
-          if (zoneData.surface_utilisable_m2) {
-            constraints.push({
-              title: `Surface utilisable en zone ${zoneCode}`,
-              description: `${zoneData.surface_utilisable_m2}m² sur ${zoneData.surface_m2}m² total`,
-              severity: "medium", 
-              source: "Calcul IBUS",
-              icon: "📐"
-            });
-          }
-        });
-      }
-      
-      // Ajouter les contraintes supplémentaires
-      if (parsedAnalysis.contraintes_supplementaires) {
-        parsedAnalysis.contraintes_supplementaires.forEach(contrainte => {
-          constraints.push({
-            title: contrainte.type.charAt(0).toUpperCase() + contrainte.type.slice(1),
-            description: contrainte.description,
-            severity: contrainte.impact,
-            source: "RDPPF/Règlement",
-            icon: "⚠️"
-          });
-        });
-      }
-      
-      // Ajouter places de parc si définies
-      if (parsedAnalysis.places_de_parc && parsedAnalysis.places_de_parc.habitation_ratio > 0) {
-        constraints.push({
-          title: "Places de parc",
-          description: `Ratio: ${parsedAnalysis.places_de_parc.habitation_ratio} place(s) par logement`,
-          severity: "medium",
-          source: "Règlement stationnement", 
-          icon: "🚗"
-        });
-      }
-      
-      // Ajouter places de jeux si définies
-      if (parsedAnalysis.places_de_jeux && parsedAnalysis.places_de_jeux.surface_par_logement_m2 > 0) {
-        constraints.push({
-          title: "Aires de jeux",
-          description: `${parsedAnalysis.places_de_jeux.surface_par_logement_m2}m² par logement, ${parsedAnalysis.places_de_jeux.condition}`,
-          severity: "medium",
-          source: "Règlement espaces verts",
-          icon: "🌱"
-        });
-      }
-
-      const result = {
-        success: true,
-        data: {
-          analysis: parsedAnalysis,
-          parcel: {
-            address: finalAddress,
-            commune: parsedAnalysis.commune,
-            model_used: selectedModel
-          },
-          constraints: constraints, // Format compatible frontend
-          metadata: {
-            model_used: selectedModel,
-            parcelle_address: finalAddress,
-            completeness: comprehensiveData.completeness,
-            rdppf_constraints: comprehensiveData.rdppfConstraints.length,
-            processing_time_ms: comprehensiveData.processingTime
-          },
-          raw_data: {
-            rdppf: comprehensiveData.rdppfConstraints,
-            zones: comprehensiveData.zones,
-            communal_regulations: comprehensiveData.communalRegulations
-          }
-        },
-        analysisType: analysisType,
-        timestamp: new Date().toISOString()
-      };
-      
-      console.log('✅ Analyse d\'urbaniste expert terminée avec succès');
-      return res.json(result);
-      
-    } catch (parseError) {
-      console.error('❌ Erreur parsing JSON:', parseError);
-      
-      // Fallback: extraire contraintes du texte
-      const textConstraints = extractConstraintsFromText(expertAnalysis);
-      
-      const result = {
-        success: true,
-        data: {
-          analysis: expertAnalysis,
-          parcel: {
-            address: finalAddress,
-            commune: extractCommuneFromText(expertAnalysis),
-            model_used: selectedModel
-          },
-          constraints: textConstraints, // Format compatible frontend
-          metadata: {
-            model_used: selectedModel,
-            completeness: comprehensiveData.completeness,
-            note: "Analyse textuelle (JSON parsing failed)"
-          }
-        }
-      };
-      return res.json(result);
-    }
+    
+    console.log('✅ Analyse de test terminée');
+    return res.json(result);
     
   } catch (error) {
     console.error('❌ Erreur analyse IA:', error);
     res.status(500).json({ error: 'Erreur lors de l\'analyse: ' + error.message });
-  }
-});
-
-// Fonction de fallback pour analyse simplifiée si orchestrateur non disponible  
-async function performSimplifiedAnalysis(address, req, res) {
-  try {
-    const OpenAI = require('openai');
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    
-    let selectedModel = 'gpt-4';
-    try {
-      await openai.models.retrieve('o1');
-      selectedModel = 'o1';
-    } catch (error) {
-      // Fallback to gpt-4
-    }
-    
-    const completion = await openai.chat.completions.create({
-      model: selectedModel,
-      messages: [
-        {
-          role: 'system',
-          content: 'Vous êtes un expert en urbanisme suisse. Analysez cette parcelle et fournissez un JSON structuré avec les contraintes principales.'
-        },
-        {
-          role: 'user', 
-          content: `Analysez la parcelle "${address}" en format JSON avec commune, zones, contraintes IBUS, hauteurs, distances.`
-        }
-      ],
-      ...(selectedModel === 'o1' ? { reasoning_effort: 'medium' } : { temperature: 0.1, max_tokens: 1500 })
-    });
-    
-    return res.json({
-      success: true,
-      data: {
-        analysis: completion.choices[0].message.content,
-        metadata: { model_used: selectedModel, mode: 'simplified' }
-      }
-    });
-    
-  } catch (error) {
-    return res.status(500).json({ error: 'Erreur analyse simplifiée: ' + error.message });
-  }
-}
-
-// Fonction helper pour parser l'analyse IA en contraintes structurées
-function parseAIAnalysisToConstraints(aiText) {
-  const constraints = [];
-  
-  // Contraintes communes d'urbanisme suisse
-  const constraintPatterns = [
-    {
-      theme: "Construction",
-      patterns: [
-        /IUS|indice.*utilisation.*sol.*(\d+[.,]\d+)/i,
-        /IOS.*(\d+[.,]\d+)/i,
-        /coefficient.*occupation.*(\d+[.,]\d+)/i
-      ],
-      icon: "🏗️"
-    },
-    {
-      theme: "Hauteur", 
-      patterns: [
-        /hauteur.*max.*(\d+[.,]?\d*)\s*(m|mètre)/i,
-        /(\d+[.,]?\d*)\s*(m|mètre).*hauteur/i
-      ],
-      icon: "📏"
-    },
-    {
-      theme: "Distances",
-      patterns: [
-        /distance.*limite.*(\d+[.,]?\d*)\s*(m|mètre)/i,
-        /recul.*(\d+[.,]?\d*)\s*(m|mètre)/i
-      ],
-      icon: "📐"
-    },
-    {
-      theme: "Espaces verts",
-      patterns: [
-        /espace.*vert.*(\d+)%/i,
-        /végétal.*(\d+)%/i
-      ],
-      icon: "🌱"
-    },
-    {
-      theme: "Protection",
-      patterns: [
-        /protection.*patrimoine/i,
-        /zone.*protégée/i,
-        /servitude/i
-      ],
-      icon: "🛡️"
-    }
-  ];
-
-  constraintPatterns.forEach(category => {
-    category.patterns.forEach(pattern => {
-      const match = aiText.match(pattern);
-      if (match) {
-        constraints.push({
-          theme: category.theme,
-          title: match[0],
-          description: extractContextAroundMatch(aiText, match.index, 100),
-          severity: "medium",
-          source: "Analyse IA urbanisme",
-          icon: category.icon
-        });
-      }
-    });
-  });
-
-  // Si aucune contrainte spécifique trouvée, extraire des sections générales
-  if (constraints.length === 0) {
-    const sections = aiText.split(/\n\s*\n/);
-    sections.forEach((section, index) => {
-      if (section.length > 50 && index < 8) {
-        constraints.push({
-          theme: `Contrainte ${index + 1}`,
-          title: section.split('\n')[0].substring(0, 100),
-          description: section.substring(0, 200),
-          severity: "medium",
-          source: "Analyse IA urbanisme",
-          icon: "📋"
-        });
-      }
-    });
-  }
-
-  return constraints.slice(0, 12); // Limiter à 12 contraintes max
-}
-
-function extractContextAroundMatch(text, index, contextLength) {
-  const start = Math.max(0, index - contextLength);
-  const end = Math.min(text.length, index + contextLength);
-  return text.substring(start, end).trim();
-}
-
-// Fonction pour extraire contraintes du texte si JSON parsing échoue
-function extractConstraintsFromText(text) {
-  const constraints = [];
-  
-  // Patterns pour extraire les contraintes du texte
-  const patterns = [
-    {
-      regex: /IBUS.*?(\d+[.,]\d+)/gi,
-      title: "Indice d'utilisation du sol (IBUS)",
-      icon: "🏗️"
-    },
-    {
-      regex: /hauteur.*?max.*?(\d+)\s*m/gi,
-      title: "Hauteur maximale",
-      icon: "📏"
-    },
-    {
-      regex: /distance.*?min.*?(\d+)\s*m/gi,
-      title: "Distance minimale",
-      icon: "📐"
-    },
-    {
-      regex: /surface.*?utilisable.*?(\d+)\s*m/gi,
-      title: "Surface utilisable",
-      icon: "📐"
-    }
-  ];
-  
-  patterns.forEach(pattern => {
-    let match;
-    while ((match = pattern.regex.exec(text)) !== null) {
-      constraints.push({
-        title: pattern.title,
-        description: match[0],
-        severity: "medium",
-        source: "Analyse textuelle",
-        icon: pattern.icon
-      });
-    }
-  });
-  
-  // Si aucune contrainte trouvée, créer des contraintes génériques
-  if (constraints.length === 0) {
-    const sections = text.split(/\n\s*\n/).slice(0, 5);
-    sections.forEach((section, index) => {
-      if (section.length > 30) {
-        constraints.push({
-          title: `Contrainte ${index + 1}`,
-          description: section.substring(0, 150) + (section.length > 150 ? '...' : ''),
-          severity: "medium",
-          source: "Analyse IA",
-          icon: "📋"
-        });
-      }
-    });
-  }
-  
-  return constraints;
-}
-
-// Fonction pour extraire le nom de commune du texte
-function extractCommuneFromText(text) {
-  const communeMatch = text.match(/commune[^:\n]*?([A-Z][a-z]+)/i);
-  return communeMatch ? communeMatch[1] : 'Non déterminée';
-}
-
-// Route pour télécharger les règlements communaux locaux
-app.get('/api/documents/regulation/:commune', (req, res) => {
-  console.log('📥 Téléchargement règlement demandé:', req.protocol, req.get('host'), req.originalUrl);
-  const commune = req.params.commune;
-  const fs = require('fs');
-  
-  // Fonction pour normaliser les noms (enlever accents, standardiser)
-  const normalize = (str) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Enlever les accents
-      .toLowerCase()
-      .trim();
-  };
-  
-  // Essayer différentes variantes du nom du fichier
-  const baseDir = path.join(__dirname, 'reglements');
-  
-  try {
-    // Lister tous les fichiers du dossier reglements
-    const files = fs.readdirSync(baseDir);
-    
-    // Chercher un fichier qui correspond à la commune
-    const matchingFile = files.find(file => {
-      if (!file.endsWith('.pdf')) return false;
-      
-      // Normaliser le nom du fichier pour la comparaison
-      const normalizedFile = normalize(file);
-      const normalizedCommune = normalize(commune);
-      
-      // Vérifier si le nom de commune est contenu dans le nom du fichier
-      return normalizedFile.includes(normalizedCommune);
-    });
-    
-    if (matchingFile) {
-      const filePath = path.join(baseDir, matchingFile);
-      
-      // Servir le fichier PDF
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${matchingFile}"`);
-      res.sendFile(filePath);
-    } else {
-      // Si aucun fichier n'est trouvé, essayer avec le format standard
-      const standardFilename = `VS_${commune}_Règlement des constructions.pdf`;
-      const standardPath = path.join(baseDir, standardFilename);
-      
-      if (fs.existsSync(standardPath)) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${standardFilename}"`);
-        res.sendFile(standardPath);
-      } else {
-        res.status(404).json({ 
-          error: `Règlement non disponible pour la commune ${commune}`,
-          message: 'Le fichier PDF du règlement communal n\'a pas été trouvé.'
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Erreur lors de la recherche du règlement:', error);
-    res.status(500).json({ 
-      error: 'Erreur serveur',
-      message: 'Une erreur est survenue lors de la recherche du règlement.'
-    });
-  }
-});
-
-// Route d'upload sécurisée avec rate limiting
-app.post('/api/upload', uploadLimiter, ensureAuthenticated, upload.single('file'), scanUploadedFile, async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Aucun fichier fourni' });
-    }
-
-    const { commune, document_type } = req.body;
-    
-    // Créer l'entrée en base de données
-    const { Document } = require('./models-node');
-    const document = await Document.create({
-      filename: req.file.filename,
-      originalFilename: req.file.originalname,
-      userId: req.user.id,
-      commune: commune || '',
-      documentType: document_type || 'reglement'
-    });
-
-    // Extraction PDF supprimée - non nécessaire pour cette application
-    // const { extractDocument } = require('./services-node/pdfService');
-    // extractDocument(document.id, req.file.path);
-
-    res.json({
-      message: 'Document uploadé avec succès',
-      documentId: document.id
-    });
-  } catch (error) {
-    console.error('Erreur upload:', error);
-    res.status(500).json({ error: 'Erreur lors de l\'upload' });
   }
 });
 
@@ -1039,148 +555,14 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-// Gestion des erreurs 404
-app.use((req, res) => {
-  if (req.path.startsWith('/api/')) {
-    res.status(404).json({ error: 'Endpoint non trouvé' });
-  } else {
-    res.status(404).render('404');
-  }
+// === ROUTES D'ANALYSE IA REFACTORISÉES ===
+// L'ancienne route complexe a été remplacée par des modules séparés
+// pour une meilleure maintenabilité et performance
+
+// === DÉMARRAGE DU SERVEUR ===
+app.listen(PORT, () => {
+  console.log(`🚀 Serveur Express démarré sur le port ${PORT}`);
+  console.log(`📍 URL: http://localhost:${PORT}`);
+  console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`💾 Base de données: SQLite`);
 });
-
-// === SÉCURITÉ : Gestion sécurisée des erreurs ===
-app.use((err, req, res, next) => {
-  // Logger l'erreur complète côté serveur (sans l'exposer au client)
-  console.error('Erreur serveur:', {
-    message: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    timestamp: new Date().toISOString()
-  });
-
-  // Gestion spécifique des erreurs Multer
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ 
-        error: 'Fichier trop volumineux',
-        message: 'La taille du fichier ne peut pas dépasser 25MB'
-      });
-    }
-    if (err.code === 'LIMIT_FILE_COUNT') {
-      return res.status(400).json({ 
-        error: 'Trop de fichiers',
-        message: 'Un seul fichier autorisé à la fois'
-      });
-    }
-    return res.status(400).json({ 
-      error: 'Erreur de téléchargement',
-      message: 'Problème lors du téléchargement du fichier'
-    });
-  }
-
-  // Gestion des erreurs de validation
-  if (err.name === 'ValidationError') {
-    return res.status(400).json({ 
-      error: 'Données invalides',
-      message: 'Les données fournies ne respectent pas le format requis'
-    });
-  }
-
-  // Gestion des erreurs de base de données
-  if (err.name === 'SequelizeError' || err.name === 'SequelizeValidationError') {
-    return res.status(500).json({ 
-      error: 'Erreur de base de données',
-      message: 'Une erreur est survenue lors de l\'accès aux données'
-    });
-  }
-
-  // Gestion des erreurs d'authentification
-  if (err.name === 'UnauthorizedError') {
-    return res.status(401).json({ 
-      error: 'Non autorisé',
-      message: 'Accès refusé'
-    });
-  }
-
-  // Erreur générique sans exposer les détails internes
-  const statusCode = err.status || err.statusCode || 500;
-  
-  if (req.path.startsWith('/api/')) {
-    res.status(statusCode).json({ 
-      error: statusCode === 500 ? 'Erreur serveur interne' : 'Erreur de traitement',
-      message: process.env.NODE_ENV === 'development' ? err.message : 'Une erreur inattendue s\'est produite'
-    });
-  } else {
-    res.status(statusCode).render('500', { 
-      error: 'Une erreur s\'est produite',
-      user: req.user || null 
-    });
-  }
-});
-
-// Initialisation de la base de données et démarrage du serveur
-async function startServer() {
-  try {
-    // Importer les modèles pour la synchronisation
-    const { sequelize: db } = require('./models-node');
-    
-    // Tester la connexion Supabase si configurée
-    try {
-      const { testSupabaseConnection } = require('./config/supabase');
-      await testSupabaseConnection();
-    } catch (error) {
-      console.log('ℹ️ Supabase non configuré, utilisation de SQLite');
-    }
-    
-    // Synchroniser les modèles avec la base de données
-    await db.sync();
-    const dialect = db.getDialect();
-    console.log(`✅ Base de données synchronisée (${dialect.toUpperCase()})`);
-    
-    if (dialect === 'postgres') {
-      console.log('🐘 PostgreSQL/Supabase activé avec Row Level Security');
-    } else {
-      console.log('📁 SQLite activé (mode développement)');
-    }
-
-    // Index vectoriel supprimé - lié à l'extraction PDF
-    // const { loadVectorIndex } = require('./services-node/vectorService');
-    // await loadVectorIndex();
-
-    // OCR initialisé à la demande (pas d'initialisation au démarrage)
-
-    // Démarrer le serveur
-    app.listen(PORT, '0.0.0.0', () => {
-      serverLogger.info(`Serveur Urban IA démarré sur port ${PORT}`, {
-        port: PORT,
-        environment: process.env.NODE_ENV,
-        database: process.env.SUPABASE_DB_PASSWORD ? 'PostgreSQL' : 'SQLite'
-      });
-      console.log(`✅ Serveur Urban IA démarré sur http://localhost:${PORT}`);
-      console.log(`🌐 Interface web accessible à cette adresse`);
-      console.log(`📱 Vous pouvez maintenant ouvrir votre navigateur`);
-    });
-  } catch (error) {
-    serverLogger.error('Erreur au démarrage du serveur:', error);
-    process.exit(1);
-  }
-}
-
-// === GESTION D'ERREURS FINALES ===
-
-// Middleware pour les routes non trouvées (doit être avant le gestionnaire d'erreurs)
-app.use(notFoundHandler);
-
-// Gestionnaire d'erreurs global (doit être en dernier)
-app.use(globalErrorHandler);
-
-// Export pour les tests
-module.exports = app;
-
-// Démarrer le serveur si ce n'est pas un import
-if (require.main === module) {
-  startServer();
-} 

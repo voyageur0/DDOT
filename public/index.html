@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DDOT</title>
+    <title>DDOT - Analyse Immobilière Intelligente</title>
+    <meta name="description" content="Système avancé d'analyse immobilière pour le Valais. Données publiques GeoAdmin et analyse IA des contraintes d'urbanisme.">
+    <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/modern-components.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -13,47 +16,65 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-family-sans);
+            background: var(--color-neutral-50);
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
             min-height: 100vh;
+        }
+
+        .navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-neutral-200);
+            z-index: var(--z-fixed);
+            padding: var(--space-4) 0;
+        }
+        
+        .nav-content {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: 0 var(--space-6);
         }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            max-width: 1200px;
-            width: 100%;
-            overflow: visible;
-            position: relative;
-            z-index: 1;
+        
+        .logo {
+            font-family: var(--font-family-display);
+            font-size: var(--text-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-600);
+            text-decoration: none;
         }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
+        
+        .nav-link {
+            color: var(--color-neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color var(--transition-base);
         }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        
+        .nav-link:hover {
+            color: var(--color-primary-600);
         }
 
         .search-section {
-            padding: 40px;
-            background: #f8f9fa;
+            padding: var(--space-16) var(--space-6);
+            background: white;
             position: relative;
             z-index: 10;
         }
@@ -534,110 +555,122 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>DDOT</h1>
-            <p>Système avancé d'analyse immobilière pour le Valais<br>
-            <small>Données publiques GeoAdmin • Base de données règlements communaux</small></p>
-            <div class="user-menu">
-                <span id="userGreeting"></span>
-                <button id="loginBtn" class="user-btn">Se connecter / S'inscrire</button>
-                <button id="logoutBtn" class="user-btn" style="display: none;">Se déconnecter</button>
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="navigation">
+            <div class="nav-content">
+                <a href="#" class="logo">DDOT</a>
+                <div class="nav-menu">
+                    <a href="#features" class="nav-link">Fonctionnalités</a>
+                    <a href="#communes" class="nav-link">Communes</a>
+                    <a href="#about" class="nav-link">À propos</a>
+                    <div class="user-menu">
+                        <span id="userGreeting"></span>
+                        <button id="loginBtn" class="btn btn-secondary btn-sm">Se connecter</button>
+                        <button id="logoutBtn" class="btn btn-secondary btn-sm" style="display: none;">Se déconnecter</button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="search-section">
-            <div class="search-container">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput" 
-                       placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
-                <button class="search-btn" id="searchBtn">🔍</button>
-                <div class="suggestions" id="suggestions"></div>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section class="hero-modern">
+            <div class="hero-content">
+                <h1 class="hero-title">Analyse Immobilière Intelligente pour le Valais</h1>
+                <p class="hero-subtitle">Exploitez la puissance de l'IA et des données publiques suisses pour analyser vos parcelles et contraintes d'urbanisme en quelques clics</p>
+                <div class="hero-cta">
+                    <button class="btn-hero btn-hero-primary" onclick="scrollToSearch()">🔍 Analyser une parcelle</button>
+                    <button class="btn-hero btn-hero-secondary" onclick="scrollToCommunes()">📋 Voir les communes</button>
+                </div>
             </div>
-            
+        </section>
 
-        </div>
-
-        <div class="results-container" id="resultsContainer">
-            <div class="loading" id="loading">
-                <div class="loading-spinner"></div>
-                <p>Analyse en cours via VSGIS.ch et GeoAdmin...</p>
+        <!-- Search Section -->
+        <section class="search-section" id="search">
+            <div class="container">
+                <div class="search-container-modern">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" 
+                           class="search-input-modern" 
+                           id="searchInput" 
+                           placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
+                    <button class="search-button" id="searchBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="21 21l-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                    <div class="suggestions-modern" id="suggestions"></div>
+                </div>
             </div>
+        </section>
 
-            <div id="analysisResults" style="display: none;">
-                <!-- Informations générales -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">📋</div>
-                        <h2 class="section-title">Informations Générales</h2>
+        <!-- Results Container -->
+        <section class="results-container" id="resultsContainer" style="display: none;">
+            <div class="container">
+                <div class="loading-modern" id="loading">
+                    <div class="spinner-modern"></div>
+                    <p class="loading-text-modern">Analyse en cours via GeoAdmin et base de données DDOT...</p>
+                </div>
+
+                <div id="analysisResults" style="display: none;">
+                    <!-- Informations générales -->
+                    <div class="results-card-modern">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">📋</div>
+                            <h2 class="card-title-modern">Informations Générales</h2>
+                        </div>
+                        <div class="card-body-modern">
+                            <div class="info-grid-modern" id="generalInfo"></div>
+                        </div>
                     </div>
-                    <div class="info-grid" id="generalInfo"></div>
-                </div>
 
-                <!-- Propriétaires -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">👥</div>
-                        <h2 class="section-title">Informations Cadastrales</h2>
+                    <!-- Autres sections masquées par défaut -->
+                    <div id="ownersInfo" style="display: none;"></div>
+                    <div id="cadastralInfo" style="display: none;"></div>
+                    <div id="zoningInfo" style="display: none;"></div>
+                    <div id="developmentInfo" style="display: none;"></div>
+
+                    <!-- Actions -->
+                    <div class="actions-container-modern">
+                        <button class="action-btn-modern action-btn-ai" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
+                            🤖 Analyse IA Contraintes
+                        </button>
+                        <button class="action-btn-modern action-btn-secondary" id="rdppfBtn">
+                            📋 Télécharger RDPPF
+                        </button>
+                        <button class="action-btn-modern action-btn-warning" id="regulationBtn" style="display:none;">
+                            📚 Règlement Communal
+                        </button>
+                        <button class="action-btn-modern action-btn-ai" onclick="newSearch()">
+                            🔄 Nouvelle Recherche
+                        </button>
                     </div>
-                    <div id="ownersInfo"></div>
+                    
+                    <!-- Résultats de l'analyse IA -->
+                    <div id="aiAnalysisResults" style="display: none;"></div>
                 </div>
-
-                <!-- Détails Cadastraux -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">🗺️</div>
-                        <h2 class="section-title">Détails de la Parcelle</h2>
-                    </div>
-                    <div class="info-grid" id="cadastralInfo"></div>
-                </div>
-
-                <!-- Zonage et Réglementation -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">⚖️</div>
-                        <h2 class="section-title">Zonage Public</h2>
-                    </div>
-                    <div class="info-grid" id="zoningInfo"></div>
-                </div>
-
-                <!-- Potentiel de Développement -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">📈</div>
-                        <h2 class="section-title">Potentiel de Développement</h2>
-                    </div>
-                    <div class="info-grid" id="developmentInfo"></div>
-                </div>
-
-                <!-- Actions -->
-                <div class="actions-container">
-                    <button class="action-btn ai-analysis-btn" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
-                        🤖 Analyse IA Contraintes
-                    </button>
-                    <button class="action-btn secondary" id="rdppfBtn">
-                        📋 Télécharger RDPPF
-                    </button>
-                    <button class="action-btn warning" id="regulationBtn" style="display:none;">
-                        📚 Règlement Communal
-                    </button>
-                    <button class="action-btn" onclick="newSearch()">
-                        🔄 Nouvelle Recherche
-                    </button>
-                </div>
-                
-                <!-- Résultats de l'analyse IA -->
-                <div id="aiAnalysisResults" style="display: none;"></div>
             </div>
-        </div>
+        </section>
+
+        <!-- Communes Section -->
+        <section class="communes-section-modern" id="communes">
+            <div class="container">
+                <div class="communes-header">
+                    <h2 class="communes-title">Communes du Valais Romand</h2>
+                    <p class="communes-subtitle">23 communes avec analyse complète disponible</p>
+                </div>
+                <div class="communes-grid" id="communesGrid">
+                    <!-- Les communes seront injectées ici -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Floating AI Button -->
+        <button id="floatingAiBtn" class="floating-ai-modern" onclick="performAIAnalysis()" title="Analyse IA" style="display: none;">
+            🤖
+        </button>
     </div>
-
-    <!-- Bouton flottant IA -->
-    <button id="floatingAiBtn" class="floating-ai-btn" onclick="performAIAnalysis()" title="Analyse IA">
-        🤖
-        <span class="ai-bubble" id="aiBubble">Je peux analyser cette parcelle :)</span>
-    </button>
 
     <footer class="footer">
         DDOT - Projet en cours de développement.<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
@@ -696,157 +729,33 @@
                 window.location.href = '/api/auth/logout';
             });
 
-            // Afficher la barre des communes disponibles (23 communes VS) dès le chargement
-            const communesBarId = 'communesAvailableBar';
-            if (!document.getElementById(communesBarId)) {
-                const communes = ['Arbaz','Ardon','Ayent','Chamoson','Charrat','Conthey','Martigny','Mase','Mollens','Nax','Nendaz','Riddes','Saillon','Saint-Léonard','Salgesch','Savièse','Saxon','Sierre','Sion','Vernamiège','Vérrossaz','Vétroz'];
-                
-                // Créer le conteneur principal
-                const container = document.createElement('div');
-                container.id = communesBarId;
-                container.style.cssText = `
-                    background: #f8f9fa;
-                    border-bottom: 1px solid #e9ecef;
-                    padding: 30px 40px;
-                    margin: 0 0 30px 0;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-                    animation: slideInFromTop 0.6s ease-out;
-                `;
-
-                // Tutoriel
-                const tutorial = document.createElement('div');
-                tutorial.style.cssText = `
-                    background: white;
-                    border: 1px solid #dee2e6;
-                    border-radius: 8px;
-                    padding: 16px;
-                    margin-bottom: 16px;
-                    font-size: 0.9rem;
-                    line-height: 1.5;
-                    color: #495057;
-                    animation: fadeInUp 0.8s ease-out 0.2s both;
-                `;
-                tutorial.innerHTML = `
-                    <h4 style="margin: 0 0 8px 0; font-size: 1rem; font-weight: 600; color: #2c3e50;">
-                        Comment utiliser DDOT
-                    </h4>
-                    <p style="margin: 0 0 8px 0;">
-                        1. Saisissez une adresse, un numéro de parcelle ou une commune dans la barre de recherche
-                    </p>
-                    <p style="margin: 0 0 8px 0;">
-                        2. Consultez gratuitement les informations de base (parcelle, adresse, coordonnées)
-                    </p>
-                    <p style="margin: 0;">
-                        3. Utilisez les boutons d'action pour accéder aux analyses avancées et documents officiels
-                    </p>
-                `;
-
-                // Bandeau communes
-                const communesBar = document.createElement('div');
-                communesBar.style.cssText = `
-                    background: white;
-                    border: 1px solid #dee2e6;
-                    border-radius: 8px;
-                    padding: 16px;
-                    font-size: 0.9rem;
-                    animation: fadeInUp 0.8s ease-out 0.4s both;
-                `;
-                communesBar.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; font-size: 1rem; font-weight: 600; color: #2c3e50;">
-                            Communes du Valais Romand
-                        </h4>
-                        <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; color: #6c757d;">
-                            23 communes disponibles
-                        </span>
+            // Initialiser la grille des communes
+            initializeCommunesGrid();
+        });
+        
+        function initializeCommunesGrid() {
+            const communes = ['Arbaz','Ardon','Ayent','Chamoson','Charrat','Conthey','Martigny','Mase','Mollens','Nax','Nendaz','Riddes','Saillon','Saint-Léonard','Salgesch','Savièse','Saxon','Sierre','Sion','Vernamiège','Vérrossaz','Vétroz'];
+            const communesGrid = document.getElementById('communesGrid');
+            
+            if (communesGrid) {
+                communesGrid.innerHTML = communes.map((commune, index) => `
+                    <div class="commune-tag" onclick="selectCommune('${commune}')" style="animation-delay: ${index * 0.05}s">
+                        ${commune}
                     </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${communes.map((commune, index) => `
-                            <button style="background: #f8f9fa; 
-                                         border: 1px solid #dee2e6; 
-                                         padding: 6px 12px; 
-                                         border-radius: 4px; 
-                                         font-size: 0.85rem; 
-                                         color: #495057;
-                                         cursor: pointer;
-                                         transition: all 0.3s ease;
-                                         font-family: inherit;
-                                         animation: fadeInScale 0.5s ease-out ${0.1 * index}s both;
-                                         transform: translateY(0);"
-                                  onmouseover="this.style.background='#e9ecef'; this.style.borderColor='#adb5bd'; this.style.transform='translateY(-2px) scale(1.05)';"
-                                  onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#dee2e6'; this.style.transform='translateY(0) scale(1)';"
-                                   onclick="document.getElementById('searchInput').value='${commune}'; document.getElementById('searchInput').focus();">
-                                ${commune}
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-
-                container.appendChild(tutorial);
-                container.appendChild(communesBar);
-
-                // Insérer juste après le header (ou en haut du corps si header absent)
-                const header = document.querySelector('.header');
-                if (header && header.parentElement) {
-                    // Insérer dans le même conteneur que le reste pour l'alignement
-                    const searchSection = document.querySelector('.search-section');
-                    if (searchSection) {
-                        searchSection.parentElement.insertBefore(container, searchSection);
-                    } else {
-                        header.parentElement.insertBefore(container, header.nextSibling);
-                    }
-                } else {
-                    document.body.insertBefore(container, document.body.firstChild);
-                }
-
-                // Ajouter les animations CSS
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes slideInFromTop {
-                        from {
-                            opacity: 0;
-                            transform: translateY(-20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    
-                    @keyframes fadeInUp {
-                        from {
-                            opacity: 0;
-                            transform: translateY(20px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    
-                    @keyframes fadeInScale {
-                        from {
-                            opacity: 0;
-                            transform: scale(0.8);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: scale(1);
-                        }
-                    }
-                    
-                    /* Animation pour les suggestions */
-                    .suggestion-item {
-                        animation: fadeInUp 0.3s ease-out;
-                    }
-                    
-                    /* Animation pour les résultats */
-                    .analysis-section {
-                        animation: fadeInUp 0.6s ease-out;
-                    }
-                `;
-                document.head.appendChild(style);
+                `).join('');
+            }
+        }
+        
+        function selectCommune(commune) {
+            document.getElementById('searchInput').value = commune;
+            scrollToSearch();
+            document.getElementById('searchInput').focus();
+        }
+        
+        // Fermer les suggestions en cliquant ailleurs
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container-modern')) {
+                document.getElementById('suggestions').classList.remove('show');
             }
         });
 
