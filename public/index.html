@@ -670,6 +670,9 @@
         <button id="floatingAiBtn" class="floating-ai-modern" onclick="performAIAnalysis()" title="Analyse IA" style="display: none;">
             🤖
         </button>
+
+        <!-- Toast Notifications Container -->
+        <div class="toast-container" id="toastContainer"></div>
     </div>
 
     <footer class="footer">
@@ -724,8 +727,9 @@
 
             // Fermer les suggestions en cliquant ailleurs (mais pas sur une suggestion)
             document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-container') && !e.target.closest('.suggestion-item')) {
+                if (!e.target.closest('.search-container-modern') && !e.target.closest('.suggestion-item-modern')) {
                     suggestions.style.display = 'none';
+                    suggestions.classList.remove('show');
                 }
             });
 
@@ -776,6 +780,7 @@
 
             if (query.length < 2) {
                 suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
                 return;
             }
 
@@ -806,20 +811,29 @@
                         const y = result.attrs.y || result.attrs.lat || 0;
                         
                         suggestionsHTML += `
-                            <div class="suggestion-item" data-index="${index}">
-                                ${label}
+                            <div class="suggestion-item-modern" data-index="${index}">
+                                <div class="suggestion-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                        <circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                                </div>
+                                <div class="suggestion-content">
+                                    <div class="suggestion-label">${label}</div>
+                                </div>
                             </div>
                         `;
                     });
                     
                     suggestions.innerHTML = suggestionsHTML;
                     suggestions.style.display = 'block';
+                    suggestions.classList.add('show');
                     
                     // Stocker les résultats pour l'utilisation dans selectSuggestionByIndex
                     window.currentSuggestions = data.results;
                     
                     // Ajouter la gestion des clics sur les suggestions
-                    suggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                    suggestions.querySelectorAll('.suggestion-item-modern').forEach(item => {
                         item.addEventListener('click', function(e) {
                             e.stopPropagation(); // Empêcher la fermeture des suggestions
                             const index = parseInt(this.getAttribute('data-index'));
@@ -828,10 +842,12 @@
                     });
                 } else {
                     suggestions.style.display = 'none';
+                    suggestions.classList.remove('show');
                 }
             } catch (error) {
                 console.error('Erreur suggestions:', error);
                 suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
             }
         }
 
@@ -841,7 +857,9 @@
                 const cleanLabel = result.attrs.label.replace(/<[^>]*>/g, '');
                 
                 document.getElementById('searchInput').value = cleanLabel;
-                document.getElementById('suggestions').style.display = 'none';
+                const suggestions = document.getElementById('suggestions');
+                suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
                 
                 // Déclencher la recherche directement avec les données de la suggestion
                 performSearchWithResult(result);
@@ -852,7 +870,9 @@
             // Fonction legacy maintenue pour compatibilité
             const cleanLabel = label.replace(/<[^>]*>/g, '');
             document.getElementById('searchInput').value = cleanLabel;
-            document.getElementById('suggestions').style.display = 'none';
+            const suggestions = document.getElementById('suggestions');
+            suggestions.style.display = 'none';
+            suggestions.classList.remove('show');
             performSearch();
         }
 
@@ -1080,23 +1100,37 @@
             loading.style.display = 'none';
             analysisResults.style.display = 'block';
 
-            // Informations générales
+            // Informations générales avec cartes modernes
             generalInfo.innerHTML = `
-                <div class="info-item">
-                    <div class="info-label">N° de parcelle</div>
-                    <div class="info-value">${data.cadastral.parcel_number}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Adresse postale</div>
-                    <div class="info-value" id="addressValue">${data.general.adresse}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Commune / Canton</div>
-                    <div class="info-value">${data.cadastral.commune} (${data.cadastral.canton})</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Coordonnées</div>
-                    <div class="info-value">${data.general.coordonnees}</div>
+                <div class="info-cards-grid">
+                    <div class="info-card-modern animate-slide-in">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">📍</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">N° de parcelle</div>
+                            <div class="info-card-value">${data.cadastral.parcel_number}</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.1s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🏠</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Adresse postale</div>
+                            <div class="info-card-value" id="addressValue">${data.general.adresse}</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.2s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏛️</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Commune / Canton</div>
+                            <div class="info-card-value">${data.cadastral.commune} (${data.cadastral.canton})</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.3s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🌍</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Coordonnées</div>
+                            <div class="info-card-value">${data.general.coordonnees}</div>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -1343,9 +1377,19 @@
                 console.log('🔍 Contraintes:', analysisResult.data?.constraints);
                 
                 displayAIAnalysisResults(analysisResult);
+                
+                // Notification de succès
+                const constraintsCount = analysisResult.data?.constraints?.length || 0;
+                showToast('success', 'Analyse terminée', 
+                    `${constraintsCount} contrainte${constraintsCount > 1 ? 's' : ''} identifiée${constraintsCount > 1 ? 's' : ''} pour cette parcelle.`);
 
             } catch (error) {
                 console.error('Erreur analyse IA:', error);
+                
+                // Notification d'erreur
+                showToast('error', 'Erreur d\'analyse', 
+                    'Impossible de réaliser l\'analyse IA. Veuillez réessayer.');
+                
                 resultsDiv.innerHTML = `
                     <div class="ai-analysis-result">
                         <div class="section-header">
@@ -1391,42 +1435,116 @@
                 return;
             }
 
-            let rows = '';
+            let constraintsCards = '';
             if (Array.isArray(constraints) && constraints.length) {
-                constraints.forEach(c => {
-                    const sevClass = c.severity ? `severity-${c.severity}` : '';
-                    rows += `<tr class="${sevClass}"><td>${c.icon || '📋'} ${c.title || ''}</td><td>${c.severity || ''}</td><td>${c.description || ''}</td></tr>`;
+                constraints.forEach((c, index) => {
+                    const severityColor = {
+                        'high': 'linear-gradient(135deg, #ef4444, #dc2626)',
+                        'medium': 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                        'low': 'linear-gradient(135deg, #10b981, #059669)'
+                    };
+                    const severity = c.severity || 'medium';
+                    const cardGradient = severityColor[severity] || severityColor['medium'];
+                    
+                    constraintsCards += `
+                        <div class="constraint-card-modern animate-slide-in" style="animation-delay: ${index * 0.1}s">
+                            <div class="constraint-card-header">
+                                <div class="constraint-icon" style="background: ${cardGradient}">
+                                    ${c.icon || '📋'}
+                                </div>
+                                <div class="constraint-title-section">
+                                    <h3 class="constraint-title">${c.title || 'Contrainte'}</h3>
+                                    <span class="constraint-severity severity-${severity}">
+                                        ${severity === 'high' ? 'Critique' : 
+                                          severity === 'medium' ? 'Important' : 'Information'}
+                                    </span>
+                                </div>
+                                <div class="constraint-badge severity-${severity}">
+                                    ${severity === 'high' ? '!' : severity === 'medium' ? '⚠' : 'ℹ'}
+                                </div>
+                            </div>
+                            <div class="constraint-card-body">
+                                <p class="constraint-description">${c.description || 'Aucune description disponible'}</p>
+                                <div class="constraint-source">
+                                    <span class="source-label">Source:</span>
+                                    <span class="source-value">${c.source || 'Analyse IA'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 });
             } else {
-                rows = '<tr><td colspan="3" style="text-align:center;">Aucune contrainte détectée.</td></tr>';
+                constraintsCards = `
+                    <div class="no-constraints-card">
+                        <div class="no-constraints-icon">🔍</div>
+                        <h3>Aucune contrainte détectée</h3>
+                        <p>L'analyse n'a pas identifié de contraintes spécifiques pour cette parcelle.</p>
+                    </div>
+                `;
             }
 
             resultsDiv.innerHTML = `
                 <div class="ai-analysis-result">
-                    <div class="section-header">
-                        <div class="section-icon">🤖</div>
-                        <h2 class="section-title">Contraintes de la parcelle</h2>
-                    </div>
-                    <table class="constraints-table">
-                        <thead>
-                            <tr>
-                                <th>Contrainte</th>
-                                <th>Niveau</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                    ${result.recommendations ? `
-                        <div style="margin-top:20px;background:#e8f5e8;padding:15px;border-left:4px solid #28a745;border-radius:10px;">
-                            <h4 style="color: #155724; margin-bottom: 15px;">💡 Recommandations</h4>
-                            <div style="line-height: 1.6; color: #155724;">
-                                ${result.recommendations}
-                            </div>
+                    <div class="section-header-modern">
+                        <div class="section-icon-modern">🤖</div>
+                        <div class="section-title-content">
+                            <h2 class="section-title-modern">Analyse des Contraintes</h2>
+                            <p class="section-subtitle">Contraintes d'urbanisme identifiées par l'IA</p>
                         </div>
-                    ` : ''}
+                        <div class="analysis-badge">
+                            <span class="badge-text">IA</span>
+                        </div>
+                    </div>
+                    <div class="constraints-grid">
+                        ${constraintsCards}
+                    </div>
+                </div>`;
+        }
+
+        // === SYSTÈME DE NOTIFICATIONS TOAST ===
+        function showToast(type, title, message, duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toastId = 'toast_' + Date.now();
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `toast-modern ${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
                 </div>
+                <button class="toast-close" onclick="removeToast('${toastId}')">✕</button>
             `;
+
+            container.appendChild(toast);
+
+            // Animation d'apparition
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            // Auto-removal
+            if (duration > 0) {
+                setTimeout(() => removeToast(toastId), duration);
+            }
+
+            return toastId;
+        }
+
+        function removeToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }
         }
 
         function showLoading() {

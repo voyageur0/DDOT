@@ -37,6 +37,7 @@ const paymentRoutes = require('./routes-node/payment');
 
 // Import des nouvelles routes refactorisées
 const aiAnalysisRoutes = require('./routes/ai-analysis');
+const iaConstraintsRoutes = require('./routes-node/ia-constraints');
 
 // Configuration de l'application
 const app = express();
@@ -479,9 +480,10 @@ app.use('/api/documents', ensureAuthenticated, csrfMiddleware, documentRoutes);
 app.use('/api/analysis', aiAnalysisLimiter, analysisRoutes); // Analyse avec rate limiting
 
 app.use('/api/payment', csrfMiddleware, paymentRoutes);
+app.use('/api/ia-constraints', aiAnalysisLimiter, iaConstraintsRoutes);
 
-// Route IA simplifiée pour test
-app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
+// Route IA SUPPRIMÉE - remplacée par iaConstraintsRoutes
+/*app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
   console.log('🔍 Requête IA reçue:', req.body);
   
   try {
@@ -542,7 +544,7 @@ app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
     console.error('❌ Erreur analyse IA:', error);
     res.status(500).json({ error: 'Erreur lors de l\'analyse: ' + error.message });
   }
-});
+});*/
 
 // Middleware d'authentification
 function ensureAuthenticated(req, res, next) {

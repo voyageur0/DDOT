@@ -82,7 +82,12 @@ app.get('/api/geoadmin-search', async (req, res) => {
 
 // Route de santé pour le monitoring
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    server: 'DDOT TypeScript Server',
+    autoreload: 'enabled'
+  });
 });
 
 // Middleware d'erreur générique
