@@ -3,6 +3,8 @@ import { performance } from 'perf_hooks';
 import axios from 'axios';
 import { performComprehensiveAnalysis, performQuickAnalysis } from '../lib/parcelAnalysisOrchestrator';
 import { callOpenAI } from '../utils/openai';
+import { performStructuredAnalysis, type AnalysisResult } from '../lib/aiAnalysisEngine';
+import { performAdvancedAnalysis, type AdvancedAnalysisResult } from '../lib/advancedAIAnalysisEngine';
 
 const router = Router();
 
@@ -163,23 +165,23 @@ router.post('/ia-constraints', async (req, res, next) => {
           });
         }
         
-        console.log(`📊 Données collectées (${comprehensiveData.completeness}% complétude) - Envoi à OpenAI...`);
+        console.log(`📊 Données collectées (${comprehensiveData.completeness}% complétude) - Analyse IA avancée o3/o3-mini...`);
         
-        // Envoyer les données formatées à OpenAI
-        const openaiAnalysis = await callOpenAIWithDeepSearch(comprehensiveData);
+        // Nouvelle analyse IA avancée avec double niveau et filtrage par zone
+        const advancedAnalysis = await performAdvancedAnalysis(comprehensiveData);
         
         const elapsedMs = performance.now() - t0;
         console.log(`✅ Analyse automatisée complète terminée en ${Math.round(elapsedMs)}ms`);
 
         return res.json({ 
-          constraints: openaiAnalysis,
+          advancedAnalysis,
           comprehensiveData,
           searchQuery,
-          analysisType,
+          analysisType: 'advanced',
           completeness: comprehensiveData.completeness,
           processingTime: comprehensiveData.processingTime,
           elapsedMs: Math.round(elapsedMs),
-          source: 'Analyse approfondie multi-étapes avec APIs officielles + OpenAI gpt-4.1 (recherche approfondie)'
+          source: 'Analyse avancée double niveau o3/o3-mini avec filtrage par zone RDPPF'
         });
         
       } catch (error: any) {

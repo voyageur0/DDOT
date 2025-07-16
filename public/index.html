@@ -3,1360 +3,1742 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DDOT - Analyse Immobilière Intelligente</title>
-    <meta name="description" content="Système avancé d'analyse immobilière pour le Valais. Données publiques GeoAdmin et analyse IA des contraintes d'urbanisme.">
-    <link rel="stylesheet" href="/css/design-system.css">
-    <link rel="stylesheet" href="/css/modern-components.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>DDOT - Plateforme d'Analyse Urbanistique</title>
+    <link rel="stylesheet" href="/css/modern-ui.css">
+    <link rel="stylesheet" href="/css/auth.css">
+    <meta name="description" content="Analyse intelligente d'urbanisme pour le Valais - Découvrez les contraintes de construction en temps réel">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-content">
+            <a href="/" class="navbar-brand">DDOT</a>
+            <div class="navbar-actions">
+                <button class="btn btn-ghost" id="loginBtn">Se connecter</button>
+                <button class="btn btn-primary" id="signupBtn">Commencer</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">L'urbanisme Valaisan réinventé</h1>
+                <p class="hero-subtitle">
+                    Analysez instantanément les contraintes de construction de n'importe quelle parcelle 
+                    avec notre IA spécialisée en urbanisme suisse.
+                </p>
+                
+                <div class="search-hero">
+                    <div class="search-container-modern">
+                        <form class="search-form" id="heroSearchForm">
+                            <svg class="search-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <path d="m21 21-4.35-4.35"/>
+                            </svg>
+                            <input 
+                                type="text" 
+                                class="search-input" 
+                                id="heroSearchInput"
+                                placeholder="Cherchez une parcelle, adresse ou coordonnées..."
+                                autocomplete="off"
+                            >
+                            <button type="submit" class="search-button">
+                                Analyser
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">1</div>
+                                <div class="stat-label">Canton</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                    <polyline points="9 22 9 12 15 12 15 22"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">23</div>
+                                <div class="stat-label">Communes</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-number">95%</div>
+                                <div class="stat-label">Exactitude</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Parcel Information Section -->
+                <section class="parcel-info-section" id="parcelInfoSection" style="display: none; margin-top: 40px;">
+                    <div class="parcel-info-card">
+                        <div class="parcel-header">
+                            <div class="parcel-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="9" y1="9" x2="15" y2="9"/>
+                                    <line x1="9" y1="15" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                            <h3 class="parcel-title">Informations de la Parcelle</h3>
+                        </div>
+                        <div class="parcel-info-grid" id="parcelInfoContent">
+                            <!-- Content populated by JavaScript -->
+                        </div>
+                        <div id="parcelMapContainer" style="height: 300px; margin-top: 20px; border-radius: 8px; overflow: hidden; display: none;">
+                            <!-- Google Maps will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Cards -->
+    <section class="cards-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Fonctionnalités intelligentes</h2>
+                <p class="section-subtitle">
+                    Une suite complète d'outils pour analyser et comprendre les contraintes d'urbanisme
+                </p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card" data-feature="ai-analysis">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                            <path d="M2 17L12 22L22 17"/>
+                            <path d="M2 12L12 17L22 12"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Analyse IA Avancée</h3>
+                    <p class="card-description">
+                        Notre intelligence artificielle analyse automatiquement les règlements communaux 
+                        et identifie toutes les contraintes applicables à votre projet.
+                    </p>
+                    <a href="#" class="card-action">
+                        Découvrir l'IA
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card" data-feature="real-time">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Données Temps Réel</h3>
+                    <p class="card-description">
+                        Accès direct aux données officielles du cadastre valaisan et aux 
+                        restrictions légales mises à jour en continu.
+                    </p>
+                    <a href="#" class="card-action">
+                        Voir les sources
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card" data-feature="documents">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Règlements Communaux</h3>
+                    <p class="card-description">
+                        Téléchargement direct des règlements de construction et plans d'aménagement 
+                        pour plus de 20 communes valaisannes.
+                    </p>
+                    <a href="#" class="card-action">
+                        Liste des communes
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card" data-feature="visualization">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Visualisation 3D</h3>
+                    <p class="card-description">
+                        Modélisation interactive de votre parcelle avec les contraintes de hauteur, 
+                        reculs et zones d'affectation visualisées en 3D.
+                    </p>
+                    <a href="#" class="card-action">
+                        Voir la démo
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card" data-feature="reports">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v20m8-10H4"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">Rapports Détaillés</h3>
+                    <p class="card-description">
+                        Génération automatique de rapports PDF complets avec toutes les contraintes, 
+                        sources légales et recommandations pour votre projet.
+                    </p>
+                    <a href="#" class="card-action">
+                        Exemple de rapport
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="card" data-feature="api">
+                    <div class="card-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"/>
+                            <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                    </div>
+                    <h3 class="card-title">API Développeurs</h3>
+                    <p class="card-description">
+                        Intégrez nos analyses d'urbanisme directement dans vos applications 
+                        avec notre API REST complète et documentation détaillée.
+                    </p>
+                    <a href="#" class="card-action">
+                        Documentation API
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection" style="display: none;">
+        <div class="container">
+
+            <div class="actions-cards">
+                <div class="cards-grid">
+                    <div class="card" id="aiAnalysisCard" style="display: none;">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                                <path d="M2 17L12 22L22 17"/>
+                                <path d="M2 12L12 17L22 12"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Analyse IA Contraintes</h3>
+                        <p class="card-description">Lancer l'analyse intelligente des contraintes d'urbanisme</p>
+                        <button class="btn btn-primary" onclick="performAIAnalysis()">
+                            Analyser avec l'IA
+                        </button>
+                    </div>
+
+                    <div class="card" id="rdppfCard">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Télécharger RDPPF</h3>
+                        <p class="card-description">Registre des restrictions de droit public à la propriété foncière</p>
+                        <button class="btn btn-secondary" id="rdppfBtn">
+                            Télécharger PDF
+                        </button>
+                    </div>
+
+                    <div class="card" id="regulationCard" style="display: none;">
+                        <div class="card-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Règlement Communal</h3>
+                        <p class="card-description">Règlement de construction et zones de la commune</p>
+                        <button class="btn btn-secondary" id="regulationBtn">
+                            Voir le règlement
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aiAnalysisResults" style="display: none; margin-top: 2rem;">
+                <!-- AI Analysis results will be inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Actions -->
+    <div class="floating-actions">
+        <button class="floating-btn" onclick="newSearch()" title="Nouvelle recherche">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Analyse en cours...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-family-sans);
-            background: var(--color-neutral-50);
-            margin: 0;
-            padding: 0;
-        }
-
-        .main-container {
-            min-height: 100vh;
-        }
-
-        .navigation {
+        /* Styles supplémentaires pour cette page */
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
+            bottom: 0;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--color-neutral-200);
-            z-index: var(--z-fixed);
-            padding: var(--space-4) 0;
-        }
-        
-        .nav-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: var(--container-xl);
-            margin: 0 auto;
-            padding: 0 var(--space-6);
-        }
-        
-        .logo {
-            font-family: var(--font-family-display);
-            font-size: var(--text-2xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--color-primary-600);
-            text-decoration: none;
-        }
-        
-        .nav-menu {
-            display: flex;
-            gap: var(--space-6);
-            align-items: center;
-        }
-        
-        .nav-link {
-            color: var(--color-neutral-600);
-            text-decoration: none;
-            font-weight: var(--font-weight-medium);
-            transition: color var(--transition-base);
-        }
-        
-        .nav-link:hover {
-            color: var(--color-primary-600);
-        }
-
-        .search-section {
-            padding: var(--space-16) var(--space-6);
-            background: white;
-            position: relative;
-            z-index: 10;
-        }
-
-        .search-container {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
-            z-index: 100;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 20px 60px 20px 20px;
-            font-size: 18px;
-            border: 3px solid #e9ecef;
-            border-radius: 50px;
-            outline: none;
-            transition: all 0.3s ease;
-            background: white;
-            position: relative;
-            z-index: 101;
-        }
-
-        .search-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 44px;
-            height: 44px;
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 102;
+            z-index: 9999;
         }
 
-        .search-btn:hover {
-            transform: translateY(-50%) scale(1.05);
+        .loading-content {
+            text-align: center;
+            padding: var(--space-2xl);
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
         }
 
-        .suggestions {
+        .hero-stats {
+            margin-top: var(--space-3xl);
+            padding: 0 var(--space-lg);
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-md);
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 20px;
+            padding: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                0 1px 2px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            flex: 1;
+            min-width: 0;
+            transform-style: preserve-3d;
+            animation: statEnter 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px) rotateX(15deg);
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes statEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .stat-card::before {
+            content: '';
             position: absolute;
-            top: 100%;
+            top: 0;
             left: 0;
             right: 0;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            margin-top: 5px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 10000;
-            display: none;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--accent) 20%, 
+                var(--accent) 80%, 
+                transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.8s ease;
         }
 
-        .suggestion-item {
-            padding: 15px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            transition: background-color 0.2s;
+        .stat-card:hover::before {
+            transform: translateX(100%);
         }
 
-        .suggestion-item:hover {
-            background-color: #f8f9fa;
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 112, 243, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border-color: rgba(0, 112, 243, 0.3);
+            background: rgba(255, 255, 255, 0.98);
         }
 
-        .suggestion-item:last-child {
-            border-bottom: none;
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, 
+                rgba(0, 112, 243, 0.1) 0%, 
+                rgba(0, 212, 170, 0.1) 100%);
+            border: 1px solid rgba(0, 112, 243, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            margin-bottom: var(--space-md);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
         }
 
-        .results-container {
-            padding: 40px;
-            display: none;
+        .stat-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, 
+                rgba(0, 112, 243, 0.2) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
-        .analysis-section {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, 
+                rgba(0, 112, 243, 0.2) 0%, 
+                rgba(0, 212, 170, 0.2) 100%);
+            border-color: rgba(0, 112, 243, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 112, 243, 0.2);
+        }
+
+        .stat-card:hover .stat-icon::after {
+            opacity: 1;
+        }
+
+        .stat-content {
+            flex: 1;
+            width: 100%;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, 
+                var(--text-primary) 0%, 
+                var(--accent) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: var(--space-sm);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-variant-numeric: tabular-nums;
+            transition: all 0.4s ease;
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-label {
+            color: var(--accent);
+            opacity: 1;
+            transform: translateY(-2px);
         }
 
         .section-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin-right: 15px;
-            font-size: 18px;
+            text-align: center;
+            margin-bottom: var(--space-2xl);
         }
 
         .section-title {
-            font-size: 1.4em;
-            font-weight: 600;
-            color: #2c3e50;
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        .section-subtitle {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .info-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 5px;
-        }
-
-        .info-value {
-            font-size: 1.1em;
-            color: #2c3e50;
-        }
-
-        .actions-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .action-btn.secondary {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-
-        .action-btn.warning {
-            background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
-        }
-
-        .action-btn.ai-analysis-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            animation: ai-glow 2s ease-in-out infinite alternate;
-        }
-
-        .action-btn.ai-analysis-btn::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #667eea, #764ba2, #667eea, #764ba2);
-            border-radius: inherit;
-            z-index: -1;
-            animation: ai-border 3s linear infinite;
-        }
-
-        @keyframes ai-glow {
-            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6), 0 0 40px rgba(118, 75, 162, 0.4); }
-        }
-
-        @keyframes ai-border {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .ai-analysis-result {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border: 1px solid #dee2e6;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .ai-analysis-result::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-            animation: ai-scan 2s ease-in-out infinite;
-        }
-
-        @keyframes ai-scan {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        .actions-cards {
+            margin-top: var(--space-2xl);
         }
 
         .constraint-item {
-            background: white;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            transition: all 0.3s var(--ease-smooth);
         }
 
-        .constraint-severity-high {
-            border-left-color: #dc3545;
+        .constraint-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--accent);
         }
 
-        .constraint-severity-medium {
-            border-left-color: #ffc107;
+        .constraint-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
         }
 
-        .constraint-severity-low {
-            border-left-color: #28a745;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #dc3545;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-        }
-
-        .property-owners {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-
-        .vsgis-indicator {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
+        .constraint-title {
             font-weight: 600;
-            margin-left: 10px;
+            color: var(--text-primary);
         }
 
-        .commune-selector {
-            margin: 20px 0;
+        .constraint-severity {
+            font-size: var(--text-xs);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .commune-selector select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 16px;
-            background: white;
+        .constraint-severity.high {
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--error);
+        }
+
+        .constraint-severity.medium {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--warning);
+        }
+
+        .constraint-severity.low {
+            background: rgba(0, 112, 243, 0.1);
+            color: var(--info);
+        }
+
+        .parcel-info-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .parcel-info-card {
+            background: var(--background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--ease-smooth);
+        }
+
+        .parcel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .parcel-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-light);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--space-md);
+            color: var(--accent);
+        }
+
+        .parcel-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .parcel-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+        }
+
+        .parcel-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .parcel-info-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .parcel-info-value {
+            font-size: var(--text-base);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-200);
+            color: var(--gray-500);
+        }
+        
+        .btn-secondary:disabled {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
         }
 
         @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 15px;
+            .hero-stats {
+                margin-top: var(--space-2xl);
+                padding: 0 var(--space-md);
             }
             
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .search-section, .results-container {
-                padding: 20px;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .actions-container {
+            .stats-container {
                 flex-direction: column;
+                gap: var(--space-lg);
+                max-width: 350px;
+            }
+            
+            .stat-card {
+                padding: var(--space-lg);
+                border-radius: 16px;
+                flex-direction: row;
+                text-align: left;
+                align-items: center;
+                gap: var(--space-md);
+                transform: translateY(20px);
+            }
+            
+            .stat-icon {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 0;
+                border-radius: 12px;
+                flex-shrink: 0;
+            }
+            
+            .stat-content {
+                flex: 1;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+                margin-bottom: 2px;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+                letter-spacing: 0.5px;
+            }
+            
+            .stat-card:hover {
+                transform: translateY(-4px) scale(1.01);
+            }
+            
+            .parcel-info-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
             }
         }
-
-        /* === Styles ajoutés pour l'authentification et le footer === */
-        .user-menu {
-            margin-top: 15px;
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                max-width: 300px;
+                gap: var(--space-md);
+            }
+            
+            .stat-card {
+                padding: var(--space-md);
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .stat-number {
+                font-size: 1.75rem;
+            }
         }
-        .user-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-left: 10px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            position: relative;
-        }
-        .modal-content h2 {
-            margin-bottom: 20px;
-        }
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-        }
-        .modal-content .close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.9em;
-            color: #495057;
-            background: #f8f9fa;
-            margin-top: 30px;
-            border-top: 1px solid #e9ecef;
-        }
-
-        /* Animation de chargement */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .floating-ai-btn {
-            position: fixed;
-            top: 50%;
-            right: 25px;
-            transform: translateY(-50%);
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            border: none;
-            font-size: 32px;
-            display: none; /* par défaut */
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1500;
-            box-shadow: 0 10px 25px rgba(102,126,234,0.45);
-            animation: floaty 4s ease-in-out infinite;
-        }
-        @keyframes floaty {
-            0% { transform: translateY(-50%) translateX(0); }
-            50% { transform: translateY(calc(-50% - 6px)) translateX(-4px); }
-            100% { transform: translateY(-50%) translateX(0); }
-        }
-        .floating-ai-btn:hover { box-shadow: 0 15px 35px rgba(102,126,234,0.6); }
-        /* bulle de dialogue */
-        .floating-ai-btn .ai-bubble {
-            position: absolute;
-            right: 110%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #fff;
-            color: #333;
-            padding: 6px 10px;
-            border-radius: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-            font-size: 0.8rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-        .floating-ai-btn.show-bubble .ai-bubble { opacity: 1; }
-
-        /* Tableau des contraintes */
-        .constraints-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .constraints-table th, .constraints-table td { padding: 10px 12px; border: 1px solid #dee2e6; text-align: left; }
-        .constraints-table th { background: #f1f3f5; font-weight: 600; }
-        .severity-high { background: #f8d7da; color: #721c24; }
-        .severity-medium { background: #fff3cd; color: #856404; }
-        .severity-low { background: #d4edda; color: #155724; }
     </style>
-</head>
-<body>
-    <div class="main-container">
-        <!-- Navigation -->
-        <nav class="navigation">
-            <div class="nav-content">
-                <a href="#" class="logo">DDOT</a>
-                <div class="nav-menu">
-                    <a href="#features" class="nav-link">Fonctionnalités</a>
-                    <a href="#communes" class="nav-link">Communes</a>
-                    <a href="#about" class="nav-link">À propos</a>
-                    <div class="user-menu">
-                        <span id="userGreeting"></span>
-                        <button id="loginBtn" class="btn btn-secondary btn-sm">Se connecter</button>
-                        <button id="logoutBtn" class="btn btn-secondary btn-sm" style="display: none;">Se déconnecter</button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        
-        <!-- Hero Section -->
-        <section class="hero-modern">
-            <div class="hero-content">
-                <h1 class="hero-title">Analyse Immobilière Intelligente pour le Valais</h1>
-                <p class="hero-subtitle">Exploitez la puissance de l'IA et des données publiques suisses pour analyser vos parcelles et contraintes d'urbanisme en quelques clics</p>
-                <div class="hero-cta">
-                    <button class="btn-hero btn-hero-primary" onclick="scrollToSearch()">🔍 Analyser une parcelle</button>
-                    <button class="btn-hero btn-hero-secondary" onclick="scrollToCommunes()">📋 Voir les communes</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Search Section -->
-        <section class="search-section" id="search">
-            <div class="container">
-                <div class="search-container-modern">
-                    <div class="search-icon">🔍</div>
-                    <input type="text" 
-                           class="search-input-modern" 
-                           id="searchInput" 
-                           placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
-                    <button class="search-button" id="searchBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21l-4.35-4.35"></path>
-                        </svg>
-                    </button>
-                    <div class="suggestions-modern" id="suggestions"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Results Container -->
-        <section class="results-container" id="resultsContainer" style="display: none;">
-            <div class="container">
-                <div class="loading-modern" id="loading">
-                    <div class="spinner-modern"></div>
-                    <p class="loading-text-modern">Analyse en cours via GeoAdmin et base de données DDOT...</p>
-                </div>
-
-                <div id="analysisResults" style="display: none;">
-                    <!-- Informations générales -->
-                    <div class="results-card-modern">
-                        <div class="card-header-modern">
-                            <div class="card-icon-modern">📋</div>
-                            <h2 class="card-title-modern">Informations Générales</h2>
-                        </div>
-                        <div class="card-body-modern">
-                            <div class="info-grid-modern" id="generalInfo"></div>
-                        </div>
-                    </div>
-
-                    <!-- Autres sections masquées par défaut -->
-                    <div id="ownersInfo" style="display: none;"></div>
-                    <div id="cadastralInfo" style="display: none;"></div>
-                    <div id="zoningInfo" style="display: none;"></div>
-                    <div id="developmentInfo" style="display: none;"></div>
-
-                    <!-- Actions -->
-                    <div class="actions-container-modern">
-                        <button class="action-btn-modern action-btn-ai" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
-                            🤖 Analyse IA Contraintes
-                        </button>
-                        <button class="action-btn-modern action-btn-secondary" id="rdppfBtn">
-                            📋 Télécharger RDPPF
-                        </button>
-                        <button class="action-btn-modern action-btn-warning" id="regulationBtn" style="display:none;">
-                            📚 Règlement Communal
-                        </button>
-                        <button class="action-btn-modern action-btn-ai" onclick="newSearch()">
-                            🔄 Nouvelle Recherche
-                        </button>
-                    </div>
-                    
-                    <!-- Résultats de l'analyse IA -->
-                    <div id="aiAnalysisResults" style="display: none;"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Communes Section -->
-        <section class="communes-section-modern" id="communes">
-            <div class="container">
-                <div class="communes-header">
-                    <h2 class="communes-title">Communes du Valais Romand</h2>
-                    <p class="communes-subtitle">23 communes avec analyse complète disponible</p>
-                </div>
-                <div class="communes-grid" id="communesGrid">
-                    <!-- Les communes seront injectées ici -->
-                </div>
-            </div>
-        </section>
-        
-        <!-- Floating AI Button -->
-        <button id="floatingAiBtn" class="floating-ai-modern" onclick="performAIAnalysis()" title="Analyse IA" style="display: none;">
-            🤖
-        </button>
-
-        <!-- Toast Notifications Container -->
-        <div class="toast-container" id="toastContainer"></div>
-    </div>
-
-    <footer class="footer">
-        DDOT - Projet en cours de développement.<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
-    </footer>
-
-
-
-    <!-- Authentification sécurisée gérée côté serveur -->
 
     <script>
-
-
         // Variables globales
         let currentData = null;
-        let searchTimeout = null;
-        
-        // Fonctions de navigation
-        function scrollToSearch() {
-            document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function scrollToCommunes() {
-            document.getElementById('communes').scrollIntoView({ behavior: 'smooth' });
-        }
+        let searchSystem = null;
+        const API_BASE_URL = window.location.origin;
+        // Communes avec règlements disponibles (basé sur /reglements)
+        const COMMUNES_DISPONIBLES = [
+            'Arbaz', 'Ardon', 'Ayent', 'Chamoson', 'Charrat', 'Conthey', 
+            'Martigny', 'Mase', 'Mollens', 'Nax', 'Nendaz', 'Riddes', 
+            'Saillon', 'Saint-Léonard', 'Salgesch', 'Savièse', 'Saxon', 
+            'Sierre', 'Sion', 'Vernamiège', 'Vérrossaz', 'Vétroz'
+        ];
 
-        /**
-         * Extrait un numéro EGRID complet à partir du label d'une suggestion.
-         * Exemple de label : "Vétroz 2450 (CH 9952 1900 3076)"  →  "CH995219003076"
-         */
-        function extractEgridFromLabel(label) {
-            const match = label.match(/\(\s*CH\s*([0-9\s]+)\s*\)/i);
-            if (match && match[1]) {
-                return 'CH' + match[1].replace(/\s+/g, '');
-            }
-            return null;
+        // Fonction de conversion CH1903+ vers WGS84
+        function convertCH1903ToWGS84(x, y) {
+            // Transformation approximative CH1903+ (LV95) vers WGS84
+            // Conversion simplifiée pour la Suisse
+            const x_aux = (x - 2600000) / 1000000;
+            const y_aux = (y - 1200000) / 1000000;
+            
+            const lat = 46.95240555556 + 
+                       (y_aux * 359.057 / 3600) + 
+                       (x_aux * y_aux * 0.523 / 3600) + 
+                       (x_aux * x_aux * y_aux * 0.002 / 3600);
+                       
+            const lng = 8.72758333333 + 
+                       (x_aux * 363.916 / 3600) + 
+                       (x_aux * y_aux * 0.084 / 3600) + 
+                       (x_aux * x_aux * x_aux * 0.0003 / 3600);
+            
+            return { lat, lng };
         }
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-            const suggestions = document.getElementById('suggestions');
-
-            searchInput.addEventListener('input', handleSearchInput);
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
+            const heroSearchForm = document.getElementById('heroSearchForm');
+            const heroSearchInput = document.getElementById('heroSearchInput');
+            
+            // Initialiser le nouveau système de recherche
+            searchSystem = new SearchSystem();
+            
+            // Écouter les événements de sélection
+            heroSearchInput.addEventListener('search-selected', async function(e) {
+                try {
+                    const suggestion = e.detail.suggestion;
+                    const data = e.detail.data;
+                    
+                    // Traiter la recherche avec les données GeoAdmin
+                    await performGeoAdminSearch(data);
+                } catch (error) {
+                    console.error('Erreur lors de la recherche:', error);
+                    showToast('error', 'Erreur', 'Impossible de charger les informations de la parcelle');
                 }
             });
-            searchBtn.addEventListener('click', performSearch);
-
-            // Fermer les suggestions en cliquant ailleurs (mais pas sur une suggestion)
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-container-modern') && !e.target.closest('.suggestion-item-modern')) {
-                    suggestions.style.display = 'none';
-                    suggestions.classList.remove('show');
-                }
-            });
-
-            // === Auth UI ===
-            const loginBtn = document.getElementById('loginBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            // Authentification gérée côté serveur
-            if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
-            if (logoutBtn) logoutBtn.addEventListener('click', () => {
-                window.location.href = '/api/auth/logout';
-            });
-
-            // Initialiser la grille des communes
-            initializeCommunesGrid();
-        });
-        
-        function initializeCommunesGrid() {
-            const communes = ['Arbaz','Ardon','Ayent','Chamoson','Charrat','Conthey','Martigny','Mase','Mollens','Nax','Nendaz','Riddes','Saillon','Saint-Léonard','Salgesch','Savièse','Saxon','Sierre','Sion','Vernamiège','Vérrossaz','Vétroz'];
-            const communesGrid = document.getElementById('communesGrid');
             
-            if (communesGrid) {
-                communesGrid.innerHTML = communes.map((commune, index) => `
-                    <div class="commune-tag" onclick="selectCommune('${commune}')" style="animation-delay: ${index * 0.05}s">
-                        ${commune}
-                    </div>
-                `).join('');
-            }
-        }
-        
-        function selectCommune(commune) {
-            document.getElementById('searchInput').value = commune;
-            scrollToSearch();
-            document.getElementById('searchInput').focus();
-        }
-        
-        // Fermer les suggestions en cliquant ailleurs
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-container-modern')) {
-                document.getElementById('suggestions').classList.remove('show');
-            }
-        });
-
-        function handleSearchInput() {
-            const query = document.getElementById('searchInput').value;
-            const suggestions = document.getElementById('suggestions');
-
-            clearTimeout(searchTimeout);
-
-            if (query.length < 2) {
-                suggestions.style.display = 'none';
-                suggestions.classList.remove('show');
-                return;
-            }
-
-            searchTimeout = setTimeout(() => {
-                showSuggestions(query);
-            }, 300);
-        }
-
-        async function showSuggestions(query) {
-            const suggestions = document.getElementById('suggestions');
-            
-            try {
-                // Recherche via API GeoAdmin
-                const response = await fetch(
-                    `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=8&sr=2056`
-                );
-                
-                if (!response.ok) throw new Error('Erreur de recherche');
-                
-                const data = await response.json();
-                
-                if (data.results && data.results.length > 0) {
-                    let suggestionsHTML = '';
-                    
-                    data.results.forEach((result, index) => {
-                        const label = result.attrs.label.replace(/<[^>]*>/g, '');
-                        const x = result.attrs.x || result.attrs.lon || 0;
-                        const y = result.attrs.y || result.attrs.lat || 0;
-                        
-                        suggestionsHTML += `
-                            <div class="suggestion-item-modern" data-index="${index}">
-                                <div class="suggestion-icon">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                        <circle cx="12" cy="10" r="3"/>
-                                    </svg>
-                                </div>
-                                <div class="suggestion-content">
-                                    <div class="suggestion-label">${label}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    suggestions.innerHTML = suggestionsHTML;
-                    suggestions.style.display = 'block';
-                    suggestions.classList.add('show');
-                    
-                    // Stocker les résultats pour l'utilisation dans selectSuggestionByIndex
-                    window.currentSuggestions = data.results;
-                    
-                    // Ajouter la gestion des clics sur les suggestions
-                    suggestions.querySelectorAll('.suggestion-item-modern').forEach(item => {
-                        item.addEventListener('click', function(e) {
-                            e.stopPropagation(); // Empêcher la fermeture des suggestions
-                            const index = parseInt(this.getAttribute('data-index'));
-                            selectSuggestionByIndex(index);
-                        });
-                    });
+            // Animation de la navbar au scroll
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
                 } else {
-                    suggestions.style.display = 'none';
-                    suggestions.classList.remove('show');
+                    navbar.style.background = 'rgba(255, 255, 255, 0.8)';
                 }
-            } catch (error) {
-                console.error('Erreur suggestions:', error);
-                suggestions.style.display = 'none';
-                suggestions.classList.remove('show');
-            }
-        }
+            });
 
-        function selectSuggestionByIndex(index) {
-            if (window.currentSuggestions && window.currentSuggestions[index]) {
-                const result = window.currentSuggestions[index];
-                const cleanLabel = result.attrs.label.replace(/<[^>]*>/g, '');
+            // Gestion du formulaire de recherche
+            heroSearchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // Ne pas permettre la recherche directe - l'utilisateur doit sélectionner une suggestion
+                showToast('info', 'Sélectionnez une suggestion', 'Veuillez sélectionner une parcelle ou adresse dans la liste des suggestions');
+            });
+
+            // Animation des cartes au survol
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
                 
-                document.getElementById('searchInput').value = cleanLabel;
-                const suggestions = document.getElementById('suggestions');
-                suggestions.style.display = 'none';
-                suggestions.classList.remove('show');
-                
-                // Déclencher la recherche directement avec les données de la suggestion
-                performSearchWithResult(result);
-            }
-        }
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
 
-        function selectSuggestion(label, x, y) {
-            // Fonction legacy maintenue pour compatibilité
-            const cleanLabel = label.replace(/<[^>]*>/g, '');
-            document.getElementById('searchInput').value = cleanLabel;
-            const suggestions = document.getElementById('suggestions');
-            suggestions.style.display = 'none';
-            suggestions.classList.remove('show');
-            performSearch();
-        }
+            heroSearchInput.focus();
+        });
 
-        async function performSearchWithResult(result) {
-            showLoading();
-
+        // Fonction de recherche avec les données GeoAdmin (corrigée pour EGRID)
+        async function performGeoAdminSearch(geoAdminData) {
+            showLoading(true);
+            
             try {
-                // Tentative d'extraction directe de l'EGRID depuis le label
-                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
-
-                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
-                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
-                    try {
-                        // Utiliser l'API parcellaire suisse directe
-                        const response = await fetch(
-                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
-                        );
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            console.log('Données parcelle:', data); // Pour debug
-                        }
-                        
-                        // Essayer avec l'API cadastre
-                        const cadastreResponse = await fetch(
-                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
-                        );
-                        
-                        if (cadastreResponse.ok) {
-                            const cadastreData = await cadastreResponse.json();
-                            console.log('Données cadastre:', cadastreData); // Pour debug
-                            
-                            if (cadastreData.results && cadastreData.results.length > 0) {
-                                for (let cadastreResult of cadastreData.results) {
-                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
-                                        egridComplet = cadastreResult.attributes.egrid;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.log('Erreur récupération EGRID:', error);
-                    }
+                console.log('🔍 Données GeoAdmin reçues:', geoAdminData);
+                
+                if (!geoAdminData) {
+                    throw new Error('Aucune donnée GeoAdmin fournie');
                 }
-
-                // Créer les données directement avec le résultat de la suggestion
-                const parcelNumber = result.attrs.number || extractParcelNumber(result.attrs.label);
-                const cleanedAddress = cleanAddress(result.attrs);
-
+                
+                // Extraire l'EGRID de toutes les sources possibles
+                const egrid = extractEGRID(geoAdminData);
+                console.log('🏷️ EGRID extrait:', egrid);
+                console.log('🔍 Données brutes geoAdminData:', geoAdminData);
+                
+                const commune = extractCommuneFromGeoAdmin(geoAdminData);
+                console.log('🏛️ Commune extraite:', commune);
+                
+                // Récupérer les coordonnées correctes et les convertir
+                const coordinates = await getCorrectCoordinates(geoAdminData);
+                
+                // Obtenir l'adresse postale réelle
+                const realAddress = await getRealAddress(coordinates, geoAdminData);
+                
+                // Obtenir les informations détaillées de la parcelle
+                const parcelDetails = await getParcelDetails(geoAdminData);
+                
+                // Construire les données complètes avec EGRID correct
                 currentData = {
                     general: {
-                        adresse: cleanedAddress || 'Adresse non disponible',
-                        coordonnees: result.attrs.x && result.attrs.y ? 
-                            `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
-                            'Coordonnées non disponibles',
-                        systeme_ref: "CH1903+ / LV95 (EPSG:2056)",
-                        date_analyse: new Date().toLocaleDateString('fr-CH'),
-                        type_objet: result.attrs.origin || 'Parcelle'
+                        adresse: realAddress,
+                        commune: commune,
+                        egrid: egrid
                     },
                     cadastral: {
-                        id_federal: egridComplet,
-                        parcel_number: parcelNumber || 'Indisponible',
-                        commune: extractCommune(result.attrs.label),
-                        canton: 'Valais (VS)',
-                        statut: 'Données publiques GeoAdmin',
-                        bbox: result.attrs.geom_st_box2d || 'Non disponible'
+                        id_federal: egrid,
+                        numero: extractParcelNumber(geoAdminData.label || ''),
+                        commune: commune,
+                        egrid: egrid,
+                        surface: parcelDetails.surface || 0,
+                        proprietaire: parcelDetails.proprietaire || 'Information publique non disponible'
                     },
-                    zonage: {
-                        source: 'Informations disponibles auprès des services communaux',
-                        note: 'Consultation du règlement communal recommandée'
-                    }
+                    coordinates: coordinates,
+                    geoAdmin: geoAdminData,
+                    parcelDetails: parcelDetails,
+                    source: 'GeoAdmin_Enhanced'
                 };
                 
-                // Chercher adresse officielle
-                if (result.attrs.x && result.attrs.y) {
-                    const officialAddress = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
-                    if (officialAddress) currentData.general.adresse = officialAddress;
-                }
-
+                console.log('✅ Données complètes construites:', currentData);
+                console.log('🔑 EGRID final dans currentData:', currentData.cadastral.egrid);
+                
                 displayResults(currentData);
-
+                showToast('success', 'Parcelle trouvée', `${realAddress} chargée avec succès`);
+                
             } catch (error) {
-                console.error('Erreur lors de l\'affichage:', error);
-                showError('Erreur lors de l\'affichage des résultats: ' + error.message);
+                console.error('Erreur de recherche:', error);
+                showToast('error', 'Erreur', error.message || 'Impossible de charger les informations de la parcelle');
+            } finally {
+                showLoading(false);
             }
         }
-
-        async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
+        
+        // Fonction pour extraire l'EGRID de toutes les sources possibles
+        function extractEGRID(geoAdminData) {
+            // Essayer différentes sources pour l'EGRID
+            const possibleEgrids = [
+                geoAdminData.featureId,
+                geoAdminData.id,
+                geoAdminData.feature_id,
+                geoAdminData.egid,
+                geoAdminData.EGRID,
+                geoAdminData.egrid,
+                geoAdminData.attrs?.featureId,
+                geoAdminData.attrs?.id,
+                geoAdminData.attrs?.EGRID,
+                geoAdminData.attrs?.egrid
+            ];
             
-            if (!query) {
-                alert('Veuillez saisir une recherche');
-                return;
+            // Prendre le premier EGRID valide trouvé
+            for (const egrid of possibleEgrids) {
+                if (egrid && egrid !== '' && egrid !== 'undefined') {
+                    console.log('🎯 EGRID trouvé:', egrid);
+                    return egrid;
+                }
             }
-
-            showLoading();
-
+            
+            // Si aucun EGRID direct, essayer d'extraire depuis le label
+            const label = geoAdminData.label || geoAdminData.attrs?.label || '';
+            
+            // Essayer d'abord le format avec espaces: CH 1234 5678 9012
+            const egridWithSpacesMatch = label.match(/CH\s+(\d{4})\s+(\d{4})\s+(\d{4})/);
+            if (egridWithSpacesMatch) {
+                const cleanEgrid = `CH${egridWithSpacesMatch[1]}${egridWithSpacesMatch[2]}${egridWithSpacesMatch[3]}`;
+                console.log('🎯 EGRID extrait du label (avec espaces):', cleanEgrid);
+                return cleanEgrid;
+            }
+            
+            // Essayer ensuite le format sans espaces: CH123456789012 (12 chiffres)
+            const egridMatch = label.match(/CH\d{12}/);
+            if (egridMatch) {
+                console.log('🎯 EGRID extrait du label (sans espaces, 12 chiffres):', egridMatch[0]);
+                return egridMatch[0];
+            }
+            
+            // Essayer aussi le format avec 9 chiffres (au cas où)
+            const egridMatch9 = label.match(/CH\d{9}/);
+            if (egridMatch9) {
+                console.log('🎯 EGRID extrait du label (sans espaces, 9 chiffres):', egridMatch9[0]);
+                return egridMatch9[0];
+            }
+            
+            console.warn('⚠️ Aucun EGRID trouvé dans les données');
+            return '';
+        }
+        
+        // Obtenir les coordonnées correctes et les convertir
+        async function getCorrectCoordinates(geoAdminData) {
+            // Extraire les coordonnées CH1903+ (LV95)
+            let x = geoAdminData.x || geoAdminData.geom_st_x || 0;
+            let y = geoAdminData.y || geoAdminData.geom_st_y || 0;
+            
+            // Si on a déjà des coordonnées WGS84
+            if (geoAdminData.lat && geoAdminData.lon) {
+                return {
+                    x: x,
+                    y: y,
+                    lat: geoAdminData.lat,
+                    lng: geoAdminData.lon
+                };
+            }
+            
+            // Conversion CH1903+ vers WGS84 (version améliorée)
+            const wgs84 = convertCH1903ToWGS84Precise(x, y);
+            
+            return {
+                x: x,
+                y: y,
+                lat: wgs84.lat,
+                lng: wgs84.lng
+            };
+        }
+        
+        // Obtenir l'adresse postale réelle via reverse geocoding amélioré
+        async function getRealAddress(coordinates, geoAdminData) {
             try {
-                // Recherche via API GeoAdmin uniquement
-                const searchResponse = await fetch(
-                    `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=5&sr=2056`
-                );
+                // 1. Essayer d'abord avec OpenStreetMap Nominatim (gratuit et fiable)
+                const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coordinates.lat}&lon=${coordinates.lng}&zoom=18&addressdetails=1&accept-language=fr`;
                 
-                if (!searchResponse.ok) {
-                    throw new Error(`Erreur API GeoAdmin: ${searchResponse.status}`);
-                }
+                const nominatimResponse = await fetch(nominatimUrl, {
+                    headers: {
+                        'User-Agent': 'DDOT-Urbanisme-App'
+                    }
+                });
                 
-                const searchData = await searchResponse.json();
-                
-                if (!searchData.results || searchData.results.length === 0) {
-                    throw new Error('Aucun résultat trouvé dans GeoAdmin');
-                }
-
-                const result = searchData.results[0];
-                
-                // Tentative d'extraction directe de l'EGRID depuis le label
-                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
-
-                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
-                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
-                    try {
-                        // Utiliser l'API parcellaire suisse directe
-                        const response = await fetch(
-                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
-                        );
+                if (nominatimResponse.ok) {
+                    const nominatimData = await nominatimResponse.json();
+                    if (nominatimData.display_name) {
+                        // Extraire une adresse propre depuis Nominatim
+                        const address = nominatimData.address;
+                        let cleanAddress = '';
                         
-                        if (response.ok) {
-                            const data = await response.json();
-                            console.log('Données parcelle:', data); // Pour debug
+                        if (address.house_number && address.road) {
+                            cleanAddress = `${address.road} ${address.house_number}`;
+                        } else if (address.road) {
+                            cleanAddress = address.road;
+                        } else if (address.village || address.town || address.city) {
+                            const locality = address.village || address.town || address.city;
+                            cleanAddress = `Secteur ${locality}`;
                         }
                         
-                        // Essayer avec l'API cadastre
-                        const cadastreResponse = await fetch(
-                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
-                        );
+                        if (cleanAddress && address.postcode && (address.village || address.town || address.city)) {
+                            const locality = address.village || address.town || address.city;
+                            return `${cleanAddress}, ${address.postcode} ${locality}`;
+                        } else if (cleanAddress) {
+                            return cleanAddress;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur géocodage Nominatim:', error);
+            }
+            
+            try {
+                // 2. Fallback: utiliser l'API de géocodage inverse de GeoAdmin
+                const url = `https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&limit=1&bbox=${coordinates.lng-0.001},${coordinates.lat-0.001},${coordinates.lng+0.001},${coordinates.lat+0.001}&origins=address`;
+                
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        const address = data.results[0].attrs.label;
+                        if (address && !address.includes('CH ')) {
+                            return address.replace(/<[^>]*>/g, '').trim();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur géocodage GeoAdmin:', error);
+            }
+            
+            // 3. Fallback: extraire l'adresse du label original ou utiliser la commune
+            const label = geoAdminData.label || '';
+            const cleanLabel = label.replace(/<[^>]*>/g, '').trim();
+            
+            // Si le label contient déjà une adresse (pas juste un numéro)
+            if (cleanLabel && !cleanLabel.match(/^\d+/) && !cleanLabel.includes('CH ')) {
+                return cleanLabel;
+            }
+            
+            // 4. Dernière option: utiliser la commune
+            const commune = extractCommuneFromGeoAdmin(geoAdminData);
+            return commune ? `Parcelle à ${commune}` : 'Adresse non disponible';
+        }
+        
+        // Obtenir les détails de la parcelle (surface, propriétaire si disponible) - Version améliorée
+        async function getParcelDetails(geoAdminData) {
+            let details = {
+                surface: 0,
+                proprietaire: null,
+                type_usage: null,
+                zone: null
+            };
+            
+            try {
+                // 1. Essayer avec l'API Features de GeoAdmin
+                const featureId = geoAdminData.featureId || geoAdminData.id;
+                if (featureId) {
+                    const url = `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-farbe/features/${featureId}?geometryFormat=geojson`;
+                    
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const properties = data.feature?.properties || {};
                         
-                        if (cadastreResponse.ok) {
-                            const cadastreData = await cadastreResponse.json();
-                            console.log('Données cadastre:', cadastreData); // Pour debug
+                        details.surface = properties.flaeche || properties.area || properties.surface || 0;
+                        details.proprietaire = properties.eigentuemer || properties.owner || null;
+                        details.type_usage = properties.nutzung || properties.usage || null;
+                        details.zone = properties.zone || null;
+                        
+                        if (details.surface > 0) {
+                            console.log('Surface trouvée via API Features:', details.surface, 'm²');
+                            return details;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur API Features:', error);
+            }
+            
+            try {
+                // 2. Essayer avec l'API Identify si on a des coordonnées
+                if (geoAdminData.geom_st_x && geoAdminData.geom_st_y) {
+                    const identifyUrl = `https://api3.geo.admin.ch/rest/services/api/MapServer/identify?geometry=${geoAdminData.geom_st_x},${geoAdminData.geom_st_y}&geometryType=esriGeometryPoint&layers=all:ch.kantone.cadastralwebmap-farbe&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5&returnGeometry=false`;
+                    
+                    const response = await fetch(identifyUrl);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.results && data.results.length > 0) {
+                            const attributes = data.results[0].attributes || {};
+                            details.surface = attributes.flaeche || attributes.area || attributes.surface || 0;
                             
-                            if (cadastreData.results && cadastreData.results.length > 0) {
-                                for (let cadastreResult of cadastreData.results) {
-                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
-                                        egridComplet = cadastreResult.attributes.egrid;
-                                        break;
-                                    }
-                                }
+                            if (details.surface > 0) {
+                                console.log('Surface trouvée via API Identify:', details.surface, 'm²');
+                                return details;
                             }
                         }
-                    } catch (error) {
-                        console.log('Erreur récupération EGRID:', error);
                     }
                 }
-                
-                // Créer les données avec les informations GeoAdmin
-                const parcelNumber2 = result.attrs.number || extractParcelNumber(result.attrs.label);
-                const cleanedAddress2 = cleanAddress(result.attrs);
-
-                currentData = {
-                    general: {
-                        adresse: cleanedAddress2 || 'Adresse non disponible',
-                        coordonnees: result.attrs.x && result.attrs.y ? 
-                            `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
-                            'Coordonnées non disponibles',
-                        systeme_ref: "CH1903+ / LV95 (EPSG:2056)",
-                        date_analyse: new Date().toLocaleDateString('fr-CH'),
-                        type_objet: result.attrs.origin || 'Parcelle'
-                    },
-                    cadastral: {
-                        id_federal: egridComplet,
-                        parcel_number: parcelNumber2 || 'Indisponible',
-                        commune: extractCommune(result.attrs.label),
-                        canton: 'Valais (VS)',
-                        statut: 'Données publiques GeoAdmin',
-                        bbox: result.attrs.geom_st_box2d || 'Non disponible'
-                    },
-                    zonage: {
-                        source: 'Informations disponibles auprès des services communaux',
-                        note: 'Consultation du règlement communal recommandée'
-                    }
-                };
-                
-                // Chercher adresse officielle
-                if (result.attrs.x && result.attrs.y) {
-                    const officialAddress2 = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
-                    if (officialAddress2) currentData.general.adresse = officialAddress2;
-                }
-
-                displayResults(currentData);
-
             } catch (error) {
-                console.error('Erreur lors de la recherche:', error);
-                showError('Erreur lors de l\'analyse: ' + error.message + '. Veuillez vérifier votre recherche.');
+                console.log('Erreur API Identify:', error);
             }
-        }
-
-        function extractCommune(label) {
-            const communeNames = ['Sion', 'Martigny', 'Chamoson', 'Monthey', 'Sierre', 'Collonges', 'Savièse', 'Fully', 'Vétroz', 'Conthey', 'Ayent', 'Nendaz', 'Val de Bagnes', 'Bagnes'];
             
-            for (const commune of communeNames) {
-                if (label.toLowerCase().includes(commune.toLowerCase())) {
+            try {
+                // 3. Essayer avec une approche alternative via search
+                const egrid = geoAdminData.featureId || geoAdminData.id;
+                if (egrid) {
+                    const searchUrl = `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${egrid}&type=featuresearch&bbox=0,0,100,100&sr=2056`;
+                    
+                    const response = await fetch(searchUrl);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.results && data.results.length > 0) {
+                            const result = data.results[0];
+                            details.surface = result.attrs?.flaeche || result.attrs?.area || result.attrs?.surface || 0;
+                            
+                            if (details.surface > 0) {
+                                console.log('Surface trouvée via Search API:', details.surface, 'm²');
+                                return details;
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('Erreur Search API:', error);
+            }
+            
+            // 4. Fallback: essayer d'extraire depuis les données de base
+            details.surface = geoAdminData.flaeche || geoAdminData.area || geoAdminData.surface || 0;
+            
+            console.log('Surface finale (fallback):', details.surface, 'm²');
+            return details;
+        }
+        
+        // Conversion précise CH1903+ vers WGS84
+        function convertCH1903ToWGS84Precise(x, y) {
+            // Formules officielles de conversion CH1903+ (LV95) vers WGS84
+            const x_aux = (x - 2600000) / 1000000;
+            const y_aux = (y - 1200000) / 1000000;
+            
+            // Latitude
+            const lat_aux = 16.9023892 + 
+                           3.238272 * x_aux - 
+                           0.270978 * Math.pow(y_aux, 2) - 
+                           0.002528 * Math.pow(x_aux, 2) - 
+                           0.0447 * Math.pow(y_aux, 2) * x_aux - 
+                           0.0140 * Math.pow(x_aux, 3);
+            
+            const lat = lat_aux * 100 / 36;
+            
+            // Longitude
+            const lng_aux = 2.6779094 + 
+                           4.728982 * y_aux + 
+                           0.791484 * y_aux * x_aux + 
+                           0.1306 * y_aux * Math.pow(x_aux, 2) - 
+                           0.0436 * Math.pow(y_aux, 3);
+            
+            const lng = lng_aux * 100 / 36;
+            
+            return {
+                lat: 46 + lat / 3600,
+                lng: 6 + lng / 3600
+            };
+        }
+        
+        // Extraire le numéro de parcelle depuis le label
+        function extractParcelNumber(label) {
+            const match = label.match(/(\d+)/);
+            return match ? match[1] : '';
+        }
+        
+        // Extraire la commune depuis les données GeoAdmin
+        function extractCommuneFromGeoAdmin(data) {
+            const label = data.label || '';
+            const detail = data.detail || '';
+            
+            // Chercher le nom de commune dans les communes disponibles
+            for (const commune of COMMUNES_DISPONIBLES) {
+                if (label.toLowerCase().includes(commune.toLowerCase()) || 
+                    detail.toLowerCase().includes(commune.toLowerCase())) {
                     return commune;
                 }
             }
             
-            return 'Commune non identifiée';
+            return '';
         }
 
-        function displayResults(data) {
-            // S'assurer que les éléments existent avant de les modifier
-            const loading = document.getElementById('loading');
-            const analysisResults = document.getElementById('analysisResults');
-            const generalInfo = document.getElementById('generalInfo');
-            const ownersInfo = document.getElementById('ownersInfo');
-            const cadastralInfo = document.getElementById('cadastralInfo');
-            const zoningInfo = document.getElementById('zoningInfo');
+        // Fonction de recherche avec retry (fallback)
+        async function performSearch(query) {
+            showLoading(true);
+            
+            try {
+                const fetchWithRetry = async (url, options, retries = 3, delay = 1000) => {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.ok || response.status !== 0) {
+                                return response;
+                            }
+                            throw new Error(`HTTP ${response.status}`);
+                        } catch (error) {
+                            if (i === retries - 1) throw error;
+                            console.log(`Tentative ${i + 1} échouée, nouvelle tentative dans ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2;
+                        }
+                    }
+                };
 
-            if (!loading || !analysisResults || !generalInfo || !ownersInfo || !cadastralInfo || !zoningInfo) {
-                console.error('Éléments DOM manquants');
-                showError('Erreur d\'affichage: éléments de page manquants');
-                return;
+                const response = await fetchWithRetry(`${API_BASE_URL}/api/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentData = data;
+                displayResults(data);
+                showToast('success', 'Recherche réussie', `Parcelle ${data.cadastral?.id_federal || 'trouvée'}`);
+            } catch (error) {
+                console.error('Erreur de recherche:', error);
+                showToast('error', 'Erreur', error.message || 'Impossible de trouver la parcelle');
+            } finally {
+                showLoading(false);
             }
+        }
 
-            loading.style.display = 'none';
-            analysisResults.style.display = 'block';
+        // Affichage des résultats GeoAdmin
+        function displayGeoAdminResult(attrs) {
+            const parcelInfoSection = document.getElementById('parcelInfoSection');
+            const parcelInfoContent = document.getElementById('parcelInfoContent');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // Construire le contenu HTML avec les données GeoAdmin
+            let infoHTML = '';
+            
+            // Nom/Label
+            if (attrs.label) {
+                infoHTML += `
+                    <div class="parcel-info-item">
+                        <div class="parcel-info-label">Résultat</div>
+                        <div class="parcel-info-value">${attrs.label.replace(/<[^>]*>/g, '')}</div>
+                    </div>
+                `;
+            }
+            
+            // Détails
+            if (attrs.detail) {
+                infoHTML += `
+                    <div class="parcel-info-item">
+                        <div class="parcel-info-label">Détails</div>
+                        <div class="parcel-info-value">${attrs.detail}</div>
+                    </div>
+                `;
+            }
+            
+            // Coordonnées suisses
+            if (attrs.x && attrs.y) {
+                infoHTML += `
+                    <div class="parcel-info-item">
+                        <div class="parcel-info-label">Coordonnées CH1903+</div>
+                        <div class="parcel-info-value">E: ${attrs.x.toFixed(2)} / N: ${attrs.y.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+            
+            // Coordonnées WGS84
+            if (attrs.lat && attrs.lon) {
+                infoHTML += `
+                    <div class="parcel-info-item">
+                        <div class="parcel-info-label">Coordonnées WGS84</div>
+                        <div class="parcel-info-value">Lat: ${attrs.lat.toFixed(6)} / Lon: ${attrs.lon.toFixed(6)}</div>
+                    </div>
+                `;
+            }
+            
+            // Commune/Canton
+            if (attrs.detail && attrs.detail.includes('vs')) {
+                infoHTML += `
+                    <div class="parcel-info-item">
+                        <div class="parcel-info-label">Canton</div>
+                        <div class="parcel-info-value">Valais (VS)</div>
+                    </div>
+                `;
+            }
+            
+            parcelInfoContent.innerHTML = infoHTML;
+            
+            // Afficher la section des informations de parcelle
+            parcelInfoSection.style.display = 'block';
+            
+            // Initialiser Google Maps si on a les coordonnées
+            if (attrs.lat && attrs.lon) {
+                initializeGoogleMap(attrs.lat, attrs.lon, attrs.label || 'Parcelle');
+            }
+            
+            // Afficher la section des résultats avec les boutons d'action
+            resultsSection.style.display = 'block';
+            setTimeout(() => {
+                resultsSection.classList.add('visible');
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
 
-            // Informations générales avec cartes modernes
-            generalInfo.innerHTML = `
-                <div class="info-cards-grid">
-                    <div class="info-card-modern animate-slide-in">
-                        <div class="info-card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">📍</div>
-                        <div class="info-card-content">
-                            <div class="info-card-label">N° de parcelle</div>
-                            <div class="info-card-value">${data.cadastral.parcel_number}</div>
+        // Affichage des résultats
+        function displayResults(data) {
+            const parcelInfoSection = document.getElementById('parcelInfoSection');
+            const parcelInfoContent = document.getElementById('parcelInfoContent');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            console.log('Affichage des données:', data);
+            
+            // Construire le contenu HTML pour les informations de parcelle
+            let infoHTML = '';
+            
+            // EGRID (identifiant fédéral)
+            const egrid = data.cadastral?.egrid || data.general?.egrid || 'Non disponible';
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">EGRID (ID fédéral)</div>
+                    <div class="parcel-info-value" style="font-family: monospace; font-weight: 700; color: #0070f3;">${egrid}</div>
+                </div>
+            `;
+            
+            // Numéro de parcelle
+            const parcelNumber = data.cadastral?.numero || data.cadastral?.id_federal || data.geoAdmin?.featureId || 'Non disponible';
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">N° de parcelle</div>
+                    <div class="parcel-info-value">${parcelNumber}</div>
+                </div>
+            `;
+            
+            // Surface de la parcelle
+            const surface = data.cadastral?.surface || data.parcelDetails?.surface || 0;
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">Surface</div>
+                    <div class="parcel-info-value">${surface > 0 ? surface.toLocaleString('fr-CH') + ' m²' : 'Non disponible'}</div>
+                </div>
+            `;
+            
+            // Propriétaire
+            const proprietaire = data.cadastral?.proprietaire || data.parcelDetails?.proprietaire || 'Information non disponible publiquement';
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">Propriétaire</div>
+                    <div class="parcel-info-value">${proprietaire}</div>
+                </div>
+            `;
+            
+            // Adresse postale (utiliser la vraie adresse)
+            const adresse = data.general?.adresse || 'Non disponible';
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">Adresse postale</div>
+                    <div class="parcel-info-value">${adresse}</div>
+                </div>
+            `;
+            
+            // Commune et canton
+            const commune = data.cadastral?.commune || data.general?.commune || 'Non disponible';
+            infoHTML += `
+                <div class="parcel-info-item">
+                    <div class="parcel-info-label">Commune / Canton</div>
+                    <div class="parcel-info-value">${commune} / Valais (VS)</div>
+                </div>
+            `;
+            
+            // Coordonnées exactes
+            if (data.coordinates) {
+                const coords = data.coordinates;
+                
+                if (coords.x && coords.y) {
+                    infoHTML += `
+                        <div class="parcel-info-item">
+                            <div class="parcel-info-label">Coordonnées CH1903+</div>
+                            <div class="parcel-info-value">E: ${coords.x.toFixed(2)} / N: ${coords.y.toFixed(2)}</div>
                         </div>
+                    `;
+                }
+                
+                if (coords.lat && coords.lng) {
+                    infoHTML += `
+                        <div class="parcel-info-item">
+                            <div class="parcel-info-label">Coordonnées WGS84</div>
+                            <div class="parcel-info-value">Lat: ${coords.lat.toFixed(6)} / Lng: ${coords.lng.toFixed(6)}</div>
+                        </div>
+                    `;
+                    
+                    // Initialiser Google Maps avec les coordonnées corrigées
+                    initializeGoogleMap(coords.lat, coords.lng, adresse);
+                }
+            }
+            
+            // Section d'actions parfaitement alignée avec Google Maps
+            infoHTML += `
+                <!-- Espace de transition -->
+                <div style="height: 24px;"></div>
+                
+                <!-- Section Actions redesignée - Harmonieuse et horizontale -->
+                <div id="actionsContainer" style="
+                    width: 100%;
+                    margin: 32px 0 0 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                ">
+                    <!-- En-tête élégant -->
+                    <div style="
+                        text-align: center;
+                        margin-bottom: 24px;
+                        padding-bottom: 20px;
+                        border-bottom: 1px solid #e5e7eb;
+                    ">
+                        <h3 style="
+                            margin: 0 0 6px 0;
+                            color: #111827;
+                            font-size: 20px;
+                            font-weight: 700;
+                            letter-spacing: -0.025em;
+                        ">Actions Parcellaires</h3>
+                        <p style="
+                            margin: 0;
+                            color: #6b7280;
+                            font-size: 15px;
+                            font-weight: 400;
+                        ">Analyse et documents officiels</p>
                     </div>
-                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.1s">
-                        <div class="info-card-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🏠</div>
-                        <div class="info-card-content">
-                            <div class="info-card-label">Adresse postale</div>
-                            <div class="info-card-value" id="addressValue">${data.general.adresse}</div>
-                        </div>
-                    </div>
-                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.2s">
-                        <div class="info-card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏛️</div>
-                        <div class="info-card-content">
-                            <div class="info-card-label">Commune / Canton</div>
-                            <div class="info-card-value">${data.cadastral.commune} (${data.cadastral.canton})</div>
-                        </div>
-                    </div>
-                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.3s">
-                        <div class="info-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🌍</div>
-                        <div class="info-card-content">
-                            <div class="info-card-label">Coordonnées</div>
-                            <div class="info-card-value">${data.general.coordonnees}</div>
-                        </div>
+
+                    <!-- Boutons en grille 2x2 avec 3 boutons -->
+                    <div class="actions-grid-container">
+                        ${generateHarmoniousButtons(data)}
                     </div>
                 </div>
             `;
-
-            // Carte Google Maps / Street View
-            const mapContainerId = 'streetViewContainer';
-            let latLngUrl = '';
-            let mapContainer = document.getElementById(mapContainerId);
-            if (!mapContainer) {
-                mapContainer = document.createElement('div');
-                mapContainer.id = mapContainerId;
-                mapContainer.style.marginTop = '25px';
-                generalInfo.parentElement?.appendChild(mapContainer);
-            }
-
-            // Conversion LV95 -> WGS84 pour Google Maps
-            function lv95toWgs(easting, northing) {
-                const y = (easting - 2600000) / 1000000;
-                const x = (northing - 1200000) / 1000000;
-                let lat = 16.9023892 + 3.238272 * x - 0.270978 * y * y - 0.002528 * x * x - 0.0447 * y * y * x - 0.0140 * x * x * x;
-                let lng = 2.6779094 + 4.728982 * y + 0.791484 * y * x + 0.1306 * y * x * x - 0.0436 * y * y * y;
-                lat = (lat * 100) / 36;
-                lng = (lng * 100) / 36;
-                return { lat, lng };
-            }
-
-            let coordParts = data.general.coordonnees.split(',').map(p => parseFloat(p.trim()));
-            if (coordParts.length === 2 && !isNaN(coordParts[0]) && !isNaN(coordParts[1])) {
-                // Identifier est/nord : l'est est généralement > 2 500 000
-                let east = coordParts[0];
-                let north = coordParts[1];
-                if (coordParts[0] < coordParts[1]) { // inverser si nécessaire
-                    east = coordParts[1];
-                    north = coordParts[0];
-                }
-
-                const { lat, lng } = lv95toWgs(east, north);
-                latLngUrl = `${lat},${lng}`;
-            } else {
-                // Fallback à l'adresse si conversion impossible
-                latLngUrl = encodeURIComponent(data.general.adresse);
-            }
-
-            mapContainer.innerHTML = `
-                <iframe width="100%" height="450" style="border:0; border-radius:10px;" loading="lazy"
-                    src="https://www.google.com/maps?q=${latLngUrl}&layer=c&output=svembed&z=17">
-                </iframe>`;
-
-            // Mise à jour adresse via reverse-geocoding OSM
-            if (latLngUrl.includes(',')) {
-                const [latStr,lngStr] = latLngUrl.split(',');
-                fetchReverseAddress(latStr.trim(), lngStr.trim()).then(addr => {
-                    if (addr) {
-                        const span = document.getElementById('addressValue');
-                        if (span) span.textContent = addr;
-                    } else {
-                        fetchGoogleAddress(latStr.trim(),lngStr.trim()).then(ga=>{
-                            if(ga){
-                                const span=document.getElementById('addressValue');
-                                if(span) span.textContent=ga;
-                            }
-                        });
-                    }
-                });
-            }
-
-            // Masquer complètement les sections détaillées inutiles
-            ['ownersInfo', 'cadastralInfo', 'zoningInfo'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    const section = el.closest('.analysis-section');
-                    if (section) section.style.display = 'none';
-                }
-            });
-
-            // Cacher la section potentiel de développement
-            const developmentSection = document.querySelector('#developmentInfo');
-            if (developmentSection) {
-                const parentSection = developmentSection.closest('.analysis-section');
-                if (parentSection) {
-                    parentSection.style.display = 'none';
-                }
-            }
-
-            // Configuration des boutons d'action
-            setupActionButtons(data);
+            
+            parcelInfoContent.innerHTML = infoHTML;
+            
+            // Afficher la section des informations de parcelle
+            parcelInfoSection.style.display = 'block';
+            
+            // Cacher l'ancienne section des résultats (plus besoin)
+            resultsSection.style.display = 'none';
+            
+            // Scroll vers les résultats
+            setTimeout(() => {
+                parcelInfoSection.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
         }
+        
+        // Générer les 3 boutons avec UI/UX améliorée
+        function generateHarmoniousButtons(data) {
+            const egrid = data.cadastral?.egrid || data.general?.egrid || data.geoAdmin?.featureId || data.geoAdmin?.id || '';
+            const commune = data.cadastral?.commune || data.general?.commune || '';
+            const hasRegulation = commune && COMMUNES_DISPONIBLES.includes(commune);
+            
+            console.log('🔍 EGRID final extrait:', egrid);
+            console.log('📍 Commune finale:', commune);
+            
+            return `
+                <!-- Bouton 1: Analyse IA (position top-left) -->
+                <button onclick="performAIAnalysis()" class="action-button primary-button" 
+                        title="Analyser les contraintes d'urbanisme avec l'IA">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                    <span>Analyse IA</span>
+                    <small style="opacity: 0.8; font-size: 12px; font-weight: 400;">Contraintes d'urbanisme</small>
+                </button>
 
-        function setupActionButtons(data) {
-            // Liste des communes éligibles - mise à jour pour correspondre aux fichiers disponibles
-            const allowed=["Arbaz","Ardon","Ayent","Chamoson","Charrat","Conthey","Martigny","Mase","Mollens","Nax","Nendaz","Riddes","Saillon","Saint-Léonard","Salgesch","Savièse","Saxon","Sierre","Sion","Vernamiège","Vérrossaz","Vétroz"];
+                <!-- Bouton 2: RDPPF PDF (position top-right) -->
+                <button onclick="downloadRDPPF('${egrid}')" class="action-button secondary-button"
+                        title="Télécharger le RDPPF (Registre des restrictions de droit public)">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M16 13l-4-4-4 4"/>
+                        <path d="M12 17V9"/>
+                    </svg>
+                    <span>RDPPF PDF</span>
+                    <small style="opacity: 0.7; font-size: 12px; font-weight: 400;">Restrictions légales</small>
+                </button>
 
-            // Gérer le bouton flottant
-            const floatBtn=document.getElementById('floatingAiBtn');
-            if(floatBtn){
-                if(allowed.includes(data.cadastral.commune)){
-                    floatBtn.style.display='flex';
-                    floatBtn.classList.add('show-bubble');
-                }else{
-                    floatBtn.style.display='none';
-                    floatBtn.classList.remove('show-bubble');
-                }
-            }
-
-            // masquer l'ancien bouton IA
-            const aiAnalysisBtn=document.getElementById('aiAnalysisBtn');
-            if(aiAnalysisBtn) aiAnalysisBtn.style.display='none';
-
-            // Bouton RDPPF
-            const rdppfBtn = document.getElementById('rdppfBtn');
-            if (rdppfBtn) {
-                const egridVal = data.cadastral.id_federal;
-
-                if (egridVal && egridVal !== 'Non disponible') {
-                    rdppfBtn.onclick = () => {
-                        window.open(`https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egridVal}&LANG=fr`, '_blank');
-                    };
-                    rdppfBtn.innerHTML = '📋 Télécharger RDPPF';
-                } else {
-                    rdppfBtn.onclick = () => {
-                        window.open('https://www.rdppf.admin.ch/', '_blank');
-                    };
-                    rdppfBtn.innerHTML = '📋 RDPPF Général';
-                }
-            }
-
-            // Bouton Règlement Communal
-            const regulationBtn = document.getElementById('regulationBtn');
-            if (regulationBtn) {
-                const communeKey = data.cadastral.commune;
+                <!-- Bouton 3: Règlement Communal (position bottom-center) -->
+                <button ${hasRegulation ? `onclick="downloadRegulation('${commune}')"` : 'disabled'} 
+                        class="action-button ${hasRegulation ? 'secondary-button' : 'disabled-button'}"
+                        title="${hasRegulation ? `Télécharger le règlement de construction de ${commune}` : `Règlement de ${commune || 'cette commune'} non disponible`}">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                        <path d="M16 8l-4 4-4-4"/>
+                    </svg>
+                    <span>Règlement ${commune || 'Communal'}</span>
+                    <small style="opacity: 0.7; font-size: 12px; font-weight: 400;">
+                        ${hasRegulation ? 'Règles de construction' : 'Non disponible'}
+                    </small>
+                </button>
+            `;
+        }
+        
+        // Fonction pour télécharger le RDPPF (refaite de zéro avec validation améliorée)
+        function downloadRDPPF(egrid) {
+            console.log('📥 downloadRDPPF appelée avec EGRID:', egrid);
+            
+            // Validation de l'EGRID
+            if (!egrid || egrid === '' || egrid === 'undefined' || egrid === 'Non disponible') {
+                console.log('❌ EGRID vide, extraction depuis currentData...');
                 
-                // Vérifier si la commune est dans la liste des communes éligibles
-                if (communeKey && allowed.includes(communeKey)) {
-                    regulationBtn.onclick = () => {
-                        window.open(`/api/regulation/${encodeURIComponent(communeKey)}`, '_blank');
-                    };
-                    regulationBtn.style.display = 'inline-flex';
-                    regulationBtn.innerHTML = '📚 Règlement Communal';
-                } else {
-                    regulationBtn.style.display = 'none';
+                if (currentData) {
+                    egrid = currentData.cadastral?.egrid || 
+                           currentData.general?.egrid || 
+                           currentData.geoAdmin?.featureId || 
+                           currentData.geoAdmin?.id || '';
+                    console.log('🔍 EGRID extrait depuis currentData:', egrid);
+                }
+                
+                if (!egrid || egrid === 'Non disponible') {
+                    console.error('❌ Aucun EGRID trouvé');
+                    showToast('error', 'EGRID manquant', 'L\'EGRID n\'est pas disponible pour cette parcelle. Veuillez sélectionner une parcelle avec un EGRID valide.');
+                    return;
                 }
             }
-        }
-
-        function generatePDF() {
-            if (!currentData) {
-                alert('Aucune donnée à exporter');
+            
+            // Validation du format EGRID (CH suivi de 9 ou 12 chiffres)
+            const egridRegex = /^CH\d{9}$|^CH\d{12}$/;
+            if (!egridRegex.test(egrid)) {
+                console.warn('⚠️ Format EGRID invalide:', egrid);
+                showToast('warning', 'Format EGRID invalide', `L'EGRID "${egrid}" n'est pas au format valide (CH suivi de 9 ou 12 chiffres)`);
                 return;
             }
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // En-tête
-            doc.setFontSize(20);
-            doc.text('Rapport de Parcelle - DDOT', 20, 30);
-            doc.setFontSize(12);
-            doc.text(`Généré le ${new Date().toLocaleDateString('fr-CH')}`, 20, 40);
-            doc.text('Données publiques GeoAdmin', 20, 48);
-
-            // Informations générales
-            doc.setFontSize(16);
-            doc.text('1. Informations Générales', 20, 70);
-            doc.setFontSize(11);
-            doc.text(`Localisation: ${currentData.general.adresse}`, 25, 85);
-            doc.text(`Coordonnées: ${currentData.general.coordonnees}`, 25, 95);
-            doc.text(`Date d'analyse: ${currentData.general.date_analyse}`, 25, 105);
-
-            // Informations cadastrales
-            doc.setFontSize(16);
-            doc.text('2. Informations Cadastrales', 20, 125);
-            doc.setFontSize(11);
-            doc.text(`ID Fédéral: ${currentData.cadastral.id_federal}`, 25, 140);
-            doc.text(`Commune: ${currentData.cadastral.commune}`, 25, 150);
-            doc.text(`Canton: ${currentData.cadastral.canton}`, 25, 160);
-            doc.text(`Source: ${currentData.cadastral.statut}`, 25, 170);
-
-            // Informations importantes
-            doc.setFontSize(16);
-            doc.text('3. Informations Importantes', 20, 190);
-            doc.setFontSize(11);
-            doc.text('• Les données de propriétaires ne sont pas publiques', 25, 205);
-            doc.text('• Contactez le cadastre communal pour les détails', 25, 215);
-            doc.text('• Consultez le règlement communal pour les contraintes', 25, 225);
-
-            // Pied de page
-            doc.setFontSize(8);
-            doc.text('© DDOT - Données publiques GeoAdmin', 20, 285);
-            doc.text('Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz', 105, 285);
-
-            doc.save(`parcelle-${currentData.cadastral.commune}-${currentData.general.date_analyse}.pdf`);
+            
+            // URL officielle RDPPF Valais
+            const rdppfUrl = `https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egrid}&LANG=fr`;
+            console.log('🌐 Téléchargement RDPPF:', rdppfUrl);
+            
+            // Ouvrir dans un nouvel onglet
+            window.open(rdppfUrl, '_blank');
+            
+            // Notification de succès
+            showToast('success', 'RDPPF', `Téléchargement RDPPF lancé pour ${egrid}`);
+        }
+        
+        // Fonction pour télécharger le règlement communal
+        function downloadRegulation(commune) {
+            console.log('📥 downloadRegulation appelée pour:', commune);
+            
+            if (!commune || !COMMUNES_DISPONIBLES.includes(commune)) {
+                console.error('❌ Commune non disponible:', commune);
+                showToast('error', 'Règlement indisponible', `Le règlement de ${commune || 'cette commune'} n'est pas disponible`);
+                return;
+            }
+            
+            // URL du règlement communal
+            const regulationUrl = `/reglements/VS_${commune}_Règlement des constructions.pdf`;
+            console.log('🌐 Téléchargement règlement:', regulationUrl);
+            
+            // Ouvrir dans un nouvel onglet
+            window.open(regulationUrl, '_blank');
+            
+            // Notification de succès
+            showToast('success', 'Règlement communal', `Ouverture du règlement de ${commune}`);
+        }
+        
+        // Fonctions pour les boutons (conservées pour compatibilité)
+        function openRDPPF(egrid) {
+            return openRDPPFSimplified(egrid);
+        }
+        
+        // Nouvelle fonction pour ouvrir RDPPF avec ou sans EGRID (utilise la fonction simplifiée)
+        function openRDPPFForParcel() {
+            console.log('🔄 openRDPPFForParcel() appelée');
+            
+            if (!currentData) {
+                showToast('warning', 'RDPPF', 'Aucune parcelle sélectionnée');
+                return;
+            }
+            
+            const egrid = currentData.cadastral?.egrid || 
+                         currentData.general?.egrid || 
+                         currentData.geoAdmin?.featureId || 
+                         currentData.geoAdmin?.id || '';
+            
+            console.log('📋 EGRID extrait pour openRDPPFForParcel:', egrid);
+            
+            // Utiliser la fonction simplifiée
+            openRDPPFSimplified(egrid);
+        }
+        
+        function openRegulation(commune) {
+            if (!commune || !COMMUNES_DISPONIBLES.includes(commune)) {
+                showToast('info', 'Règlement', `Règlement de ${commune || 'cette commune'} non disponible`);
+                return;
+            }
+            
+            const regulationUrl = `/reglements/VS_${commune}_Règlement des constructions.pdf`;
+            window.open(regulationUrl, '_blank');
+            showToast('info', 'Règlement', `Ouverture du règlement de ${commune}`);
         }
 
+        // Configuration des boutons d'action
+        function setupActionButtons(data) {
+            const aiCard = document.getElementById('aiAnalysisCard');
+            const rdppfBtn = document.getElementById('rdppfBtn');
+            const regulationCard = document.getElementById('regulationCard');
+            const regulationBtn = document.getElementById('regulationBtn');
+            
+            // 4.10 - Bouton analyse IA - toujours visible
+            aiCard.style.display = 'block';
+            
+            // 4.8 - Bouton RDPPF
+            const egridVal = data.cadastral?.egrid || 
+                            data.general?.egrid || 
+                            data.geoAdmin?.featureId || 
+                            '';
+            
+            if (egridVal) {
+                rdppfBtn.onclick = () => {
+                    const rdppfUrl = `https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egridVal}&LANG=fr`;
+                    window.open(rdppfUrl, '_blank');
+                    showToast('info', 'RDPPF', 'Téléchargement du RDPPF en cours...');
+                };
+                rdppfBtn.textContent = 'Télécharger RDPPF';
+                rdppfBtn.disabled = false;
+            } else {
+                rdppfBtn.onclick = () => {
+                    showToast('warning', 'RDPPF non disponible', 'EGRID non trouvé pour cette parcelle');
+                };
+                rdppfBtn.textContent = 'RDPPF non disponible';
+                rdppfBtn.disabled = true;
+            }
+            
+            // 4.9 - Bouton règlement communal
+            const commune = data.cadastral?.commune || 
+                           data.general?.commune || 
+                           extractCommuneFromGeoAdmin(data.geoAdmin || {}) ||
+                           '';
+            
+            if (commune) {
+                regulationCard.style.display = 'block';
+                
+                // Vérifier si la commune a un règlement disponible
+                const communeNormalized = commune.replace('Saint-Léonard', 'Saint-Leonard');
+                const hasRegulation = COMMUNES_DISPONIBLES.some(c => 
+                    c.toLowerCase() === communeNormalized.toLowerCase()
+                );
+                
+                if (hasRegulation) {
+                    regulationBtn.onclick = () => {
+                        const pdfUrl = `/reglements/VS_${communeNormalized}_Règlement des constructions.pdf`;
+                        window.open(pdfUrl, '_blank');
+                        showToast('info', 'Règlement communal', `Ouverture du règlement de ${commune}`);
+                    };
+                    regulationBtn.textContent = 'Télécharger le règlement';
+                    regulationBtn.disabled = false;
+                } else {
+                    regulationBtn.onclick = () => {
+                        showToast('info', 'Règlement non disponible', 
+                            `Le règlement de ${commune} n'est pas encore dans notre base de données.`);
+                    };
+                    regulationBtn.textContent = 'Règlement non disponible';
+                    regulationBtn.disabled = true;
+                }
+            } else {
+                regulationCard.style.display = 'none';
+            }
+        }
+        
+        // Initialisation de Google Maps
+        function initializeGoogleMap(lat, lng, title) {
+            const mapContainer = document.getElementById('parcelMapContainer');
+            mapContainer.style.display = 'block';
+            
+            // Pour l'instant, créer un iframe avec Google Maps embed
+            // Solution temporaire qui ne nécessite pas d'API key
+            const embedUrl = `https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2500!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2s${lat},${lng}!5e1!3m2!1sfr!2sch!4v1`;
+            
+            mapContainer.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="300" 
+                    frameborder="0" 
+                    style="border:0; border-radius: 8px;" 
+                    src="${embedUrl}"
+                    allowfullscreen="" 
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            `;
+        }
+        
 
-
-        // Fonction pour l'analyse IA automatique des contraintes
+        // Analyse IA
         async function performAIAnalysis() {
-            if (!currentData) {
-                alert('Aucune parcelle sélectionnée');
-                return;
-            }
-
-            const actionBtn = document.getElementById('floatingAiBtn') || document.getElementById('aiAnalysisBtn');
+            if (!currentData) return;
+            
             const resultsDiv = document.getElementById('aiAnalysisResults');
             
-            if (actionBtn) {
-                actionBtn.disabled = true;
-                actionBtn.innerHTML = '🔄';
-            }
-
-            // Afficher loader dans la zone résultats
             resultsDiv.style.display = 'block';
             resultsDiv.innerHTML = `
-                <div class="ai-analysis-result">
-                    <div class="section-header">
-                        <div class="section-icon">🤖</div>
-                        <h2 class="section-title">Analyse IA des Contraintes</h2>
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <h3 class="result-title">Analyse IA en cours...</h3>
                     </div>
-                    <div style="text-align: center; padding: 40px;">
-                        <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #667eea; border-radius: 50%; border-top: 3px solid transparent; animation: spin 1s linear infinite;"></div>
-                        <h4 style="margin-top: 20px; color: #667eea;">Analyse en cours...</h4>
-                    </div>
+                    <p style="color: var(--text-secondary);">Notre IA analyse les contraintes d'urbanisme pour cette parcelle...</p>
                 </div>
             `;
 
             try {
-                const response = await fetch('/api/ia-constraints', {
+                const fetchWithRetry = async (url, options, retries = 3, delay = 1000) => {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.ok || response.status !== 0) {
+                                return response;
+                            }
+                            throw new Error(`HTTP ${response.status}`);
+                        } catch (error) {
+                            if (i === retries - 1) throw error;
+                            console.log(`Tentative ${i + 1} échouée, nouvelle tentative dans ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2;
+                        }
+                    }
+                };
+
+                const response = await fetchWithRetry('/api/ia-constraints', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1367,342 +1749,385 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erreur lors de l\'analyse');
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
                 }
 
                 const analysisResult = await response.json();
-                
-                console.log('🔍 Réponse API complète:', analysisResult);
-                console.log('🔍 Structure data:', analysisResult.data);
-                console.log('🔍 Contraintes:', analysisResult.data?.constraints);
-                
                 displayAIAnalysisResults(analysisResult);
                 
-                // Notification de succès
                 const constraintsCount = analysisResult.data?.constraints?.length || 0;
-                showToast('success', 'Analyse terminée', 
-                    `${constraintsCount} contrainte${constraintsCount > 1 ? 's' : ''} identifiée${constraintsCount > 1 ? 's' : ''} pour cette parcelle.`);
+                showToast('success', 'Analyse terminée', `${constraintsCount} contrainte${constraintsCount > 1 ? 's' : ''} identifiée${constraintsCount > 1 ? 's' : ''}`);
 
             } catch (error) {
                 console.error('Erreur analyse IA:', error);
-                
-                // Notification d'erreur
-                showToast('error', 'Erreur d\'analyse', 
-                    'Impossible de réaliser l\'analyse IA. Veuillez réessayer.');
+                showToast('error', 'Erreur d\'analyse', error.message || 'Impossible de réaliser l\'analyse IA');
                 
                 resultsDiv.innerHTML = `
-                    <div class="ai-analysis-result">
-                        <div class="section-header">
-                            <div class="section-icon">❌</div>
-                            <h2 class="section-title">Erreur</h2>
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div class="result-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="15" y1="9" x2="9" y2="15"/>
+                                    <line x1="9" y1="9" x2="15" y2="15"/>
+                                </svg>
+                            </div>
+                            <h3 class="result-title">Erreur d'analyse</h3>
                         </div>
-                        <div style="padding: 20px; color: #dc3545;">
-                            <p>${error.message}</p>
-                        </div>
+                        <p style="color: var(--text-secondary);">
+                            ${error.message || 'Une erreur est survenue lors de l\'analyse'}
+                        </p>
                     </div>
                 `;
-            } finally {
-                if (actionBtn) {
-                    actionBtn.disabled = false;
-                    actionBtn.innerHTML = '🤖';
-                }
             }
         }
 
+        // Affichage des résultats d'analyse IA
         function displayAIAnalysisResults(result) {
             const resultsDiv = document.getElementById('aiAnalysisResults');
             
-            // Extraire les contraintes depuis la nouvelle structure de données
-            let constraints = [];
-            if (result.data && result.data.constraints) {
-                constraints = result.data.constraints;
-            } else if (result.constraints) {
-                constraints = result.constraints;
-            }
-            
-            console.log('🔍 Contraintes reçues:', constraints);
-            
-            if (typeof constraints === 'string') {
-                // Afficher la synthèse telle quelle
+            if (!result.data || !result.data.constraints) {
                 resultsDiv.innerHTML = `
-                    <div class="ai-analysis-result">
-                        <div class="section-header">
-                            <div class="section-icon">🤖</div>
-                            <h2 class="section-title">Synthèse IA</h2>
-                        </div>
-                        <div style="white-space:pre-wrap;line-height:1.6;padding:15px;">${constraints}</div>
-                    </div>`;
+                    <div class="result-card">
+                        <p style="color: var(--text-secondary);">Aucune donnée d'analyse disponible</p>
+                    </div>
+                `;
                 return;
             }
 
-            let constraintsCards = '';
-            if (Array.isArray(constraints) && constraints.length) {
-                constraints.forEach((c, index) => {
-                    const severityColor = {
-                        'high': 'linear-gradient(135deg, #ef4444, #dc2626)',
-                        'medium': 'linear-gradient(135deg, #f59e0b, #d97706)', 
-                        'low': 'linear-gradient(135deg, #10b981, #059669)'
-                    };
-                    const severity = c.severity || 'medium';
-                    const cardGradient = severityColor[severity] || severityColor['medium'];
+            const constraints = result.data.constraints;
+            
+            let html = `
+                <div class="result-card fade-in">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                                <path d="M2 17L12 22L22 17"/>
+                                <path d="M2 12L12 17L22 12"/>
+                            </svg>
+                        </div>
+                        <h3 class="result-title">Analyse des Contraintes</h3>
+                    </div>
                     
-                    constraintsCards += `
-                        <div class="constraint-card-modern animate-slide-in" style="animation-delay: ${index * 0.1}s">
-                            <div class="constraint-card-header">
-                                <div class="constraint-icon" style="background: ${cardGradient}">
-                                    ${c.icon || '📋'}
-                                </div>
-                                <div class="constraint-title-section">
-                                    <h3 class="constraint-title">${c.title || 'Contrainte'}</h3>
-                                    <span class="constraint-severity severity-${severity}">
-                                        ${severity === 'high' ? 'Critique' : 
-                                          severity === 'medium' ? 'Important' : 'Information'}
-                                    </span>
-                                </div>
-                                <div class="constraint-badge severity-${severity}">
-                                    ${severity === 'high' ? '!' : severity === 'medium' ? '⚠' : 'ℹ'}
-                                </div>
-                            </div>
-                            <div class="constraint-card-body">
-                                <p class="constraint-description">${c.description || 'Aucune description disponible'}</p>
-                                <div class="constraint-source">
-                                    <span class="source-label">Source:</span>
-                                    <span class="source-value">${c.source || 'Analyse IA'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                constraintsCards = `
-                    <div class="no-constraints-card">
-                        <div class="no-constraints-icon">🔍</div>
-                        <h3>Aucune contrainte détectée</h3>
-                        <p>L'analyse n'a pas identifié de contraintes spécifiques pour cette parcelle.</p>
-                    </div>
-                `;
-            }
-
-            resultsDiv.innerHTML = `
-                <div class="ai-analysis-result">
-                    <div class="section-header-modern">
-                        <div class="section-icon-modern">🤖</div>
-                        <div class="section-title-content">
-                            <h2 class="section-title-modern">Analyse des Contraintes</h2>
-                            <p class="section-subtitle">Contraintes d'urbanisme identifiées par l'IA</p>
-                        </div>
-                        <div class="analysis-badge">
-                            <span class="badge-text">IA</span>
-                        </div>
-                    </div>
-                    <div class="constraints-grid">
-                        ${constraintsCards}
-                    </div>
-                </div>`;
-        }
-
-        // === SYSTÈME DE NOTIFICATIONS TOAST ===
-        function showToast(type, title, message, duration = 5000) {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-
-            const toastId = 'toast_' + Date.now();
-            const icons = {
-                success: '✓',
-                error: '✕',
-                warning: '⚠',
-                info: 'ℹ'
-            };
-
-            const toast = document.createElement('div');
-            toast.id = toastId;
-            toast.className = `toast-modern ${type}`;
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="removeToast('${toastId}')">✕</button>
+                    ${result.data.summary ? `
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: var(--text-lg);">
+                            ${result.data.summary}
+                        </p>
+                    ` : ''}
+                    
+                    <div class="constraints-list">
             `;
 
-            container.appendChild(toast);
-
-            // Animation d'apparition
-            setTimeout(() => toast.classList.add('show'), 100);
-
-            // Auto-removal
-            if (duration > 0) {
-                setTimeout(() => removeToast(toastId), duration);
-            }
-
-            return toastId;
-        }
-
-        function removeToast(toastId) {
-            const toast = document.getElementById(toastId);
-            if (toast) {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }
-        }
-
-        function showLoading() {
-            const resultsContainer = document.getElementById('resultsContainer');
-            const loading = document.getElementById('loading');
-            const analysisResults = document.getElementById('analysisResults');
-            
-            if (resultsContainer) resultsContainer.style.display = 'block';
-            if (loading) loading.style.display = 'block';
-            if (analysisResults) analysisResults.style.display = 'none';
-        }
-
-        function showError(message) {
-            const loading = document.getElementById('loading');
-            const analysisResults = document.getElementById('analysisResults');
-            
-            if (loading) loading.style.display = 'none';
-            if (analysisResults) {
-                analysisResults.innerHTML = `
-                    <div class="error-message">
-                        <h3>❌ Erreur</h3>
-                        <p>${message}</p>
-                        <button class="action-btn" onclick="newSearch()" style="margin-top: 15px;">
-                            🔄 Nouvelle Recherche
-                        </button>
+            constraints.forEach(constraint => {
+                const severityClass = constraint.severity || 'low';
+                html += `
+                    <div class="constraint-item">
+                        <div class="constraint-header">
+                            <span class="constraint-title">${constraint.title}</span>
+                            <span class="constraint-severity ${severityClass}">${getSeverityLabel(severityClass)}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0;">
+                            ${constraint.description}
+                        </p>
+                        ${constraint.source ? `
+                            <div style="margin-top: 0.75rem;">
+                                <span style="
+                                    display: inline-block;
+                                    padding: 0.25rem 0.5rem;
+                                    background: var(--surface);
+                                    border: 1px solid var(--border);
+                                    border-radius: var(--radius-sm);
+                                    font-size: var(--text-xs);
+                                    color: var(--text-muted);
+                                ">
+                                    Source: ${constraint.source}
+                                </span>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
-                analysisResults.style.display = 'block';
-            }
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Utilitaires
+        function getSeverityLabel(severity) {
+            const labels = {
+                'high': 'Critique',
+                'medium': 'Important',
+                'low': 'Information'
+            };
+            return labels[severity] || severity;
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+                error: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+            };
+            
+            toast.innerHTML = `
+                ${icons[type] || ''}
+                <div>
+                    <strong>${title}</strong>
+                    ${message ? `<p style="margin: 0.25rem 0 0 0; opacity: 0.8;">${message}</p>` : ''}
+                </div>
+                <button onclick="this.parentElement.remove()" style="
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    cursor: pointer;
+                    padding: 0.25rem;
+                    border-radius: var(--radius-sm);
+                    margin-left: auto;
+                ">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
         }
 
         function newSearch() {
-            const resultsContainer = document.getElementById('resultsContainer');
-            const searchInput = document.getElementById('searchInput');
-            const floatBtn = document.getElementById('floatingAiBtn');
-            
-            if (resultsContainer) resultsContainer.style.display = 'none';
-            if (searchInput) {
-                searchInput.value = '';
-                searchInput.focus();
-            }
-            if (floatBtn) {
-                floatBtn.style.display = 'none';
-                floatBtn.classList.remove('show-bubble');
-            }
+            // Réinitialiser les valeurs et l'état
             currentData = null;
-        }
-
-        /* === Authentification sécurisée côté serveur === */
-        // L'authentification est gérée côté serveur avec Passport.js
-        // Redirection vers les pages d'authentification sécurisées
-        function redirectToLogin() {
-            window.location.href = '/login';
-        }
-        
-        function redirectToRegister() {
-            window.location.href = '/register';
-        }
-        
-        function redirectToDashboard() {
-            window.location.href = '/dashboard';
-        }
-
-        // === Fonctions utilitaires ===
-        function extractParcelNumber(label) {
-            const match = label.replace(/<[^>]+>/g, '').match(/Parcelle\s*(\d+[a-zA-Z0-9\-]*)/i);
-            if (match) return match[1];
-            const num = label.replace(/<[^>]+>/g, '').match(/\b(\d{3,})\b/);
-            return num ? num[1] : null;
-        }
-
-        function cleanAddress(attrs) {
-            // On privilégie le champ detail si disponible
-            if (attrs.detail && attrs.detail.length > 3) return attrs.detail;
-
-            let txt = attrs.label.replace(/<[^>]+>/g, '');
-
-            // Supprimer la mention Parcelle xxx
-            txt = txt.replace(/Parcelle\s*\d+[a-zA-Z0-9\-]*,?/i, '');
-
-            // Supprimer un éventuel code EGRID (CH + chiffres)
-            txt = txt.replace(/\bCH?\d{8,}\b/gi, '');
-
-            // Supprimer un identifiant numérique (5+ chiffres) en début ou fin de chaîne
-            txt = txt.replace(/^\d{5,}\s*/, '').replace(/\s*\d{5,}$/,'');
-
-            // Supprimer les doubles espaces et virgules inutiles
-            txt = txt.replace(/\s{2,}/g, ' ').replace(/,\s*,/g, ',').trim();
-
-            return txt;
-        }
-
-        // Récupérer l'adresse officielle via la couche des adresses GEOAdmin
-        async function fetchOfficialAddress(easting, northing) {
-            try {
-                const url = `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?geometry=${easting},${northing}&geometryFormat=geojson&geometryType=esriGeometryPoint&layers=all:ch.swisstopo.amtliches-gebaeudeadressverzeichnis&tolerance=10&mapExtent=${easting-100},${northing-100},${easting+100},${northing+100}&imageDisplay=100,100,96&lang=fr`;
-                const response = await fetch(url);
-                if (!response.ok) return null;
-                const data = await response.json();
-                if (data.results && data.results.length > 0) {
-                    const attrs = data.results[0].attributes || {};
-                    // Champs possibles : "strname1", "strname2", "streetname", "number", "plz", "zip", "localname"...
-                    const street = attrs.strname1 || attrs.streetname || '';
-                    const num = attrs.number || attrs.hausnr || '';
-                    const zip = attrs.plz || attrs.zip || '';
-                    const city = attrs.localname || attrs.locality || attrs.city || '';
-                    if (street && num && zip && city) {
-                        return `${street} ${num}, ${zip} ${city}`;
-                    }
-                }
-            } catch (err) {
-                console.error('Erreur fetchOfficialAddress:', err);
+            
+            // Nettoyer le champ de recherche
+            const heroSearchInput = document.getElementById('heroSearchInput');
+            if (heroSearchInput) {
+                heroSearchInput.value = '';
+                heroSearchInput.focus();
             }
-            return null;
-        }
-
-        async function fetchReverseAddress(lat, lng) {
-            try {
-                const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=fr`);
-                if (!resp.ok) return null;
-                const json = await resp.json();
-                if (json && json.address) {
-                    const a = json.address;
-                    const street = a.road || a.street || a.residential || a.path || '';
-                    const num = a.house_number || '';
-                    const postcode = a.postcode || '';
-                    const city = a.city || a.town || a.village || a.hamlet || a.municipality || '';
-                    if (street && num && postcode && city) {
-                        return `${street} ${num}, ${postcode} ${city}`;
-                    }
-                    if (street && postcode && city) {
-                        return `${street}, ${postcode} ${city}`;
-                    }
-                    if (street && city) {
-                        return `${street}, ${city}`;
-                    }
-                    if (json.display_name) {
-                        // fallback: prendre les deux premiers éléments du display_name
-                        const parts = json.display_name.split(',').map(p=>p.trim());
-                        return parts.slice(0,3).join(', ');
-                    }
+            
+            // Cacher les suggestions si elles sont visibles
+            if (searchSystem) {
+                searchSystem.hideSuggestions();
+            }
+            
+            // Masquer les résultats
+            const elementsToHide = [
+                'resultsSection',
+                'aiAnalysisResults', 
+                'parcelInfoSection',
+                'parcelMapContainer'
+            ];
+            
+            elementsToHide.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                    element.classList.remove('visible');
                 }
-                return null;
-            } catch(e) {console.error('reverse geocode err',e); return null;}
-        }
-
-        async function fetchGoogleAddress(lat,lng){
-            try{
-                const url=`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=fr&sensor=false`;
-                const resp=await fetch(url);
-                if(!resp.ok) return null;
-                const j=await resp.json();
-                if(j.status==='OK'&&j.results&&j.results.length){
-                    return j.results[0].formatted_address;
-                }
-            }catch(e){console.error('google geocode err',e);}
-            return null;
+            });
+            
+            // Scroll vers le haut de la page
+            window.scrollTo({ 
+                top: 0, 
+                behavior: 'smooth' 
+            });
         }
     </script>
+    
+    <!-- CSS responsive pour les boutons horizontaux redesignés -->
+    <style>
+        /* Styles pour la grille d'actions avec 3 boutons - UI/UX améliorée */
+        .actions-grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 8px;
+        }
+        
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 24px 20px;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            border: none;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .action-button:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .action-button svg {
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .action-button:hover svg {
+            transform: scale(1.1);
+        }
+        
+        .primary-button {
+            background: linear-gradient(135deg, #0070f3 0%, #00d4aa 100%);
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 112, 243, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .primary-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(0, 112, 243, 0.4);
+        }
+        
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.95);
+            color: #374151;
+            border: 2px solid rgba(0, 112, 243, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .secondary-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #0070f3;
+            color: #0070f3;
+            box-shadow: 0 12px 32px rgba(0, 112, 243, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .disabled-button {
+            background: rgba(248, 250, 252, 0.8);
+            color: #9ca3af;
+            border: 2px solid #e5e7eb;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .disabled-button:hover {
+            transform: none;
+        }
+        
+        /* Positionnement spécifique des boutons */
+        .actions-grid-container .action-button:nth-child(1) {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        
+        .actions-grid-container .action-button:nth-child(2) {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        
+        .actions-grid-container .action-button:nth-child(3) {
+            grid-column: span 2;
+            grid-row: 2;
+            max-width: 320px;
+            justify-self: center;
+        }
+        
+        /* Responsive pour grille 2x2 */
+        @media (max-width: 768px) {
+            .actions-grid-container {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: auto auto auto !important;
+                gap: 16px !important;
+                max-width: 400px;
+            }
+            
+            .actions-grid-container .action-button:nth-child(1),
+            .actions-grid-container .action-button:nth-child(2),
+            .actions-grid-container .action-button:nth-child(3) {
+                grid-column: 1 !important;
+                grid-row: auto !important;
+                max-width: none !important;
+                justify-self: stretch !important;
+            }
+            
+            .action-button {
+                min-height: 100px;
+                padding: 20px;
+            }
+        }
+        
+        /* Animation d'apparition pour les boutons */
+        .action-button {
+            animation: slideInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .action-button:nth-child(1) { 
+            animation-delay: 0.1s; 
+        }
+        .action-button:nth-child(2) { 
+            animation-delay: 0.2s; 
+        }
+        .action-button:nth-child(3) { 
+            animation-delay: 0.3s; 
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    
+    <!-- Scripts d'authentification -->
+    <script src="/js/auth.js?v=2"></script>
+    <script src="/js/search-system.js?v=1"></script>
 </body>
-</html> 
+</html>
