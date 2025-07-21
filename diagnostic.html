@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test de Diagnostic Serveur</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Diagnostic du Serveur DDOT</h1>
+    
+    <div class="status info">
+        <h3>Test de Connectivité</h3>
+        <p>Serveur: <span id="serverUrl">http://localhost:3001</span></p>
+        <p>Status: <span id="serverStatus">En cours de test...</span></p>
+        <p>Timestamp: <span id="timestamp"></span></p>
+    </div>
+
+    <div class="status info">
+        <h3>URLs à tester :</h3>
+        <ul>
+            <li><a href="http://localhost:3001" target="_blank">http://localhost:3001</a></li>
+            <li><a href="http://127.0.0.1:3001" target="_blank">http://127.0.0.1:3001</a></li>
+            <li><a href="http://192.168.5.104:3001" target="_blank">http://192.168.5.104:3001</a></li>
+        </ul>
+    </div>
+
+    <div class="status info">
+        <h3>Informations Navigateur</h3>
+        <p>User Agent: <span id="userAgent"></span></p>
+        <p>Navigateur: <span id="browser"></span></p>
+    </div>
+
+    <div id="testResults"></div>
+
+    <script>
+        // Mise à jour des infos
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        
+        // Détection du navigateur
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
+        const isFirefox = /Firefox/.test(navigator.userAgent);
+        
+        let browserName = 'Inconnu';
+        if (isChrome) browserName = 'Chrome';
+        else if (isSafari) browserName = 'Safari';
+        else if (isFirefox) browserName = 'Firefox';
+        
+        document.getElementById('browser').textContent = browserName;
+
+        // Test de connectivité
+        async function testServer() {
+            try {
+                const response = await fetch('/api/geoadmin-search?searchText=test&limit=1');
+                const data = await response.json();
+                
+                document.getElementById('serverStatus').textContent = 'Connecté ✅';
+                document.getElementById('serverStatus').parentElement.className = 'status success';
+                
+                const resultsDiv = document.getElementById('testResults');
+                resultsDiv.innerHTML = '<div class="status success"><h3>Test API Réussi</h3><p>Réponse: ' + JSON.stringify(data, null, 2) + '</p></div>';
+                
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = 'Erreur: ' + error.message;
+                document.getElementById('serverStatus').parentElement.className = 'status error';
+                
+                const resultsDiv = document.getElementById('testResults');
+                resultsDiv.innerHTML = '<div class="status error"><h3>Test API Échoué</h3><p>Erreur: ' + error.message + '</p></div>';
+            }
+        }
+
+        // Démarrer le test
+        testServer();
+    </script>
+</body>
+</html>

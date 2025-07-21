@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDOT - Analyse d'Urbanisme</title>
+    <link rel="stylesheet" href="/css/minimal-design.css">
+    <style>
+        /* Styles spécifiques à cette page */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .search-section {
+            padding: 3rem 0;
+        }
+        
+        .results-section {
+            display: none;
+            padding: 2rem 0;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .constraint-item {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all var(--transition-base);
+        }
+        
+        .constraint-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--accent);
+        }
+        
+        .constraint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .constraint-title {
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .constraint-severity {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .constraint-severity.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+        
+        .constraint-severity.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .constraint-severity.low {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .loading-content {
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="minimal-container">
+            <h1 class="minimal-title">DDOT</h1>
+            <p class="minimal-subtitle">Analyse intelligente d'urbanisme pour le Valais</p>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="minimal-container">
+            <div class="search-container-minimal">
+                <form class="search-form-minimal" id="searchForm">
+                    <svg class="search-icon-minimal" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" 
+                           class="search-input-minimal" 
+                           id="searchInput" 
+                           placeholder="Recherchez une parcelle, adresse ou coordonnées..."
+                           autocomplete="off">
+                    <button type="submit" class="search-button-minimal">Rechercher</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+        <div class="minimal-container">
+            <!-- General Information Card -->
+            <div class="card-minimal" id="generalInfo">
+                <div class="card-header-minimal">
+                    <svg class="card-icon-minimal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                    <h2 class="card-title-minimal">Informations Générales</h2>
+                </div>
+                <div class="info-grid-minimal" id="generalInfoContent">
+                    <!-- Content will be dynamically inserted -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-grid">
+                <button class="button-minimal accent" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                    Analyse IA Contraintes
+                </button>
+                
+                <button class="button-minimal" id="rdppfBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Télécharger RDPPF
+                </button>
+                
+                <button class="button-minimal" id="regulationBtn" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                    Règlement Communal
+                </button>
+                
+                <button class="button-minimal" onclick="newSearch()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    Nouvelle Recherche
+                </button>
+            </div>
+
+            <!-- AI Analysis Results -->
+            <div id="aiAnalysisResults" style="display: none; margin-top: 2rem;">
+                <!-- AI results will be inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="text-secondary">Chargement en cours...</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // Variables globales
+        let currentData = null;
+        const API_BASE_URL = window.location.origin;
+        const allowed = ['Sion', 'Martigny', 'Chamoson', 'Collonges', 'Savièse', 'Val de Bagnes', 'Vollèges', 'Monthey', 'Sierre', 'Vétroz', 'Conthey', 'Fully', 'Ayent', 'Nendaz', 'Leytron', 'Riddes', 'Saxon', 'Orsières', 'Bovernier'];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            
+            searchForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query) {
+                    await performSearch(query);
+                }
+            });
+
+            // Auto-focus sur le champ de recherche
+            searchInput.focus();
+        });
+
+        // Fonction de recherche
+        async function performSearch(query) {
+            showLoading(true);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/search`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentData = data;
+                displayResults(data);
+                showToast('success', 'Recherche réussie', `Parcelle ${data.cadastral?.id_federal || 'trouvée'}`);
+            } catch (error) {
+                console.error('Erreur de recherche:', error);
+                showToast('error', 'Erreur', 'Impossible de trouver la parcelle');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Affichage des résultats
+        function displayResults(data) {
+            const resultsSection = document.getElementById('resultsSection');
+            const generalInfoContent = document.getElementById('generalInfoContent');
+            
+            // Construire le contenu HTML
+            let infoHTML = '';
+            
+            if (data.cadastral?.id_federal) {
+                infoHTML += `
+                    <div class="info-item-minimal">
+                        <span class="info-label-minimal">N° de parcelle</span>
+                        <span class="info-value-minimal">${data.cadastral.id_federal}</span>
+                    </div>
+                `;
+            }
+            
+            if (data.general?.adresse) {
+                infoHTML += `
+                    <div class="info-item-minimal">
+                        <span class="info-label-minimal">Adresse postale</span>
+                        <span class="info-value-minimal">${data.general.adresse}</span>
+                    </div>
+                `;
+            }
+            
+            if (data.cadastral?.commune) {
+                infoHTML += `
+                    <div class="info-item-minimal">
+                        <span class="info-label-minimal">Commune / Canton</span>
+                        <span class="info-value-minimal">${data.cadastral.commune} / Valais</span>
+                    </div>
+                `;
+            }
+            
+            if (data.cadastral?.surface) {
+                infoHTML += `
+                    <div class="info-item-minimal">
+                        <span class="info-label-minimal">Surface</span>
+                        <span class="info-value-minimal">${data.cadastral.surface} m²</span>
+                    </div>
+                `;
+            }
+            
+            generalInfoContent.innerHTML = infoHTML;
+            
+            // Gérer les boutons
+            setupActionButtons(data);
+            
+            // Afficher la section des résultats
+            resultsSection.style.display = 'block';
+        }
+
+        // Configuration des boutons d'action
+        function setupActionButtons(data) {
+            const aiBtn = document.getElementById('aiAnalysisBtn');
+            const rdppfBtn = document.getElementById('rdppfBtn');
+            const regulationBtn = document.getElementById('regulationBtn');
+            
+            // Bouton analyse IA
+            if (data.cadastral?.id_federal) {
+                aiBtn.style.display = 'inline-flex';
+            }
+            
+            // Bouton RDPPF
+            const egridVal = data.cadastral?.egrid || data.general?.egrid;
+            if (egridVal && egridVal !== 'Non disponible') {
+                rdppfBtn.onclick = () => {
+                    window.open(`https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egridVal}&LANG=fr`, '_blank');
+                };
+            } else {
+                rdppfBtn.onclick = () => {
+                    window.open('https://www.rdppf.admin.ch/', '_blank');
+                };
+                rdppfBtn.innerHTML = rdppfBtn.innerHTML.replace('Télécharger RDPPF', 'RDPPF Général');
+            }
+            
+            // Bouton règlement communal
+            const communeKey = data.cadastral?.commune;
+            if (communeKey && allowed.includes(communeKey)) {
+                regulationBtn.onclick = () => {
+                    window.open(`/api/regulation/${encodeURIComponent(communeKey)}`, '_blank');
+                };
+                regulationBtn.style.display = 'inline-flex';
+            }
+        }
+
+        // Analyse IA
+        async function performAIAnalysis() {
+            if (!currentData) return;
+            
+            const aiBtn = document.getElementById('aiAnalysisBtn');
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            
+            // État de chargement
+            aiBtn.disabled = true;
+            aiBtn.innerHTML = '<span class="spinner-minimal"></span> Analyse en cours...';
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `
+                <div class="card-minimal">
+                    <div class="card-header-minimal">
+                        <span class="spinner-minimal"></span>
+                        <h2 class="card-title-minimal">Analyse IA en cours...</h2>
+                    </div>
+                </div>
+            `;
+
+            try {
+                // Fonction de retry avec backoff exponentiel
+                const fetchWithRetry = async (url, options, retries = 3, delay = 1000) => {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.ok || response.status !== 0) {
+                                return response;
+                            }
+                            throw new Error(`HTTP ${response.status}`);
+                        } catch (error) {
+                            if (i === retries - 1) throw error;
+                            console.log(`Tentative ${i + 1} échouée, nouvelle tentative dans ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2;
+                        }
+                    }
+                };
+
+                const response = await fetchWithRetry('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        searchQuery: currentData.general?.adresse || currentData.cadastral?.id_federal || currentData.cadastral?.commune
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
+                }
+
+                const analysisResult = await response.json();
+                displayAIAnalysisResults(analysisResult);
+                
+                const constraintsCount = analysisResult.data?.constraints?.length || 0;
+                showToast('success', 'Analyse terminée', `${constraintsCount} contrainte${constraintsCount > 1 ? 's' : ''} identifiée${constraintsCount > 1 ? 's' : ''}`);
+
+            } catch (error) {
+                console.error('Erreur analyse IA:', error);
+                showToast('error', 'Erreur d\'analyse', error.message || 'Impossible de réaliser l\'analyse IA');
+                
+                resultsDiv.innerHTML = `
+                    <div class="card-minimal">
+                        <div class="card-header-minimal">
+                            <svg class="card-icon-minimal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                            <h2 class="card-title-minimal">Erreur</h2>
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 0;">
+                            ${error.message || 'Une erreur est survenue lors de l\'analyse'}
+                        </p>
+                    </div>
+                `;
+            } finally {
+                // Restaurer le bouton
+                aiBtn.disabled = false;
+                aiBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                    Analyse IA Contraintes
+                `;
+            }
+        }
+
+        // Affichage des résultats d'analyse IA
+        function displayAIAnalysisResults(result) {
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            
+            if (!result.data || !result.data.constraints) {
+                resultsDiv.innerHTML = `
+                    <div class="card-minimal">
+                        <p style="color: var(--text-secondary);">Aucune donnée d'analyse disponible</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const constraints = result.data.constraints;
+            
+            let html = `
+                <div class="card-minimal">
+                    <div class="card-header-minimal">
+                        <svg class="card-icon-minimal" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                            <path d="M2 17L12 22L22 17"/>
+                            <path d="M2 12L12 17L22 12"/>
+                        </svg>
+                        <h2 class="card-title-minimal">Analyse des Contraintes</h2>
+                    </div>
+                    
+                    ${result.data.summary ? `
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            ${result.data.summary}
+                        </p>
+                    ` : ''}
+                    
+                    <div class="constraints-list">
+            `;
+
+            constraints.forEach(constraint => {
+                const severityClass = constraint.severity || 'low';
+                html += `
+                    <div class="constraint-item">
+                        <div class="constraint-header">
+                            <span class="constraint-title">${constraint.title}</span>
+                            <span class="constraint-severity ${severityClass}">${getSeverityLabel(severityClass)}</span>
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0; font-size: 0.875rem;">
+                            ${constraint.description}
+                        </p>
+                        ${constraint.source ? `
+                            <span class="badge-minimal" style="margin-top: 0.5rem;">
+                                ${constraint.source}
+                            </span>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Utilitaires
+        function getSeverityLabel(severity) {
+            const labels = {
+                'high': 'Élevé',
+                'medium': 'Moyen',
+                'low': 'Faible'
+            };
+            return labels[severity] || severity;
+        }
+
+        function showLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        function showToast(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-minimal ${type} fade-in`;
+            
+            const icons = {
+                success: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',
+                error: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                warning: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+                info: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+            };
+            
+            toast.innerHTML = `
+                ${icons[type] || ''}
+                <div>
+                    <strong>${title}</strong>
+                    ${message ? `<p style="margin: 0.25rem 0 0 0; font-size: 0.875rem;">${message}</p>` : ''}
+                </div>
+                <button class="toast-close-minimal" onclick="this.parentElement.remove()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function newSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('aiAnalysisResults').style.display = 'none';
+            currentData = null;
+            document.getElementById('searchInput').focus();
+        }
+    </script>
+</body>
+</html>

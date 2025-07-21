@@ -8,9 +8,7 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 // Validation des variables
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  throw new Error(
-    'Variables Supabase manquantes. Veuillez configurer SUPABASE_URL et SUPABASE_ANON_KEY dans votre fichier .env'
-  );
+  console.warn('⚠️ Variables Supabase manquantes. Certaines fonctionnalités seront désactivées.');
 }
 
 // Configuration du client Supabase avec options de sécurité
@@ -33,7 +31,19 @@ const supabaseOptions = {
 };
 
 // Client Supabase principal (avec RLS)
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, supabaseOptions);
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, supabaseOptions)
+  : null;
+
+// Client Supabase Admin (pour les opérations administratives)
+const supabaseAdmin = SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : null;
 
 // Configuration PostgreSQL pour Sequelize via Supabase
 const getPostgreSQLConfig = () => {
@@ -108,6 +118,7 @@ async function testSupabaseConnection() {
 
 module.exports = {
   supabase,
+  supabaseAdmin,
   getPostgreSQLConfig,
   testSupabaseConnection,
   SUPABASE_URL,

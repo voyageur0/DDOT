@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Affichage Contraintes</title>
+    <link rel="stylesheet" href="/css/modern-ui.css">
+    <style>
+        body { padding: 40px; background: var(--background); }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-button { margin-bottom: 20px; }
+        .constraint-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .constraint-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .constraint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .constraint-icon {
+            font-size: 1.5rem;
+        }
+        .constraint-title {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .constraint-severity {
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .severity-high {
+            background: var(--error-bg);
+            color: var(--error);
+        }
+        .severity-medium {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+        .severity-low {
+            background: var(--info-bg);
+            color: var(--info);
+        }
+        .constraint-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .loading { text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test d'affichage des contraintes</h1>
+        
+        <button class="btn btn-primary test-button" onclick="testConstraints()">
+            Tester l'analyse des contraintes
+        </button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function testConstraints() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading">Chargement...</div>';
+            
+            try {
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        searchQuery: 'Rue du Scex 10, Sion'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Réponse complète:', data);
+                
+                if (data.success && data.data && data.data.constraints) {
+                    displayConstraints(data.data.constraints);
+                } else {
+                    resultsDiv.innerHTML = '<p>Aucune contrainte trouvée</p>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            }
+        }
+        
+        function displayConstraints(constraints) {
+            const resultsDiv = document.getElementById('results');
+            
+            // Gérer le cas où il y a une seule contrainte "Analyse textuelle" avec du JSON dans la description
+            if (constraints.length === 1 && constraints[0].title === "Analyse textuelle") {
+                try {
+                    // Essayer d'extraire le JSON de la description
+                    let jsonStr = constraints[0].description;
+                    jsonStr = jsonStr.replace(/^```json\s*\n?/, '').replace(/\n?```\s*$/, '').trim();
+                    const parsed = JSON.parse(jsonStr);
+                    if (parsed.constraints) {
+                        constraints = parsed.constraints.map(c => ({
+                            ...c,
+                            icon: getIconForTitle(c.title)
+                        }));
+                    }
+                } catch (e) {
+                    console.error('Erreur parsing JSON embedded:', e);
+                }
+            }
+            
+            let html = '<h2>Contraintes identifiées (' + constraints.length + ')</h2>';
+            
+            constraints.forEach(constraint => {
+                const icon = constraint.icon || getIconForTitle(constraint.title);
+                html += `
+                    <div class="constraint-item">
+                        <div class="constraint-header">
+                            <span class="constraint-icon">${icon}</span>
+                            <span class="constraint-title">${constraint.title}</span>
+                            <span class="constraint-severity severity-${constraint.severity || 'medium'}">
+                                ${getSeverityLabel(constraint.severity || 'medium')}
+                            </span>
+                        </div>
+                        <p class="constraint-description">${constraint.description}</p>
+                        ${constraint.source ? `<small style="opacity: 0.7;">Source: ${constraint.source}</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function getIconForTitle(title) {
+            const titleLower = title.toLowerCase();
+            if (titleLower.includes('zone')) return '🏗️';
+            if (titleLower.includes('indice') || titleLower.includes('ibus')) return '📊';
+            if (titleLower.includes('hauteur')) return '📏';
+            if (titleLower.includes('distance') || titleLower.includes('recul')) return '↔️';
+            if (titleLower.includes('parking') || titleLower.includes('stationnement')) return '🚗';
+            if (titleLower.includes('vert') || titleLower.includes('arbre')) return '🌳';
+            if (titleLower.includes('servitude')) return '📋';
+            return '📌';
+        }
+        
+        function getSeverityLabel(severity) {
+            const labels = {
+                'critical': 'Critique',
+                'high': 'Élevé',
+                'medium': 'Moyen',
+                'low': 'Faible'
+            };
+            return labels[severity] || severity;
+        }
+    </script>
+</body>
+</html>

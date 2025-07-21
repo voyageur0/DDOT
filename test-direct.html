@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDOT - Test Direct</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #ff5252;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+        }
+        .error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #f44336;
+        }
+        .info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid #2196f3;
+        }
+        #results {
+            margin-top: 30px;
+        }
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+        }
+        .url-test {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        .url-test a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .url-test a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ DDOT - Plateforme d'Analyse Urbanistique</h1>
+        
+        <div class="status info">
+            <h3>🔧 Test de Connectivité</h3>
+            <p><strong>Navigateur:</strong> <span id="browser-info"></span></p>
+            <p><strong>Date:</strong> <span id="date-info"></span></p>
+        </div>
+
+        <div class="status info">
+            <h3>🌐 URLs de Test</h3>
+            <div class="url-test">
+                <span>Principal:</span>
+                <a href="http://localhost:3001" target="_blank">http://localhost:3001</a>
+            </div>
+            <div class="url-test">
+                <span>Alternative:</span>
+                <a href="http://127.0.0.1:3001" target="_blank">http://127.0.0.1:3001</a>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Rechercher une adresse ou parcelle...">
+            <button onclick="testSearch()">🔍 Rechercher</button>
+            <button onclick="testConnectivity()">🔗 Test Connexion</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Informations système
+        document.getElementById('browser-info').textContent = navigator.userAgent.includes('Safari') ? 'Safari' : 'Autre';
+        document.getElementById('date-info').textContent = new Date().toLocaleString();
+
+        function addResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<h4>${title}</h4><div>${content}</div>`;
+            results.appendChild(div);
+        }
+
+        function testConnectivity() {
+            const urls = ['http://localhost:3001', 'http://127.0.0.1:3001'];
+            
+            urls.forEach(async (url) => {
+                try {
+                    const response = await fetch(url + '/api/test');
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ ${url}`, `Connecté - ${data.message}`, 'success');
+                    } else {
+                        addResult(`❌ ${url}`, `Erreur HTTP ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${url}`, `Erreur: ${error.message}`, 'error');
+                }
+            });
+        }
+
+        function testSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) {
+                addResult('⚠️ Recherche', 'Veuillez entrer une recherche', 'error');
+                return;
+            }
+
+            // Test de recherche locale d'abord
+            const results = [
+                { label: 'Sion, Valais', type: 'ville' },
+                { label: 'Martigny, Valais', type: 'ville' },
+                { label: 'Sierre, Valais', type: 'ville' }
+            ].filter(item => item.label.toLowerCase().includes(query.toLowerCase()));
+
+            if (results.length > 0) {
+                const html = results.map(r => `<div class="result-item">📍 ${r.label} (${r.type})</div>`).join('');
+                addResult('🔍 Résultats de recherche', html, 'success');
+            } else {
+                addResult('🔍 Recherche', 'Aucun résultat trouvé', 'info');
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            setTimeout(testConnectivity, 1000);
+        };
+    </script>
+</body>
+</html>

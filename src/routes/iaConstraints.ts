@@ -173,14 +173,55 @@ router.post('/ia-constraints', async (req, res, next) => {
         const elapsedMs = performance.now() - t0;
         console.log(`✅ Analyse automatisée complète terminée en ${Math.round(elapsedMs)}ms`);
 
+        // Extraire la zone depuis les données RDPPF
+        let mainZone = 'Zone à déterminer';
+        let zoneSurface = '';
+        
+        // Vérifier dans rdppfData
+        if (comprehensiveData.rdppfData?.zoneAffectation?.designation) {
+          mainZone = comprehensiveData.rdppfData.zoneAffectation.designation;
+          if (comprehensiveData.rdppfData.zoneAffectation.surface) {
+            zoneSurface = `${comprehensiveData.rdppfData.zoneAffectation.surface} m²`;
+          }
+        }
+        // Sinon chercher dans les contraintes RDPPF
+        else if (comprehensiveData.rdppfConstraints?.length > 0) {
+          const zoneConstraint = comprehensiveData.rdppfConstraints.find(c => 
+            c.theme === 'Destination de zone' || c.rule?.includes('Zone résidentielle')
+          );
+          if (zoneConstraint) {
+            mainZone = zoneConstraint.rule;
+            // Extraire la surface si présente dans la règle
+            const surfaceMatch = zoneConstraint.rule.match(/(\d+)\s*m²/);
+            if (surfaceMatch) {
+              zoneSurface = surfaceMatch[0];
+            }
+          }
+        }
+        // Sinon utiliser l'analyse avancée
+        else if (advancedAnalysis.zone) {
+          mainZone = advancedAnalysis.zone;
+        }
+        
         return res.json({ 
-          advancedAnalysis,
-          comprehensiveData,
+          data: {
+            constraints: advancedAnalysis.constraints,
+            analysis: advancedAnalysis,
+            parcel: {
+              address: comprehensiveData.searchResult?.number || comprehensiveData.searchQuery,
+              zone: mainZone,
+              zone_surface: zoneSurface
+            },
+            summary: advancedAnalysis.summary
+          },
+          metadata: {
+            confidence: advancedAnalysis.confidence,
+            completeness: comprehensiveData.completeness,
+            processingTime: comprehensiveData.processingTime,
+            elapsedMs: Math.round(elapsedMs)
+          },
           searchQuery,
           analysisType: 'advanced',
-          completeness: comprehensiveData.completeness,
-          processingTime: comprehensiveData.processingTime,
-          elapsedMs: Math.round(elapsedMs),
           source: 'Analyse avancée double niveau o3/o3-mini avec filtrage par zone RDPPF'
         });
         

@@ -4,7 +4,8 @@ import { findCommunalRegulations, analyzeCommunalRegulation, formatRegulationsFo
 import { geocodeAddress, getFallbackCoordinates, type GeocodeResult } from './geocodingVS';
 import { getAllAdditionalData, formatAdditionalDataForAI, type CantonalDataResult } from './additionalDataSources';
 import { buildConstraintTable } from './buildConstraintTable';
-import { analyzeRdppf, type RdppfConstraint } from './rdppfExtractor';
+import { analyzeRdppf, type RdppfConstraint, extractTextFromPdf, downloadRdppf } from './rdppfExtractor';
+// import { extractRdppfData, findZoneConstraints, generateNoiseConstraints, type RdppfData } from './rdppfEnhancedExtractor';
 import { RegulationConstraint } from './regulationExtractor';
 import { calculerDensiteValais, formaterResultatsValais, extraireIndicesReglement, type ValaisDensityCalculation } from './valaisDensityCalculator';
 
@@ -30,6 +31,7 @@ export interface ComprehensiveParcelAnalysis {
   // Nouvelles données structurées à partir des règlements communaux
   communalConstraints: import('./regulationExtractor').RegulationConstraint[];
   rdppfConstraints: RdppfConstraint[];
+  rdppfData?: any; // RdppfData - Données RDPPF structurées améliorées
   
   // Calculs de densité spécifiques au Valais
   valaisDensity?: ValaisDensityCalculation;
@@ -117,8 +119,53 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       if (rdppfUrl) {
         try {
           console.log(`📑 Tentative téléchargement RDPPF...`);
+          
+          // Télécharger et extraire le texte du RDPPF
+          const pdfPath = await downloadRdppf(rdppfUrl);
+          const rdppfText = await extractTextFromPdf(pdfPath);
+          
+          // Utiliser directement analyzeRdppf avec les améliorations
           analysis.rdppfConstraints = await analyzeRdppf(rdppfUrl);
           if (analysis.rdppfConstraints.length) successCount++;
+          
+          // Extraire les informations structurées des contraintes
+          const zoneConstraint = analysis.rdppfConstraints.find(c => c.theme === 'Destination de zone');
+          const noiseConstraint = analysis.rdppfConstraints.find(c => 
+            c.theme === 'Prescriptions architecturales' && c.rule.includes('Degré de sensibilité')
+          );
+          
+          if (zoneConstraint) {
+            // Parser la zone depuis la rule
+            // La rule peut être: "Zone résidentielle 0.5 (3), Surface: 862 m², 100.0%"
+            const zoneMatch = zoneConstraint.rule.match(/^([^,]+)/);
+            if (zoneMatch) {
+              const zoneDesignation = zoneMatch[1].trim();
+              analysis.rdppfData = {
+                zoneAffectation: {
+                  designation: zoneDesignation
+                }
+              };
+              console.log(`✅ Zone extraite du RDPPF: ${zoneDesignation}`);
+              
+              // Extraire aussi la surface si présente
+              const surfaceMatch = zoneConstraint.rule.match(/Surface:\s*(\d+)\s*m²/);
+              if (surfaceMatch) {
+                analysis.rdppfData.zoneAffectation.surface = parseInt(surfaceMatch[1]);
+                console.log(`📏 Surface extraite: ${analysis.rdppfData.zoneAffectation.surface} m²`);
+              }
+            }
+          }
+          
+          // Si on a des contraintes mais pas de zone spécifique, logger pour debug
+          if (analysis.rdppfConstraints.length > 0 && !analysis.rdppfData?.zoneAffectation) {
+            console.log('⚠️ Contraintes RDPPF trouvées mais aucune zone d\'affectation:');
+            analysis.rdppfConstraints.forEach(c => {
+              if (c.theme.toLowerCase().includes('zone') || c.rule.toLowerCase().includes('zone')) {
+                console.log(`  - ${c.theme}: ${c.rule.substring(0, 100)}...`);
+              }
+            });
+          }
+          
           console.log(`📑 RDPPF analysé: ${analysis.rdppfConstraints.length} contraintes extraites`);
         } catch (rdppfError: any) {
           console.log(`⚠️ Erreur RDPPF: ${rdppfError.message}`);
@@ -184,7 +231,18 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
             const { extractConstraintsFromLargeText } = await import('./regulationExtractor');
             analysis.communalConstraints = await extractConstraintsFromLargeText(regulationText);
             
-            console.log(`✅ Règlement analysé: ${analysis.communalConstraints.length} contraintes extraites`);
+            // Si on a trouvé une zone dans le RDPPF, la loguer
+            if (analysis.rdppfData?.zoneAffectation) {
+              console.log(`🔍 Zone trouvée dans RDPPF: ${analysis.rdppfData.zoneAffectation.designation}`);
+              
+              // TODO: Implémenter la recherche de contraintes spécifiques
+              // const zoneConstraints = await findZoneConstraints(
+              //   analysis.rdppfData.zoneAffectation.designation,
+              //   regulationText
+              // );
+            }
+            
+            console.log(`✅ Règlement analysé: ${analysis.communalConstraints.length} contraintes extraites au total`);
             if (analysis.communalConstraints.length > 0) successCount++;
           }
         } catch (fileError: any) {

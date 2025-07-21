@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Autocomplétion</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-weight: 500;
+        }
+        .status.success { background-color: #d4edda; color: #155724; }
+        .status.error { background-color: #f8d7da; color: #721c24; }
+        .status.warning { background-color: #fff3cd; color: #856404; }
+        .status.info { background-color: #d1ecf1; color: #0c5460; }
+        
+        .search-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .search-input:focus {
+            border-color: #0070f3;
+            outline: none;
+        }
+        
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+            margin-top: 4px;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .autocomplete-item:hover {
+            background-color: #f8f9fa;
+        }
+        .autocomplete-item.selected {
+            background-color: #e3f2fd;
+        }
+        
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        button {
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnostic de l'Autocomplétion</h1>
+    
+    <div class="test-section">
+        <h3>📡 Test des API</h3>
+        <button onclick="testAllAPIs()">Tester toutes les API</button>
+        <div id="apiResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔧 Test de l'Autocomplétion</h3>
+        <div class="search-container">
+            <input type="text" class="search-input" id="diagnosticInput" placeholder="Tapez 'sion' pour tester l'autocomplétion...">
+        </div>
+        <div id="autocompleteResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>📋 Logs</h3>
+        <button onclick="clearLog()">Effacer les logs</button>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script src="/js/autocomplete.js"></script>
+    <script>
+        let autocompleteManager = null;
+        let logElement = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('log');
+            
+            // Initialiser l'autocomplétion
+            autocompleteManager = new AutocompleteManager(
+                '#diagnosticInput',
+                '.search-container',
+                {
+                    minLength: 2,
+                    maxResults: 5,
+                    debounceDelay: 300,
+                    cacheResults: true
+                }
+            );
+            
+            // Écouter les événements de sélection
+            document.getElementById('diagnosticInput').addEventListener('suggestion-selected', function(e) {
+                log('Suggestion sélectionnée:', e.suggestionValue);
+                showAutocompleteResult('success', `Suggestion sélectionnée: ${e.suggestionValue}`);
+                
+                if (e.suggestionData) {
+                    log('Données GeoAdmin:', JSON.stringify(e.suggestionData, null, 2));
+                }
+            });
+            
+            // Test automatique au chargement
+            setTimeout(testAllAPIs, 1000);
+        });
+        
+        function log(...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            logElement.textContent = '';
+        }
+        
+        function showAPIResult(type, message) {
+            const resultsDiv = document.getElementById('apiResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            resultsDiv.appendChild(statusDiv);
+        }
+        
+        function showAutocompleteResult(type, message) {
+            const resultsDiv = document.getElementById('autocompleteResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            resultsDiv.appendChild(statusDiv);
+        }
+        
+        async function testAllAPIs() {
+            log('Début des tests API...');
+            
+            // Vider les résultats précédents
+            document.getElementById('apiResults').innerHTML = '';
+            
+            try {
+                // Test 1: API GeoAdmin
+                log('Test 1: API GeoAdmin');
+                const geoadminResponse = await fetch('/api/geoadmin-search?searchText=sion&limit=2');
+                if (geoadminResponse.ok) {
+                    const data = await geoadminResponse.json();
+                    showAPIResult('success', `✅ API GeoAdmin OK - ${data.results?.length || 0} résultats`);
+                    log('Réponse GeoAdmin:', data);
+                } else {
+                    showAPIResult('error', `❌ API GeoAdmin erreur: ${geoadminResponse.status}`);
+                    log('Erreur GeoAdmin:', geoadminResponse.status);
+                }
+                
+                // Test 2: API Suggestions
+                log('Test 2: API Suggestions');
+                const suggestionsResponse = await fetch('/api/suggestions?q=sion&limit=2');
+                if (suggestionsResponse.ok) {
+                    const data = await suggestionsResponse.json();
+                    showAPIResult('success', `✅ API Suggestions OK - ${data.suggestions?.length || 0} suggestions`);
+                    log('Réponse Suggestions:', data);
+                } else {
+                    showAPIResult('error', `❌ API Suggestions erreur: ${suggestionsResponse.status}`);
+                    log('Erreur Suggestions:', suggestionsResponse.status);
+                }
+                
+                // Test 3: API Search
+                log('Test 3: API Search');
+                const searchResponse = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: 'Sion' })
+                });
+                if (searchResponse.ok) {
+                    const data = await searchResponse.json();
+                    showAPIResult('success', `✅ API Search OK - Parcelle trouvée`);
+                    log('Réponse Search:', data);
+                } else {
+                    const errorData = await searchResponse.json().catch(() => ({}));
+                    showAPIResult('warning', `⚠️ API Search: ${errorData.error || searchResponse.status}`);
+                    log('Erreur Search:', errorData);
+                }
+                
+                // Test 4: Vérification du serveur
+                log('Test 4: Vérification du serveur');
+                const healthResponse = await fetch('/api/suggestions/health');
+                if (healthResponse.ok) {
+                    const data = await healthResponse.json();
+                    showAPIResult('info', `ℹ️ Serveur opérationnel - ${data.message}`);
+                    log('Health check:', data);
+                } else {
+                    showAPIResult('error', `❌ Serveur non disponible`);
+                    log('Erreur serveur:', healthResponse.status);
+                }
+                
+            } catch (error) {
+                showAPIResult('error', `❌ Erreur générale: ${error.message}`);
+                log('Erreur générale:', error);
+            }
+            
+            log('Tests terminés');
+        }
+    </script>
+</body>
+</html> 

@@ -12,8 +12,7 @@ npm run dev
 # Serveur de production
 npm start
 
-# Serveur de développement TypeScript (alternatif)
-npm run ts-dev
+# Note: Le serveur TypeScript séparé a été intégré dans server.js
 ```
 
 ### Tests
@@ -44,21 +43,18 @@ cp env.example .env
 
 ## Vue d'Ensemble de l'Architecture
 
-### Architecture à Double Serveur
-Le projet a évolué pour utiliser une **configuration à double serveur** :
+### Architecture Unifiée
+Le projet utilise maintenant une **architecture serveur unifiée** :
 
-1. **Serveur Express Hérité** (`server.js`) : Basé sur CommonJS avec fonctionnalités complètes d'application web
+1. **Serveur Express Principal** (`server.js`) : Serveur unifié intégrant toutes les fonctionnalités
    - Modèles EJS, authentification, téléchargements de fichiers
    - Paiements Stripe, traitement PDF
    - SQLite/PostgreSQL avec ORM Sequelize
    - Middleware de sécurité complet
-
-2. **Serveur TypeScript Moderne** (`src/server.ts`) : Serveur API basé sur ESM
-   - Points de terminaison API purs pour l'analyse de propriétés
+   - Routes TypeScript intégrées pour l'analyse IA avancée
    - Proxy GeoAdmin pour les problèmes CORS
-   - Optimisé pour les intégrations externes
 
-Les deux serveurs peuvent fonctionner indépendamment sur des ports différents (3001 vs 3000).
+Le serveur écoute par défaut sur le port 3001 et intègre toutes les fonctionnalités.
 
 ### Pipeline d'Analyse Principal
 Le cœur de l'application est l'**orchestrateur d'analyse de parcelles** (`src/lib/parcelAnalysisOrchestrator.ts`) :

@@ -27,11 +27,89 @@ const IDENTIFY_ENDPOINT = 'https://api3.geo.admin.ch/rest/services/ech/MapServer
 const FEATURE_ENDPOINT = 'https://api3.geo.admin.ch/rest/services/api/feature';
 
 /**
+ * Recherche par adresse et retourne la parcelle associée
+ */
+async function searchByAddress(searchText: string): Promise<ParcelSearchResult | null> {
+  try {
+    // D'abord chercher l'adresse
+    const { data } = await axios.get(SEARCH_ENDPOINT, {
+      params: {
+        searchText: searchText,
+        type: 'locations',
+        origins: 'address',
+        limit: 1,
+        sr: 2056,
+        lang: 'fr'
+      },
+      timeout: 10000
+    });
+    
+    if (data?.results?.length) {
+      const hit = data.results[0];
+      console.log(`📍 Adresse trouvée: ${hit.attrs?.label}`);
+      
+      // Maintenant chercher la parcelle à ces coordonnées
+      const x = hit.attrs?.y; // Note: x et y sont inversés dans l'API
+      const y = hit.attrs?.x;
+      
+      if (x && y) {
+        // Identifier la parcelle aux coordonnées trouvées
+        const identifyData = await axios.get(IDENTIFY_ENDPOINT, {
+          params: {
+            geometry: `${x},${y}`,
+            geometryType: 'esriGeometryPoint',
+            layers: 'all:ch.kantone.cadastralwebmap-farbe',
+            imageDisplay: '512,512,96',
+            mapExtent: `${x-100},${y-100},${x+100},${y+100}`,
+            tolerance: 10,
+            returnGeometry: true,
+            sr: 2056
+          },
+          timeout: 10000
+        });
+        
+        if (identifyData.data?.results?.length) {
+          const parcel = identifyData.data.results[0];
+          console.log(`✅ Parcelle trouvée à l'adresse: ${parcel.properties?.egrid || parcel.properties?.number}`);
+          
+          return {
+            egrid: parcel.properties?.egrid || '',
+            number: parcel.properties?.number || '',
+            municipality: parcel.properties?.municipality || hit.attrs?.municipality || '',
+            canton: 'VS',
+            center: { x, y }
+          };
+        }
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Erreur recherche par adresse:', error);
+    return null;
+  }
+}
+
+/**
  * Recherche une parcelle par texte libre (adresse, no parcelle …).
  */
 export async function searchParcel(searchText: string): Promise<ParcelSearchResult | null> {
   try {
     console.log(`🔍 Recherche parcelle: "${searchText}"`);
+    
+    // D'abord essayer de chercher par adresse si ça ressemble à une adresse
+    const hasNumber = /\d/.test(searchText);
+    const hasComma = searchText.includes(',');
+    
+    if (hasNumber && (hasComma || searchText.toLowerCase().includes('route') || searchText.toLowerCase().includes('rue'))) {
+      console.log(`📍 Recherche par adresse détectée`);
+      
+      // Recherche d'adresse
+      const addressResult = await searchByAddress(searchText);
+      if (addressResult) {
+        return addressResult;
+      }
+    }
     
     // Essayer de normaliser le nom de commune s'il s'agit d'une commune
     const communeInfo = findCommune(searchText);

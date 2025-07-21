@@ -1,10 +1,13 @@
-// Activer ts-node pour importer les modules TypeScript (transpile-only)
+// Configuration des variables d'environnement
 require('dotenv').config();
-require('ts-node').register({ transpileOnly: true });
 
-// Validation des variables d'environnement
-const { validateEnvironment } = require('./config/env-validation');
-validateEnvironment();
+// Activer ts-node pour importer les modules TypeScript
+require('ts-node').register({ 
+  transpileOnly: true,
+  compilerOptions: {
+    module: 'commonjs'
+  }
+});
 
 const express = require('express');
 const session = require('express-session');
@@ -18,30 +21,44 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const { Sequelize } = require('sequelize');
 const expressLayouts = require('express-ejs-layouts');
+const cookieParser = require('cookie-parser');
 
-// Système de logging centralisé
-const { logger, httpLogger, createContextLogger, logApiError } = require('./utils/logger');
-const serverLogger = createContextLogger('SERVER');
+// Système de logging simplifié
+const logger = {
+  info: console.log,
+  error: console.error,
+  warn: console.warn
+};
 
-// Gestionnaire de cache
-const { cacheMiddleware } = require('./utils/cache-manager');
+// Cache désactivé pour le développement
 
-// Gestion d'erreurs centralisée
-const { globalErrorHandler, notFoundHandler, asyncHandler, ValidationError, NotFoundError } = require('./utils/error-handler');
+// Gestion d'erreurs simplifiée
+
+// Middlewares simplifiés
 
 // Import des middlewares et routes
 const authRoutes = require('./routes-node/auth');
 const documentRoutes = require('./routes-node/documents');
 const analysisRoutes = require('./routes-node/analysis');
 const paymentRoutes = require('./routes-node/payment');
+const searchRoutes = require('./routes-node/search');
+const suggestionsRoutes = require('./routes-node/suggestions-geoadmin');
+const geoAdminProxyRoutes = require('./routes-node/geoadmin-proxy');
+const { router: authSupabaseRoutes } = require('./routes-node/auth-supabase');
 
 // Import des nouvelles routes refactorisées
 const aiAnalysisRoutes = require('./routes/ai-analysis');
 const iaConstraintsRoutes = require('./routes-node/ia-constraints');
 
+// Import des routes TypeScript via require
+const { default: iaConstraintsTS } = require('./src/routes/iaConstraints');
+const { default: ownersTS } = require('./src/routes/owners');
+const { default: utilsTS } = require('./src/routes/utils');
+
 // Configuration de l'application
 const app = express();
-const PORT = process.env.PORT || 3001;
+const serverConfig = require('./config/server-config');
+const PORT = serverConfig.server.port;
 
 // Configuration Passport
 require('./config/passport');
@@ -115,8 +132,8 @@ if (process.env.NODE_ENV === 'production') {
     } : false
   }));
 } else {
-  // Mode développement - sécurité minimale pour éviter les problèmes HTTPS
-  console.log('🔧 Mode développement - Helmet désactivé pour éviter les problèmes HTTPS');
+  // Mode développement - sécurité désactivée
+  console.log('🔧 Mode développement - Sécurité désactivée');
 }
 
 // Configuration de la base de données
@@ -138,12 +155,7 @@ const sequelize = new Sequelize({
 });
 
 // Middlewares
-app.use(cors({
-  origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'https://localhost:3001'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+app.use(cors(serverConfig.cors));
 
 // === SÉCURITÉ : Configuration du Rate Limiting ===
 // Rate limiting général pour toutes les requêtes
@@ -210,11 +222,27 @@ app.use(generalLimiter);
 
 app.use(express.json({ limit: '10mb' })); // Limiter la taille des JSON
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.static('public'));
+app.use(cookieParser()); // Middleware pour parser les cookies
 
-// Ajout du middleware de cache et de logging
-app.use(httpLogger);
-app.use(cacheMiddleware);
+// Configuration des fichiers statiques - servir le dossier public
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+  etag: false,
+  dotfiles: 'ignore'
+}));
+
+// Servir le dossier reglements pour les PDF des règlements communaux
+app.use('/reglements', express.static(path.join(__dirname, 'reglements'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
+  etag: false,
+  dotfiles: 'ignore'
+}));
+
+// Middleware de logging simple
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Configuration des sessions avec secret sécurisé
 app.use(session({
@@ -421,7 +449,7 @@ app.get('/favicon.ico', (req, res) => {
 
 // Routes principales
 app.get('/', (req, res) => {
-  res.render('index', { user: req.user });
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/login', (req, res) => {
@@ -474,15 +502,49 @@ app.get('/api/documents/communal-regulations', async (req, res) => {
   }
 });
 
+// Route pour rediriger vers les règlements communaux
+app.get('/api/regulation/:commune', async (req, res) => {
+  try {
+    const fs = require('fs').promises;
+    const commune = req.params.commune;
+    
+    // Lire le fichier JSON des règlements
+    const regulationsPath = path.join(__dirname, 'public', 'regulations-vs.json');
+    const regulationsData = await fs.readFile(regulationsPath, 'utf8');
+    const regulations = JSON.parse(regulationsData);
+    
+    // Trouver l'URL du règlement pour la commune
+    const regulationUrl = regulations[commune];
+    
+    if (regulationUrl) {
+      // Rediriger vers l'URL du règlement
+      res.redirect(regulationUrl);
+    } else {
+      res.status(404).json({ 
+        error: 'Règlement non disponible',
+        message: `Aucun règlement trouvé pour la commune de ${commune}`
+      });
+    }
+  } catch (error) {
+    console.error('Erreur accès règlement:', error);
+    res.status(500).json({ error: 'Erreur lors de l\'accès au règlement communal' });
+  }
+});
+
 // Routes API avec protection CSRF et rate limiting
-app.use('/api/auth', authLimiter, csrfMiddleware, authRoutes);
+app.use('/api/search', searchRoutes); // Route de recherche publique
+app.use('/api/suggestions', suggestionsRoutes); // Route de suggestions publique
+app.use('/api/geoadmin-search', geoAdminProxyRoutes); // Proxy GeoAdmin pour éviter les problèmes CORS
+app.use('/api/auth', authSupabaseRoutes); // Authentification Supabase (sans CSRF pour OAuth)
+app.use('/api/auth-legacy', authLimiter, csrfMiddleware, authRoutes); // Ancienne auth
 app.use('/api/documents', ensureAuthenticated, csrfMiddleware, documentRoutes);
 app.use('/api/analysis', aiAnalysisLimiter, analysisRoutes); // Analyse avec rate limiting
 
 app.use('/api/payment', csrfMiddleware, paymentRoutes);
 app.use('/api/ia-constraints', aiAnalysisLimiter, iaConstraintsRoutes);
-
-// Route IA SUPPRIMÉE - remplacée par iaConstraintsRoutes
+app.use('/api', iaConstraintsTS); // Routes TypeScript pour l'analyse IA avancée
+app.use('/api', ownersTS); // Routes TypeScript pour les propriétaires
+app.use('/api', utilsTS); // Routes TypeScript utilitaires
 /*app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
   console.log('🔍 Requête IA reçue:', req.body);
   
@@ -562,9 +624,43 @@ function ensureAuthenticated(req, res, next) {
 // pour une meilleure maintenabilité et performance
 
 // === DÉMARRAGE DU SERVEUR ===
-app.listen(PORT, () => {
-  console.log(`🚀 Serveur Express démarré sur le port ${PORT}`);
-  console.log(`📍 URL: http://localhost:${PORT}`);
-  console.log(`🌍 Environnement: ${process.env.NODE_ENV || 'development'}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log('✅ Serveur Express démarré avec succès');
+  console.log(`🚀 Port: ${PORT}`);
+  console.log(`🌐 URL: http://localhost:${PORT}`);
+  console.log(`📍 Host: localhost`);
+  console.log(`🔧 Environnement: ${process.env.NODE_ENV || 'development'}`);
   console.log(`💾 Base de données: SQLite`);
+  console.log('🔄 Hot-reload activé avec nodemon');
+});
+
+// Gestion d'erreur de démarrage
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Erreur: Le port ${PORT} est déjà utilisé`);
+    console.error('💡 Solution: Arrêtez le processus existant ou changez de port');
+    process.exit(1);
+  } else {
+    console.error('❌ Erreur de démarrage du serveur:', error);
+    process.exit(1);
+  }
+});
+
+// Gestion gracieuse de l'arrêt
+process.on('SIGTERM', () => {
+  console.log('SIGTERM reçu, fermeture du serveur...');
+  server.close(() => {
+    console.log('Serveur fermé');
+    process.exit(0);
+  });
+});
+
+// Gestion des erreurs non capturées
+process.on('uncaughtException', (error) => {
+  console.error('Erreur non capturée:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Promesse rejetée non gérée:', reason);
 });

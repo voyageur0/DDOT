@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bouton Analyse IA</title>
+</head>
+<body>
+    <h1>Test Bouton Analyse IA</h1>
+    <button id="testButton">Tester Analyse IA</button>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Analyse en cours...</p>';
+            
+            try {
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        searchQuery: 'Sion parcelle 123'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    resultsDiv.innerHTML = '<p style="color: green;">Succès! Voir la console pour les détails.</p>';
+                } else {
+                    resultsDiv.innerHTML = `<p style="color: red;">Erreur: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                resultsDiv.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

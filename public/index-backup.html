@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>DDOT</title>
+    <title>DDOT - Analyse Immobilière Intelligente</title>
+    <meta name="description" content="Système avancé d'analyse immobilière pour le Valais. Données publiques GeoAdmin et analyse IA des contraintes d'urbanisme.">
+    <link rel="stylesheet" href="/css/design-system.css">
+    <link rel="stylesheet" href="/css/modern-components.css">
+    <link rel="stylesheet" href="/css/professional-components.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -16,47 +17,66 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-family-sans);
+            background: var(--color-neutral-50);
+            margin: 0;
+            padding: 0;
+            color: var(--color-neutral-700);
+        }
+
+        .main-container {
             min-height: 100vh;
+        }
+
+        .navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--color-neutral-200);
+            z-index: 50;
+            padding: var(--space-4) 0;
+        }
+        
+        .nav-content {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            max-width: var(--container-xl);
+            margin: 0 auto;
+            padding: 0 var(--space-6);
         }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            max-width: 1200px;
-            width: 100%;
-            overflow: visible;
-            position: relative;
-            z-index: 1;
+        
+        .logo {
+            font-family: var(--font-family-display);
+            font-size: var(--text-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary-600);
+            text-decoration: none;
         }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--space-6);
+            align-items: center;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
+        
+        .nav-link {
+            color: var(--color-neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: color var(--transition-base);
         }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        
+        .nav-link:hover {
+            color: var(--color-primary-600);
         }
 
         .search-section {
-            padding: 40px;
-            background: #f8f9fa;
+            padding: var(--space-16) var(--space-6);
+            background: white;
             position: relative;
             z-index: 10;
         }
@@ -116,14 +136,14 @@
             left: 0;
             right: 0;
             background: white;
-            border: 3px solid #667eea;
+            border: 1px solid #e9ecef;
             border-radius: 15px;
             margin-top: 5px;
             max-height: 300px;
             overflow-y: auto;
-            z-index: 99999;
+            z-index: 10000;
             display: none;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
         }
 
         .suggestion-item {
@@ -240,160 +260,84 @@
             background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
         }
 
-        .action-btn.ai-btn {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            font-size: 16px;
-            padding: 15px 30px;
-        }
-
-        .action-btn.ai-btn:hover {
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
-        }
-
-        .ai-section {
-            border-left: 5px solid #ff6b6b;
-            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-        }
-
-        .ai-icon {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        }
-
-        .ai-loading {
-            border-top: 5px solid #ff6b6b;
-        }
-
-        .ai-result {
-            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
-            border: 2px solid #667eea;
-            border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
-            font-size: 1.1em;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.1);
+        .action-btn.ai-analysis-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             position: relative;
             overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            animation: ai-glow 2s ease-in-out infinite alternate;
         }
 
-        .ai-result::before {
+        .action-btn.ai-analysis-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #ff6b6b, #ee5a24);
-            background-size: 400% 400%;
-            animation: gradient 3s ease infinite;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #667eea, #764ba2);
+            border-radius: inherit;
+            z-index: -1;
+            animation: ai-border 3s linear infinite;
         }
 
-        @keyframes gradient {
+        @keyframes ai-glow {
+            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.6), 0 0 40px rgba(118, 75, 162, 0.4); }
+        }
+
+        @keyframes ai-border {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        .ai-result h1, .ai-result h2, .ai-result h3 {
-            color: #2c3e50;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .ai-result h1 {
-            font-size: 28px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .ai-result h2 {
-            font-size: 24px;
-            color: #ff6b6b;
-            border-bottom: 2px solid #ff6b6b;
-            padding-bottom: 8px;
-        }
-
-        .ai-result h3 {
-            font-size: 20px;
-            color: #667eea;
-        }
-
-        .ai-result ul {
-            padding-left: 0;
-            list-style: none;
-        }
-
-        .ai-result li {
-            background: white;
-            margin: 8px 0;
-            padding: 12px 20px;
-            border-radius: 10px;
-            border-left: 4px solid #27ae60;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            position: relative;
-            padding-left: 50px;
-        }
-
-        .ai-result li::before {
-            content: '✓';
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #27ae60;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .ai-result strong {
-            color: #667eea;
-            font-weight: 700;
-        }
-
-        .metric-highlight {
-            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
-            border: 2px solid #ff6b6b;
+        .ai-analysis-result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
             border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-            text-align: center;
+            padding: 25px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .metric-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: #ff6b6b;
-            display: block;
+        .ai-analysis-result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            animation: ai-scan 2s ease-in-out infinite;
         }
 
-        .metric-label {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #666;
-            margin-top: 5px;
+        @keyframes ai-scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
-        .calculation-time {
-            text-align: right;
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(255, 107, 107, 0.1);
-            border-radius: 10px;
-            font-size: 0.9em;
-            color: #dc3545;
-            font-weight: 600;
+        .constraint-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .constraint-severity-high {
+            border-left-color: #dc3545;
+        }
+
+        .constraint-severity-medium {
+            border-left-color: #ffc107;
+        }
+
+        .constraint-severity-low {
+            border-left-color: #28a745;
         }
 
         .loading {
@@ -551,427 +495,1439 @@
             margin-top: 30px;
             border-top: 1px solid #e9ecef;
         }
+
+        /* Animation de chargement */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .floating-ai-btn {
+            position: fixed;
+            top: 50%;
+            right: 25px;
+            transform: translateY(-50%);
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            font-size: 32px;
+            display: none; /* par défaut */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1500;
+            box-shadow: 0 10px 25px rgba(102,126,234,0.45);
+            animation: floaty 4s ease-in-out infinite;
+        }
+        @keyframes floaty {
+            0% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(calc(-50% - 6px)) translateX(-4px); }
+            100% { transform: translateY(-50%) translateX(0); }
+        }
+        .floating-ai-btn:hover { box-shadow: 0 15px 35px rgba(102,126,234,0.6); }
+        /* bulle de dialogue */
+        .floating-ai-btn .ai-bubble {
+            position: absolute;
+            right: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            color: #333;
+            padding: 6px 10px;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .floating-ai-btn.show-bubble .ai-bubble { opacity: 1; }
+
+        /* Tableau des contraintes */
+        .constraints-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .constraints-table th, .constraints-table td { padding: 10px 12px; border: 1px solid #dee2e6; text-align: left; }
+        .constraints-table th { background: #f1f3f5; font-weight: 600; }
+        .severity-high { background: #f8d7da; color: #721c24; }
+        .severity-medium { background: #fff3cd; color: #856404; }
+        .severity-low { background: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>DDOT</h1>
-            <p>Système avancé d'analyse immobilière pour le Valais avec IA<br>
-            <small>Données publiques GeoAdmin • Intelligence Artificielle • Règlements communaux</small></p>
-            <div class="user-menu">
-                <span id="userGreeting"></span>
-                <button id="loginBtn" class="user-btn">Se connecter / S'inscrire</button>
-                <button id="logoutBtn" class="user-btn" style="display: none;">Se déconnecter</button>
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="navigation">
+            <div class="nav-content">
+                <a href="#" class="logo">DDOT</a>
+                <div class="nav-menu">
+                    <a href="#features" class="nav-link">Fonctionnalités</a>
+                    <a href="#communes" class="nav-link">Communes</a>
+                    <a href="#about" class="nav-link">À propos</a>
+                    <div class="user-menu">
+                        <span id="userGreeting"></span>
+                        <button id="loginBtn" class="btn btn-secondary btn-sm">Se connecter</button>
+                        <button id="logoutBtn" class="btn btn-secondary btn-sm" style="display: none;">Se déconnecter</button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="search-section">
-            <div class="search-container">
-                <input type="text" 
-                       class="search-input" 
-                       id="searchInput" 
-                       placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
-                <button class="search-btn" id="searchBtn">🔍</button>
-                <div class="suggestions" id="suggestions"></div>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section class="hero-modern">
+            <div class="hero-content">
+                <h1 class="hero-title">Analyse Immobilière Intelligente pour le Valais</h1>
+                <p class="hero-subtitle">Exploitez la puissance de l'IA et des données publiques suisses pour analyser vos parcelles et contraintes d'urbanisme en quelques clics</p>
+                <div class="hero-cta">
+                    <button class="btn-hero btn-hero-primary" onclick="scrollToSearch()">Analyser une parcelle</button>
+                    <button class="btn-hero btn-hero-secondary" onclick="scrollToCommunes()">Voir les communes</button>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="results-container" id="resultsContainer">
-            <div class="loading" id="loading">
-                <div class="loading-spinner"></div>
-                <p>Analyse en cours via VSGIS.ch et GeoAdmin...</p>
-            </div>
-
-            <div class="loading" id="aiLoading" style="display: none;">
-                <div class="loading-spinner ai-loading"></div>
-                <p>🧠 Analyse IA en cours... Consultation des règlements communaux et synthèse des contraintes...</p>
-            </div>
-
-            <div id="analysisResults" style="display: none;">
-                <!-- Informations générales -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">📋</div>
-                        <h2 class="section-title">Informations Générales</h2>
-                    </div>
-                    <div class="info-grid" id="generalInfo"></div>
-                </div>
-
-                <!-- Analyse IA des Contraintes -->
-                <div class="analysis-section ai-section" id="aiConstraintsSection" style="display: none;">
-                    <div class="section-header">
-                        <div class="section-icon ai-icon">🧠</div>
-                        <h2 class="section-title">Analyse IA - Contraintes Urbanistiques</h2>
-                    </div>
-                    <div id="aiConstraintsResult"></div>
-                </div>
-
-                <!-- Propriétaires -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">👥</div>
-                        <h2 class="section-title">Informations Cadastrales</h2>
-                    </div>
-                    <div id="ownersInfo"></div>
-                </div>
-
-                <!-- Détails Cadastraux -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">🗺️</div>
-                        <h2 class="section-title">Détails de la Parcelle</h2>
-                    </div>
-                    <div class="info-grid" id="cadastralInfo"></div>
-                </div>
-
-                <!-- Zonage et Réglementation -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">⚖️</div>
-                        <h2 class="section-title">Zonage Public</h2>
-                    </div>
-                    <div class="info-grid" id="zoningInfo"></div>
-                </div>
-
-                <!-- Potentiel de Développement -->
-                <div class="analysis-section">
-                    <div class="section-header">
-                        <div class="section-icon">📈</div>
-                        <h2 class="section-title">Potentiel de Développement</h2>
-                    </div>
-                    <div class="info-grid" id="developmentInfo"></div>
-                </div>
-
-                <!-- Actions -->
-                <div class="actions-container">
-                    <button class="action-btn ai-btn" id="aiConstraintsBtn" onclick="analyzeWithAI()">
-                        🧠 Analyse IA - Contraintes
+        <!-- Search Section -->
+        <section class="search-section" id="search">
+            <div class="container">
+                <div class="search-container-modern">
+                    <div class="search-icon">⌕</div>
+                    <input type="text" 
+                           class="search-input-modern" 
+                           id="searchInput" 
+                           placeholder="Recherchez une parcelle, adresse ou coordonnées (ex: Chamoson 435, Sion rue du Rhône 12)">
+                    <button class="search-button" id="searchBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21l-4.35-4.35"></path>
+                        </svg>
                     </button>
-                    <button class="action-btn" onclick="generatePDF()">
-                        📄 Générer Rapport PDF
-                    </button>
-                    <button class="action-btn warning" id="regulationBtn" style="display:none;">
-                        📚 Règlement Communal
-                    </button>
-                    <button class="action-btn" onclick="newSearch()">
-                        🔄 Nouvelle Recherche
-                    </button>
+                    <div class="suggestions-modern" id="suggestions"></div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Results Container -->
+        <section class="results-container" id="resultsContainer" style="display: none;">
+            <div class="container">
+                <div class="loading-modern" id="loading">
+                    <div class="spinner-modern"></div>
+                    <p class="loading-text-modern">Analyse en cours via GeoAdmin et base de données DDOT...</p>
+                </div>
+
+                <div id="analysisResults" style="display: none;">
+                    <!-- Informations générales -->
+                    <div class="results-card-modern">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">⊞</div>
+                            <h2 class="card-title-modern">Informations Générales</h2>
+                        </div>
+                        <div class="card-body-modern">
+                            <div class="info-grid-modern" id="generalInfo"></div>
+                        </div>
+                    </div>
+
+                    <!-- Autres sections masquées par défaut -->
+                    <div id="ownersInfo" style="display: none;"></div>
+                    <div id="cadastralInfo" style="display: none;"></div>
+                    <div id="zoningInfo" style="display: none;"></div>
+                    <div id="developmentInfo" style="display: none;"></div>
+
+                    <!-- Actions -->
+                    <div class="actions-container-modern">
+                        <button class="action-btn-modern action-btn-ai" id="aiAnalysisBtn" onclick="performAIAnalysis()" style="display:none;">
+                            🤖 Analyse IA Contraintes
+                        </button>
+                        <button class="action-btn-modern action-btn-secondary" id="rdppfBtn">
+                            Télécharger RDPPF
+                        </button>
+                        <button class="action-btn-modern action-btn-warning" id="regulationBtn" style="display:none;">
+                            📚 Règlement Communal
+                        </button>
+                        <button class="action-btn-modern action-btn-ai" onclick="newSearch()">
+                            🔄 Nouvelle Recherche
+                        </button>
+                    </div>
+                    
+                    <!-- Résultats de l'analyse IA -->
+                    <div id="aiAnalysisResults" style="display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Communes Section -->
+        <section class="communes-section-modern" id="communes">
+            <div class="container">
+                <div class="communes-header">
+                    <h2 class="communes-title">Communes du Valais Romand</h2>
+                    <p class="communes-subtitle">23 communes avec analyse complète disponible</p>
+                </div>
+                <div class="communes-grid" id="communesGrid">
+                    <!-- Les communes seront injectées ici -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Floating AI Button -->
+        <button id="floatingAiBtn" class="floating-ai-modern" onclick="performAIAnalysis()" title="Analyse IA" style="display: none;">
+            🤖
+        </button>
+
+        <!-- Toast Notifications Container -->
+        <div class="toast-container" id="toastContainer"></div>
     </div>
 
     <footer class="footer">
-                    DDOT - Système d'analyse cadastrale avec IA pour le Valais<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
+        DDOT - Projet en cours de développement.<br>Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz
     </footer>
 
-    <!-- Modal Authentification -->
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <span class="close" id="closeAuth">&times;</span>
-            <h2 id="authTitle">Connexion</h2>
-            <input type="text" id="authUsername" placeholder="Nom d'utilisateur">
-            <input type="password" id="authPassword" placeholder="Mot de passe">
-            <button id="authSubmitBtn" class="action-btn" style="margin-top:15px;">Se connecter</button>
-            <p id="switchAuth" style="margin-top:10px; font-size: 0.9em;">
-                Pas de compte ? <a href="#" id="switchToRegister">Inscrivez-vous</a>
-            </p>
-        </div>
-    </div>
+
+
+    <!-- Authentification sécurisée gérée côté serveur -->
 
     <script>
-        // Base de données des règlements communaux
-        let communalRegulations = {};
-        fetch('regulations-vs.json')
-          .then(r => r.json())
-          .then(json => { communalRegulations = json; })
-          .catch(() => { console.error('Impossible de charger regulations-vs.json'); });
+
 
         // Variables globales
         let currentData = null;
         let searchTimeout = null;
-        let currentCoordinates = null;
+        
+        // Fonctions de navigation
+        function scrollToSearch() {
+            document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function scrollToCommunes() {
+            document.getElementById('communes').scrollIntoView({ behavior: 'smooth' });
+        }
 
-        // Fonction de test pour déboguer
-        window.testSuggestions = function() {
-            console.log('Test des suggestions...');
-            const suggestions = document.getElementById('suggestions');
-            suggestions.innerHTML = `
-                <div class="suggestion-item" onclick="alert('Test cliqué!')">
-                    🧪 Test Suggestion 1
-                </div>
-                <div class="suggestion-item" onclick="alert('Test cliqué!')">
-                    🧪 Test Suggestion 2
-                </div>
-            `;
-            suggestions.style.display = 'block';
-            console.log('Suggestions de test affichées');
-        };
+        /**
+         * Extrait un numéro EGRID complet à partir du label d'une suggestion.
+         * Exemple de label : "Vétroz 2450 (CH 9952 1900 3076)"  →  "CH995219003076"
+         */
+        function extractEgridFromLabel(label) {
+            const match = label.match(/\(\s*CH\s*([0-9\s]+)\s*\)/i);
+            if (match && match[1]) {
+                return 'CH' + match[1].replace(/\s+/g, '');
+            }
+            return null;
+        }
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM chargé - Initialisation DDOT');
-            
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
             const suggestions = document.getElementById('suggestions');
 
-            if (!searchInput || !searchBtn || !suggestions) {
-                console.error('❌ Éléments DOM manquants:', { searchInput, searchBtn, suggestions });
-                return;
-            }
-
-            console.log('✅ Éléments DOM trouvés, ajout des événements...');
-
-            searchInput.addEventListener('input', function(e) {
-                console.log('📝 Input event:', e.target.value);
-                handleSearchInput();
-            });
-            
+            searchInput.addEventListener('input', handleSearchInput);
             searchInput.addEventListener('keypress', function(e) {
-                console.log('⌨️ Keypress event:', e.key);
                 if (e.key === 'Enter') {
                     performSearch();
                 }
             });
-            
             searchBtn.addEventListener('click', performSearch);
-            
-            console.log('✅ Événements ajoutés');
-            
-            // Masquer les suggestions quand on clique ailleurs
+
+            // Fermer les suggestions en cliquant ailleurs (mais pas sur une suggestion)
             document.addEventListener('click', function(e) {
-                if (!e.target.closest('.search-container')) {
+                if (!e.target.closest('.search-container-modern') && !e.target.closest('.suggestion-item-modern')) {
                     suggestions.style.display = 'none';
+                    suggestions.classList.remove('show');
                 }
             });
+
+            // === Auth UI ===
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            // Authentification gérée côté serveur
+            if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
+            if (logoutBtn) logoutBtn.addEventListener('click', () => {
+                window.location.href = '/api/auth/logout';
+            });
+
+            // Initialiser la grille des communes
+            initializeCommunesGrid();
+        });
+        
+        function initializeCommunesGrid() {
+            const communes = ['Arbaz','Ardon','Ayent','Chamoson','Charrat','Conthey','Martigny','Mase','Mollens','Nax','Nendaz','Riddes','Saillon','Saint-Léonard','Salgesch','Savièse','Saxon','Sierre','Sion','Vernamiège','Vérrossaz','Vétroz'];
+            const communesGrid = document.getElementById('communesGrid');
+            
+            if (communesGrid) {
+                communesGrid.innerHTML = communes.map((commune, index) => `
+                    <div class="commune-tag" onclick="selectCommune('${commune}')" style="animation-delay: ${index * 0.05}s">
+                        ${commune}
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function selectCommune(commune) {
+            document.getElementById('searchInput').value = commune;
+            scrollToSearch();
+            document.getElementById('searchInput').focus();
+        }
+        
+        // Fermer les suggestions en cliquant ailleurs
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container-modern')) {
+                document.getElementById('suggestions').classList.remove('show');
+            }
         });
 
-        // Gestion de la recherche avec suggestions
-        async function handleSearchInput() {
-            const query = document.getElementById('searchInput').value.trim();
+        function handleSearchInput() {
+            const query = document.getElementById('searchInput').value;
             const suggestions = document.getElementById('suggestions');
-            
-            console.log('🔍 handleSearchInput called with:', query);
-            
-            if (!query || query.length < 2) {
+
+            clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
                 suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
                 return;
             }
-            
-            // Annuler la recherche précédente
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-            
-            // Délai pour éviter trop de requêtes
-            searchTimeout = setTimeout(async () => {
-                try {
-                    console.log('📡 Recherche de suggestions pour:', query);
-                    
-                    const response = await fetch(`/api/geoadmin-search?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=8&sr=2056`);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    console.log('✅ Données reçues:', data);
-                    
-                    displaySuggestions(data.results || []);
-                    
-                } catch (error) {
-                    console.error('❌ Erreur recherche suggestions:', error);
-                    suggestions.innerHTML = '<div class="suggestion-item error">Erreur de recherche</div>';
-                    suggestions.style.display = 'block';
-                }
+
+            searchTimeout = setTimeout(() => {
+                showSuggestions(query);
             }, 300);
         }
 
-        // Afficher les suggestions
-        function displaySuggestions(results) {
+        async function showSuggestions(query) {
             const suggestions = document.getElementById('suggestions');
             
-            if (!results || results.length === 0) {
-                suggestions.innerHTML = '<div class="suggestion-item">Aucun résultat trouvé</div>';
-                suggestions.style.display = 'block';
-                return;
-            }
-            
-            console.log('📋 Affichage de', results.length, 'suggestions');
-            
-            const html = results.map((result, index) => {
-                const label = result.attrs.label.replace(/<b>/g, '').replace(/<\/b>/g, '');
-                const detail = result.attrs.detail || '';
+            try {
+                // Recherche via API GeoAdmin
+                const response = await fetch(
+                    `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=8&sr=2056`
+                );
                 
-                return `
-                    <div class="suggestion-item" onclick="selectSuggestionByIndex(${index})">
-                        <div class="suggestion-main">${label}</div>
-                        <div class="suggestion-detail">${detail}</div>
-                    </div>
-                `;
-            }).join('');
-            
-            // Stocker les résultats pour la sélection
-            window.currentSuggestions = results;
-            
-            suggestions.innerHTML = html;
-            suggestions.style.display = 'block';
+                if (!response.ok) throw new Error('Erreur de recherche');
+                
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    let suggestionsHTML = '';
+                    
+                    data.results.forEach((result, index) => {
+                        const label = result.attrs.label.replace(/<[^>]*>/g, '');
+                        const x = result.attrs.x || result.attrs.lon || 0;
+                        const y = result.attrs.y || result.attrs.lat || 0;
+                        
+                        suggestionsHTML += `
+                            <div class="suggestion-item-modern" data-index="${index}">
+                                <div class="suggestion-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                        <circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                                </div>
+                                <div class="suggestion-content">
+                                    <div class="suggestion-label">${label}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    suggestions.innerHTML = suggestionsHTML;
+                    suggestions.style.display = 'block';
+                    suggestions.classList.add('show');
+                    
+                    // Stocker les résultats pour l'utilisation dans selectSuggestionByIndex
+                    window.currentSuggestions = data.results;
+                    
+                    // Ajouter la gestion des clics sur les suggestions
+                    suggestions.querySelectorAll('.suggestion-item-modern').forEach(item => {
+                        item.addEventListener('click', function(e) {
+                            e.stopPropagation(); // Empêcher la fermeture des suggestions
+                            const index = parseInt(this.getAttribute('data-index'));
+                            selectSuggestionByIndex(index);
+                        });
+                    });
+                } else {
+                    suggestions.style.display = 'none';
+                    suggestions.classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Erreur suggestions:', error);
+                suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
+            }
         }
 
-        // Sélectionner une suggestion par index
         function selectSuggestionByIndex(index) {
-            if (!window.currentSuggestions || !window.currentSuggestions[index]) {
-                return;
+            if (window.currentSuggestions && window.currentSuggestions[index]) {
+                const result = window.currentSuggestions[index];
+                const cleanLabel = result.attrs.label.replace(/<[^>]*>/g, '');
+                
+                document.getElementById('searchInput').value = cleanLabel;
+                const suggestions = document.getElementById('suggestions');
+                suggestions.style.display = 'none';
+                suggestions.classList.remove('show');
+                
+                // Déclencher la recherche directement avec les données de la suggestion
+                performSearchWithResult(result);
             }
-            
-            const result = window.currentSuggestions[index];
-            const label = result.attrs.label.replace(/<b>/g, '').replace(/<\/b>/g, '');
-            
-            console.log('🎯 Suggestion sélectionnée:', label, result.attrs.x, result.attrs.y);
-            
-            document.getElementById('searchInput').value = label;
-            document.getElementById('suggestions').style.display = 'none';
-            
-            currentCoordinates = { x: result.attrs.x, y: result.attrs.y };
+        }
+
+        function selectSuggestion(label, x, y) {
+            // Fonction legacy maintenue pour compatibilité
+            const cleanLabel = label.replace(/<[^>]*>/g, '');
+            document.getElementById('searchInput').value = cleanLabel;
+            const suggestions = document.getElementById('suggestions');
+            suggestions.style.display = 'none';
+            suggestions.classList.remove('show');
             performSearch();
         }
 
-        // Effectuer la recherche
+        async function performSearchWithResult(result) {
+            showLoading();
+
+            try {
+                // Tentative d'extraction directe de l'EGRID depuis le label
+                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
+
+                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
+                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
+                    try {
+                        // Utiliser l'API parcellaire suisse directe
+                        const response = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
+                        );
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Données parcelle:', data); // Pour debug
+                        }
+                        
+                        // Essayer avec l'API cadastre
+                        const cadastreResponse = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
+                        );
+                        
+                        if (cadastreResponse.ok) {
+                            const cadastreData = await cadastreResponse.json();
+                            console.log('Données cadastre:', cadastreData); // Pour debug
+                            
+                            if (cadastreData.results && cadastreData.results.length > 0) {
+                                for (let cadastreResult of cadastreData.results) {
+                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
+                                        egridComplet = cadastreResult.attributes.egrid;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Erreur récupération EGRID:', error);
+                    }
+                }
+
+                // Créer les données directement avec le résultat de la suggestion
+                const parcelNumber = result.attrs.number || extractParcelNumber(result.attrs.label);
+                const cleanedAddress = cleanAddress(result.attrs);
+
+                currentData = {
+                    general: {
+                        adresse: cleanedAddress || 'Adresse non disponible',
+                        coordonnees: result.attrs.x && result.attrs.y ? 
+                            `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
+                            'Coordonnées non disponibles',
+                        systeme_ref: "CH1903+ / LV95 (EPSG:2056)",
+                        date_analyse: new Date().toLocaleDateString('fr-CH'),
+                        type_objet: result.attrs.origin || 'Parcelle'
+                    },
+                    cadastral: {
+                        id_federal: egridComplet,
+                        parcel_number: parcelNumber || 'Indisponible',
+                        commune: extractCommune(result.attrs.label),
+                        canton: 'Valais (VS)',
+                        statut: 'Données publiques GeoAdmin',
+                        bbox: result.attrs.geom_st_box2d || 'Non disponible'
+                    },
+                    zonage: {
+                        source: 'Informations disponibles auprès des services communaux',
+                        note: 'Consultation du règlement communal recommandée'
+                    }
+                };
+                
+                // Chercher adresse officielle
+                if (result.attrs.x && result.attrs.y) {
+                    const officialAddress = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
+                    if (officialAddress) currentData.general.adresse = officialAddress;
+                }
+
+                displayResults(currentData);
+
+            } catch (error) {
+                console.error('Erreur lors de l\'affichage:', error);
+                showError('Erreur lors de l\'affichage des résultats: ' + error.message);
+            }
+        }
+
         async function performSearch() {
             const query = document.getElementById('searchInput').value.trim();
             
             if (!query) {
-                alert('Veuillez entrer une recherche');
+                alert('Veuillez saisir une recherche');
                 return;
             }
-            
-            console.log('🚀 Recherche lancée pour:', query);
-            
-            // Masquer les suggestions
-            document.getElementById('suggestions').style.display = 'none';
-            
-            // Afficher le loading
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('analysisResults').style.display = 'none';
-            document.getElementById('resultsContainer').style.display = 'block';
-            
+
+            showLoading();
+
             try {
-                // Appel à l'API d'analyse
-                const response = await fetch('/api/ia-constraints', {
+                // Recherche via API GeoAdmin uniquement
+                const searchResponse = await fetch(
+                    `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(query)}&type=locations&origins=parcel,address,gg25&limit=5&sr=2056`
+                );
+                
+                if (!searchResponse.ok) {
+                    throw new Error(`Erreur API GeoAdmin: ${searchResponse.status}`);
+                }
+                
+                const searchData = await searchResponse.json();
+                
+                if (!searchData.results || searchData.results.length === 0) {
+                    throw new Error('Aucun résultat trouvé dans GeoAdmin');
+                }
+
+                const result = searchData.results[0];
+                
+                // Tentative d'extraction directe de l'EGRID depuis le label
+                let egridComplet = extractEgridFromLabel(result.attrs.label) || 'Non disponible';
+
+                // Si l'EGRID n'a pas été trouvé dans le label, on tente via les services GeoAdmin
+                if (egridComplet === 'Non disponible' && result.attrs.x && result.attrs.y) {
+                    try {
+                        // Utiliser l'API parcellaire suisse directe
+                        const response = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.bfs.gebaeude_wohnungs_register/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=10`
+                        );
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log('Données parcelle:', data); // Pour debug
+                        }
+                        
+                        // Essayer avec l'API cadastre
+                        const cadastreResponse = await fetch(
+                            `https://api3.geo.admin.ch/rest/services/api/MapServer/ch.kantone.cadastralwebmap-colour/identify?geometry=${result.attrs.x},${result.attrs.y}&geometryType=esriGeometryPoint&sr=2056&mapExtent=0,0,100,100&imageDisplay=100,100,96&tolerance=5`
+                        );
+                        
+                        if (cadastreResponse.ok) {
+                            const cadastreData = await cadastreResponse.json();
+                            console.log('Données cadastre:', cadastreData); // Pour debug
+                            
+                            if (cadastreData.results && cadastreData.results.length > 0) {
+                                for (let cadastreResult of cadastreData.results) {
+                                    if (cadastreResult.attributes && cadastreResult.attributes.egrid) {
+                                        egridComplet = cadastreResult.attributes.egrid;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Erreur récupération EGRID:', error);
+                    }
+                }
+                
+                // Créer les données avec les informations GeoAdmin
+                const parcelNumber2 = result.attrs.number || extractParcelNumber(result.attrs.label);
+                const cleanedAddress2 = cleanAddress(result.attrs);
+
+                currentData = {
+                    general: {
+                        adresse: cleanedAddress2 || 'Adresse non disponible',
+                        coordonnees: result.attrs.x && result.attrs.y ? 
+                            `${result.attrs.x.toFixed(2)}, ${result.attrs.y.toFixed(2)}` : 
+                            'Coordonnées non disponibles',
+                        systeme_ref: "CH1903+ / LV95 (EPSG:2056)",
+                        date_analyse: new Date().toLocaleDateString('fr-CH'),
+                        type_objet: result.attrs.origin || 'Parcelle'
+                    },
+                    cadastral: {
+                        id_federal: egridComplet,
+                        parcel_number: parcelNumber2 || 'Indisponible',
+                        commune: extractCommune(result.attrs.label),
+                        canton: 'Valais (VS)',
+                        statut: 'Données publiques GeoAdmin',
+                        bbox: result.attrs.geom_st_box2d || 'Non disponible'
+                    },
+                    zonage: {
+                        source: 'Informations disponibles auprès des services communaux',
+                        note: 'Consultation du règlement communal recommandée'
+                    }
+                };
+                
+                // Chercher adresse officielle
+                if (result.attrs.x && result.attrs.y) {
+                    const officialAddress2 = await fetchOfficialAddress(result.attrs.x, result.attrs.y);
+                    if (officialAddress2) currentData.general.adresse = officialAddress2;
+                }
+
+                displayResults(currentData);
+
+            } catch (error) {
+                console.error('Erreur lors de la recherche:', error);
+                showError('Erreur lors de l\'analyse: ' + error.message + '. Veuillez vérifier votre recherche.');
+            }
+        }
+
+        function extractCommune(label) {
+            const communeNames = ['Sion', 'Martigny', 'Chamoson', 'Monthey', 'Sierre', 'Collonges', 'Savièse', 'Fully', 'Vétroz', 'Conthey', 'Ayent', 'Nendaz', 'Val de Bagnes', 'Bagnes'];
+            
+            for (const commune of communeNames) {
+                if (label.toLowerCase().includes(commune.toLowerCase())) {
+                    return commune;
+                }
+            }
+            
+            return 'Commune non identifiée';
+        }
+
+        function displayResults(data) {
+            // S'assurer que les éléments existent avant de les modifier
+            const loading = document.getElementById('loading');
+            const analysisResults = document.getElementById('analysisResults');
+            const generalInfo = document.getElementById('generalInfo');
+            const ownersInfo = document.getElementById('ownersInfo');
+            const cadastralInfo = document.getElementById('cadastralInfo');
+            const zoningInfo = document.getElementById('zoningInfo');
+
+            if (!loading || !analysisResults || !generalInfo || !ownersInfo || !cadastralInfo || !zoningInfo) {
+                console.error('Éléments DOM manquants');
+                showError('Erreur d\'affichage: éléments de page manquants');
+                return;
+            }
+
+            loading.style.display = 'none';
+            analysisResults.style.display = 'block';
+
+            // Informations générales avec cartes modernes
+            generalInfo.innerHTML = `
+                <div class="info-cards-grid">
+                    <div class="info-card-modern animate-slide-in">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">⌖</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">N° de parcelle</div>
+                            <div class="info-card-value">${data.cadastral.parcel_number}</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.1s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🏠</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Adresse postale</div>
+                            <div class="info-card-value" id="addressValue">${data.general.adresse}</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.2s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🏛️</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Commune / Canton</div>
+                            <div class="info-card-value">${data.cadastral.commune} (${data.cadastral.canton})</div>
+                        </div>
+                    </div>
+                    <div class="info-card-modern animate-slide-in" style="animation-delay: 0.3s">
+                        <div class="info-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🌍</div>
+                        <div class="info-card-content">
+                            <div class="info-card-label">Coordonnées</div>
+                            <div class="info-card-value">${data.general.coordonnees}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Carte Google Maps / Street View
+            const mapContainerId = 'streetViewContainer';
+            let latLngUrl = '';
+            let mapContainer = document.getElementById(mapContainerId);
+            if (!mapContainer) {
+                mapContainer = document.createElement('div');
+                mapContainer.id = mapContainerId;
+                mapContainer.style.marginTop = '25px';
+                generalInfo.parentElement?.appendChild(mapContainer);
+            }
+
+            // Conversion LV95 -> WGS84 pour Google Maps
+            function lv95toWgs(easting, northing) {
+                const y = (easting - 2600000) / 1000000;
+                const x = (northing - 1200000) / 1000000;
+                let lat = 16.9023892 + 3.238272 * x - 0.270978 * y * y - 0.002528 * x * x - 0.0447 * y * y * x - 0.0140 * x * x * x;
+                let lng = 2.6779094 + 4.728982 * y + 0.791484 * y * x + 0.1306 * y * x * x - 0.0436 * y * y * y;
+                lat = (lat * 100) / 36;
+                lng = (lng * 100) / 36;
+                return { lat, lng };
+            }
+
+            let coordParts = data.general.coordonnees.split(',').map(p => parseFloat(p.trim()));
+            if (coordParts.length === 2 && !isNaN(coordParts[0]) && !isNaN(coordParts[1])) {
+                // Identifier est/nord : l'est est généralement > 2 500 000
+                let east = coordParts[0];
+                let north = coordParts[1];
+                if (coordParts[0] < coordParts[1]) { // inverser si nécessaire
+                    east = coordParts[1];
+                    north = coordParts[0];
+                }
+
+                const { lat, lng } = lv95toWgs(east, north);
+                latLngUrl = `${lat},${lng}`;
+            } else {
+                // Fallback à l'adresse si conversion impossible
+                latLngUrl = encodeURIComponent(data.general.adresse);
+            }
+
+            mapContainer.innerHTML = `
+                <iframe width="100%" height="450" style="border:0; border-radius:10px;" loading="lazy"
+                    src="https://www.google.com/maps?q=${latLngUrl}&layer=c&output=svembed&z=17">
+                </iframe>`;
+
+            // Mise à jour adresse via reverse-geocoding OSM
+            if (latLngUrl.includes(',')) {
+                const [latStr,lngStr] = latLngUrl.split(',');
+                fetchReverseAddress(latStr.trim(), lngStr.trim()).then(addr => {
+                    if (addr) {
+                        const span = document.getElementById('addressValue');
+                        if (span) span.textContent = addr;
+                    } else {
+                        fetchGoogleAddress(latStr.trim(),lngStr.trim()).then(ga=>{
+                            if(ga){
+                                const span=document.getElementById('addressValue');
+                                if(span) span.textContent=ga;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Masquer complètement les sections détaillées inutiles
+            ['ownersInfo', 'cadastralInfo', 'zoningInfo'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const section = el.closest('.analysis-section');
+                    if (section) section.style.display = 'none';
+                }
+            });
+
+            // Cacher la section potentiel de développement
+            const developmentSection = document.querySelector('#developmentInfo');
+            if (developmentSection) {
+                const parentSection = developmentSection.closest('.analysis-section');
+                if (parentSection) {
+                    parentSection.style.display = 'none';
+                }
+            }
+
+            // Configuration des boutons d'action
+            setupActionButtons(data);
+        }
+
+        function setupActionButtons(data) {
+            // Liste des communes éligibles - mise à jour pour correspondre aux fichiers disponibles
+            const allowed=["Arbaz","Ardon","Ayent","Chamoson","Charrat","Conthey","Martigny","Mase","Mollens","Nax","Nendaz","Riddes","Saillon","Saint-Léonard","Salgesch","Savièse","Saxon","Sierre","Sion","Vernamiège","Vérrossaz","Vétroz"];
+
+            // Gérer le bouton flottant
+            const floatBtn=document.getElementById('floatingAiBtn');
+            if(floatBtn){
+                if(allowed.includes(data.cadastral.commune)){
+                    floatBtn.style.display='flex';
+                    floatBtn.classList.add('show-bubble');
+                }else{
+                    floatBtn.style.display='none';
+                    floatBtn.classList.remove('show-bubble');
+                }
+            }
+
+            // masquer l'ancien bouton IA
+            const aiAnalysisBtn=document.getElementById('aiAnalysisBtn');
+            if(aiAnalysisBtn) aiAnalysisBtn.style.display='none';
+
+            // Bouton RDPPF
+            const rdppfBtn = document.getElementById('rdppfBtn');
+            if (rdppfBtn) {
+                const egridVal = data.cadastral.id_federal;
+
+                if (egridVal && egridVal !== 'Non disponible') {
+                    rdppfBtn.onclick = () => {
+                        window.open(`https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egridVal}&LANG=fr`, '_blank');
+                    };
+                    rdppfBtn.innerHTML = 'Télécharger RDPPF';
+                } else {
+                    rdppfBtn.onclick = () => {
+                        window.open('https://www.rdppf.admin.ch/', '_blank');
+                    };
+                    rdppfBtn.innerHTML = 'RDPPF Général';
+                }
+            }
+
+            // Bouton Règlement Communal
+            const regulationBtn = document.getElementById('regulationBtn');
+            if (regulationBtn) {
+                const communeKey = data.cadastral.commune;
+                
+                // Vérifier si la commune est dans la liste des communes éligibles
+                if (communeKey && allowed.includes(communeKey)) {
+                    regulationBtn.onclick = () => {
+                        window.open(`/api/regulation/${encodeURIComponent(communeKey)}`, '_blank');
+                    };
+                    regulationBtn.style.display = 'inline-flex';
+                    regulationBtn.innerHTML = '📚 Règlement Communal';
+                } else {
+                    regulationBtn.style.display = 'none';
+                }
+            }
+        }
+
+        function generatePDF() {
+            if (!currentData) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // En-tête
+            doc.setFontSize(20);
+            doc.text('Rapport de Parcelle - DDOT', 20, 30);
+            doc.setFontSize(12);
+            doc.text(`Généré le ${new Date().toLocaleDateString('fr-CH')}`, 20, 40);
+            doc.text('Données publiques GeoAdmin', 20, 48);
+
+            // Informations générales
+            doc.setFontSize(16);
+            doc.text('1. Informations Générales', 20, 70);
+            doc.setFontSize(11);
+            doc.text(`Localisation: ${currentData.general.adresse}`, 25, 85);
+            doc.text(`Coordonnées: ${currentData.general.coordonnees}`, 25, 95);
+            doc.text(`Date d'analyse: ${currentData.general.date_analyse}`, 25, 105);
+
+            // Informations cadastrales
+            doc.setFontSize(16);
+            doc.text('2. Informations Cadastrales', 20, 125);
+            doc.setFontSize(11);
+            doc.text(`ID Fédéral: ${currentData.cadastral.id_federal}`, 25, 140);
+            doc.text(`Commune: ${currentData.cadastral.commune}`, 25, 150);
+            doc.text(`Canton: ${currentData.cadastral.canton}`, 25, 160);
+            doc.text(`Source: ${currentData.cadastral.statut}`, 25, 170);
+
+            // Informations importantes
+            doc.setFontSize(16);
+            doc.text('3. Informations Importantes', 20, 190);
+            doc.setFontSize(11);
+            doc.text('• Les données de propriétaires ne sont pas publiques', 25, 205);
+            doc.text('• Contactez le cadastre communal pour les détails', 25, 215);
+            doc.text('• Consultez le règlement communal pour les contraintes', 25, 225);
+
+            // Pied de page
+            doc.setFontSize(8);
+            doc.text('© DDOT - Données publiques GeoAdmin', 20, 285);
+            doc.text('Développé par Blendar Berisha et Oktay Demir, Idée et Marketing par Dylan Taccoz', 105, 285);
+
+            doc.save(`parcelle-${currentData.cadastral.commune}-${currentData.general.date_analyse}.pdf`);
+        }
+
+
+
+        // Fonction pour l'analyse IA automatique des contraintes
+        async function performAIAnalysis() {
+            if (!currentData) {
+                alert('Aucune parcelle sélectionnée');
+                return;
+            }
+
+            const actionBtn = document.getElementById('floatingAiBtn') || document.getElementById('aiAnalysisBtn');
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            
+            if (actionBtn) {
+                actionBtn.disabled = true;
+                actionBtn.innerHTML = '🔄';
+            }
+
+            // Afficher loader dans la zone résultats
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = `
+                <div class="ai-analysis-result">
+                    <div class="section-header">
+                        <div class="section-icon">🤖</div>
+                        <h2 class="section-title">Analyse IA des Contraintes</h2>
+                    </div>
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid #667eea; border-radius: 50%; border-top: 3px solid transparent; animation: spin 1s linear infinite;"></div>
+                        <h4 style="margin-top: 20px; color: #667eea;">Analyse en cours...</h4>
+                    </div>
+                </div>
+            `;
+
+            try {
+                // Fonction de retry pour les erreurs de connexion
+                const fetchWithRetry = async (url, options, retries = 3, delay = 1000) => {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            const response = await fetch(url, options);
+                            if (response.ok || response.status !== 0) {
+                                return response;
+                            }
+                            throw new Error(`HTTP ${response.status}`);
+                        } catch (error) {
+                            if (i === retries - 1) throw error;
+                            console.log(`Tentative ${i + 1} échouée, nouvelle tentative dans ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2; // Backoff exponentiel
+                        }
+                    }
+                };
+
+                const response = await fetchWithRetry('/api/ia-constraints', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        searchQuery: query,
-                        analysisType: 'complete'
+                        searchQuery: currentData.general?.adresse || currentData.cadastral?.id_federal || currentData.cadastral?.commune
                     })
                 });
-                
+
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Erreur HTTP ${response.status}`);
                 }
+
+                const analysisResult = await response.json();
                 
-                const data = await response.json();
-                console.log('✅ Données d'analyse reçues:', data);
+                console.log('Réponse API complète:', analysisResult);
+                console.log('Structure data:', analysisResult.data);
+                console.log('Contraintes:', analysisResult.data?.constraints);
                 
-                currentData = data;
-                displayAnalysisResults(data);
+                displayAIAnalysisResults(analysisResult);
                 
+                // Notification de succès
+                const constraintsCount = analysisResult.data?.constraints?.length || 0;
+                showToast('success', 'Analyse terminée', 
+                    `${constraintsCount} contrainte${constraintsCount > 1 ? 's' : ''} identifiée${constraintsCount > 1 ? 's' : ''} pour cette parcelle.`);
+
             } catch (error) {
-                console.error('❌ Erreur analyse:', error);
-                alert('Erreur lors de l\'analyse: ' + error.message);
+                console.error('Erreur analyse IA:', error);
+                
+                // Notification d'erreur
+                showToast('error', 'Erreur d\'analyse', 
+                    'Impossible de réaliser l\'analyse IA. Veuillez réessayer.');
+                
+                resultsDiv.innerHTML = `
+                    <div class="ai-analysis-result">
+                        <div class="section-header">
+                            <div class="section-icon">❌</div>
+                            <h2 class="section-title">Erreur</h2>
+                        </div>
+                        <div style="padding: 20px; color: #dc3545;">
+                            <p>${error.message}</p>
+                        </div>
+                    </div>
+                `;
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                if (actionBtn) {
+                    actionBtn.disabled = false;
+                    actionBtn.innerHTML = '🤖';
+                }
             }
         }
 
-        // Afficher les résultats
-        function displayAnalysisResults(data) {
-            console.log('📊 Affichage des résultats');
+        function displayAIAnalysisResults(result) {
+            const resultsDiv = document.getElementById('aiAnalysisResults');
             
-            // Masquer le loading et afficher les résultats
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('analysisResults').style.display = 'block';
+            console.log('Résultat API reçu:', result);
             
-            // Afficher un résumé simple
-            const generalInfo = document.getElementById('generalInfo');
-            generalInfo.innerHTML = `
-                <div class="info-item">
-                    <div class="info-label">Recherche effectuée</div>
-                    <div class="info-value">${data.searchQuery || 'N/A'}</div>
+            // Extraire l'analyse avancée depuis la nouvelle API
+            const analysis = result.advancedAnalysis;
+            if (!analysis) {
+                console.error('Aucune analyse avancée trouvée');
+                resultsDiv.innerHTML = `
+                    <div class="ai-analysis-result">
+                        <div class="section-header-modern">
+                            <div class="section-icon-modern">❌</div>
+                            <div class="section-title-content">
+                                <h2 class="section-title-modern">Erreur</h2>
+                                <p class="section-subtitle">Impossible de traiter l'analyse avancée</p>
+                            </div>
+                        </div>
+                    </div>`;
+                return;
+            }
+            
+            console.log('Analyse avancée:', analysis);
+            console.log('Contraintes:', analysis.constraints);
+            console.log('Zone info:', analysis.zoneInfo);
+            
+            // Informations de zone
+            let zoneInfoSection = '';
+            if (analysis.zoneInfo) {
+                const compatibilityColors = {
+                    'excellent': { bg: '#10b981', text: 'Excellent', icon: '✅' },
+                    'good': { bg: '#3b82f6', text: 'Bon', icon: '👍' },
+                    'moderate': { bg: '#f59e0b', text: 'Modéré', icon: '⚠️' },
+                    'difficult': { bg: '#ef4444', text: 'Difficile', icon: '🚨' }
+                };
+                const compatInfo = compatibilityColors[analysis.zoneInfo.compatibility];
+                
+                zoneInfoSection = `
+                    <div class="results-card-modern" style="margin-bottom: 24px;">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">🎯</div>
+                            <div>
+                                <h3 class="card-title-modern">Information de Zone</h3>
+                                <p class="card-subtitle-modern">Zone principale et compatibilité</p>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                                <div>
+                                    <strong>Zone principale:</strong><br>
+                                    <span style="color: #6366f1; font-weight: 600;">${analysis.zoneInfo.mainZone}</span>
+                                </div>
+                                <div>
+                                    <strong>Compatibilité:</strong><br>
+                                    <span style="color: ${compatInfo.bg}; font-weight: 600;">
+                                        ${compatInfo.icon} ${compatInfo.text}
+                                    </span>
+                                </div>
+                            </div>
+                            ${analysis.zoneInfo.subZones.length > 0 ? 
+                                `<div><strong>Sous-zones:</strong> ${analysis.zoneInfo.subZones.join(', ')}</div>` : ''
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Détails de traitement
+            let processingSection = '';
+            if (analysis.processingDetails) {
+                processingSection = `
+                    <div class="results-card-modern" style="margin-bottom: 24px;">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">⚡</div>
+                            <div>
+                                <h3 class="card-title-modern">Analyse Double Niveau</h3>
+                                <p class="card-subtitle-modern">Détails du traitement o3/o3-mini</p>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                <div style="text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: #3b82f6;">
+                                        ${analysis.processingDetails.textAnalysisTime}ms
+                                    </div>
+                                    <div style="font-size: 0.875rem; color: #6b7280;">Analyse texte (o3-mini)</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: #8b5cf6;">
+                                        ${analysis.processingDetails.pdfAnalysisTime}ms
+                                    </div>
+                                    <div style="font-size: 0.875rem; color: #6b7280;">Analyse PDF (o3)</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: #10b981;">
+                                        ${analysis.processingDetails.zoneMatchedConstraints}
+                                    </div>
+                                    <div style="font-size: 0.875rem; color: #6b7280;">Contraintes zone</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: #f59e0b;">
+                                        ${analysis.confidence}%
+                                    </div>
+                                    <div style="font-size: 0.875rem; color: #6b7280;">Confiance globale</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Construire les cartes de contraintes
+            let constraintsCards = '';
+            const categoryIcons = {
+                'zone_affectation': '🏙️',
+                'gabarits_hauteurs': '📏', 
+                'reculs_distances': '📐',
+                'densité_ibus': '⊕',
+                'stationnement': '🚗',
+                'toiture_architecture': '🏠',
+                'espaces_verts': '🌳',
+                'contraintes_environnementales': '🌍',
+                'prescriptions_architecturales': '🎨',
+                'multiple': '🔄'
+            };
+
+            if (analysis.constraints && analysis.constraints.length > 0) {
+                analysis.constraints.forEach((constraint, index) => {
+                    const icon = categoryIcons[constraint.category] || '⊞';
+                    const severity = constraint.severity || 'medium';
+                    const severityColors = {
+                        'high': { bg: '#ef4444', text: 'Critique' },
+                        'medium': { bg: '#f59e0b', text: 'Important' },
+                        'low': { bg: '#10b981', text: 'Information' }
+                    };
+                    const severityInfo = severityColors[severity];
+                    
+                    // Construire les exigences
+                    let requirementsList = '';
+                    if (constraint.requirements && constraint.requirements.length > 0) {
+                        requirementsList = `
+                            <div style="margin-top: 12px;">
+                                <strong>Exigences:</strong>
+                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                    ${constraint.requirements.map(req => `<li>${req}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                    
+                    // Construire les valeurs
+                    let valuesInfo = '';
+                    if (constraint.values) {
+                        if (constraint.values.range) {
+                            valuesInfo = `<div style="margin-top: 8px;"><strong>Valeur:</strong> ${constraint.values.range.min}-${constraint.values.range.max} ${constraint.values.range.unit}</div>`;
+                        } else if (constraint.values.numeric && constraint.values.unit) {
+                            valuesInfo = `<div style="margin-top: 8px;"><strong>Valeur:</strong> ${constraint.values.numeric} ${constraint.values.unit}</div>`;
+                        } else if (constraint.values.text) {
+                            valuesInfo = `<div style="margin-top: 8px;"><strong>Valeur:</strong> ${constraint.values.text}</div>`;
+                        }
+                    }
+                    
+                    // Badge de niveau d'analyse
+                    const analysisLevelBadges = {
+                        'text': { color: '#3b82f6', text: 'Texte', icon: '📝' },
+                        'pdf': { color: '#8b5cf6', text: 'PDF', icon: '📄' },
+                        'combined': { color: '#10b981', text: 'Combiné', icon: '🔄' }
+                    };
+                    const levelInfo = analysisLevelBadges[constraint.analysisLevel] || analysisLevelBadges.text;
+                    
+                    // Zone spécifique
+                    let zoneInfo = '';
+                    if (constraint.zone) {
+                        zoneInfo = `<div style="margin-top: 8px;"><strong>Zone:</strong> <span style="color: #6366f1; font-weight: 600;">${constraint.zone}</span></div>`;
+                    }
+                    
+                    constraintsCards += `
+                        <div class="constraint-card-modern animate-slide-in" style="animation-delay: ${index * 0.1}s">
+                            <div class="constraint-card-header">
+                                <div class="constraint-icon" style="background: linear-gradient(135deg, ${severityInfo.bg}, ${severityInfo.bg}dd);">
+                                    ${icon}
+                                </div>
+                                <div class="constraint-title-section">
+                                    <h3 class="constraint-title">${constraint.title}</h3>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+                                        <span class="constraint-severity severity-${severity}">
+                                            ${severityInfo.text}
+                                        </span>
+                                        <span style="background: ${levelInfo.color}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                            ${levelInfo.icon} ${levelInfo.text}
+                                        </span>
+                                        <span style="background: #f3f4f6; color: #374151; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                            ${constraint.confidence}%
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="constraint-badge severity-${severity}">
+                                    ${severity === 'high' ? '!' : severity === 'medium' ? '⚠' : 'ℹ'}
+                                </div>
+                            </div>
+                            <div class="constraint-card-body">
+                                <p class="constraint-description">${constraint.description}</p>
+                                ${zoneInfo}
+                                ${valuesInfo}
+                                ${requirementsList}
+                                <div class="constraint-source">
+                                    <span class="source-label">Source:</span>
+                                    <span class="source-value">${constraint.source}</span>
+                                    ${constraint.article ? `<span style="margin-left: 8px; color: #6366f1; font-weight: 600;">Art. ${constraint.article}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                constraintsCards = `
+                    <div class="no-constraints-card">
+                        <div class="no-constraints-icon">⌕</div>
+                        <h3>Aucune contrainte détectée</h3>
+                        <p>L'analyse n'a pas identifié de contraintes spécifiques pour cette parcelle.</p>
+                    </div>
+                `;
+            }
+
+            // Construire la synthèse
+            let synthesisSection = '';
+            if (analysis.summary) {
+                synthesisSection = `
+                    <div class="results-card-modern" style="margin-bottom: 24px;">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">📝</div>
+                            <div>
+                                <h3 class="card-title-modern">Synthèse de l'analyse</h3>
+                                <p class="card-subtitle-modern">Résumé des principales contraintes</p>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <p style="line-height: 1.6; color: #374151;">${analysis.summary}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Construire les recommandations
+            let recommendationsSection = '';
+            if (analysis.recommendations && analysis.recommendations.length > 0) {
+                recommendationsSection = `
+                    <div class="results-card-modern" style="margin-bottom: 24px;">
+                        <div class="card-header-modern">
+                            <div class="card-icon-modern">★</div>
+                            <div>
+                                <h3 class="card-title-modern">Recommandations</h3>
+                                <p class="card-subtitle-modern">Actions conseillées</p>
+                            </div>
+                        </div>
+                        <div style="padding: 24px;">
+                            <ul style="margin: 0; padding-left: 20px; line-height: 1.6; color: #374151;">
+                                ${analysis.recommendations.map(rec => `<li style="margin-bottom: 8px;">${rec}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="ai-analysis-result">
+                    <div class="section-header-modern">
+                        <div class="section-icon-modern">🧠</div>
+                        <div class="section-title-content">
+                            <h2 class="section-title-modern">Analyse IA Avancée</h2>
+                            <p class="section-subtitle">${analysis.constraints?.length || 0} contrainte(s) pour ${analysis.zoneInfo?.mainZone || 'la zone'}</p>
+                        </div>
+                        <div class="analysis-badge">
+                            o3 + o3-mini
+                        </div>
+                    </div>
+                    
+                    ${zoneInfoSection}
+                    ${processingSection}
+                    ${synthesisSection}
+                    ${recommendationsSection}
+                    
+                    <div class="section-header-modern" style="margin-top: 32px;">
+                        <div class="section-icon-modern">⊞</div>
+                        <div class="section-title-content">
+                            <h2 class="section-title-modern">Contraintes Filtrées par Zone</h2>
+                            <p class="section-subtitle">Analyse double niveau (texte + PDF) - Zone spécifique uniquement</p>
+                        </div>
+                    </div>
+                    
+                    <div class="constraints-grid">
+                        ${constraintsCards}
+                    </div>
+                </div>`;
+        }
+
+        // === SYSTÈME DE NOTIFICATIONS TOAST ===
+        function showToast(type, title, message, duration = 5000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toastId = 'toast_' + Date.now();
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `toast-modern ${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-label">Type d'analyse</div>
-                    <div class="info-value">${data.analysisType || 'N/A'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Complétude</div>
-                    <div class="info-value">${data.completeness || 0}%</div>
-                </div>
+                <button class="toast-close" onclick="removeToast('${toastId}')">✕</button>
             `;
-            
-            // Si on a des résultats d'analyse IA
-            if (data.constraints) {
-                const aiSection = document.getElementById('aiConstraintsSection');
-                const aiResult = document.getElementById('aiConstraintsResult');
-                
-                aiResult.innerHTML = `<div class="ai-result">${data.constraints}</div>`;
-                aiSection.style.display = 'block';
+
+            container.appendChild(toast);
+
+            // Animation d'apparition
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            // Auto-removal
+            if (duration > 0) {
+                setTimeout(() => removeToast(toastId), duration);
+            }
+
+            return toastId;
+        }
+
+        function removeToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
             }
         }
 
-        // Nouvelle recherche
+        function showLoading() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const loading = document.getElementById('loading');
+            const analysisResults = document.getElementById('analysisResults');
+            
+            if (resultsContainer) resultsContainer.style.display = 'block';
+            if (loading) loading.style.display = 'block';
+            if (analysisResults) analysisResults.style.display = 'none';
+        }
+
+        function showError(message) {
+            const loading = document.getElementById('loading');
+            const analysisResults = document.getElementById('analysisResults');
+            
+            if (loading) loading.style.display = 'none';
+            if (analysisResults) {
+                analysisResults.innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Erreur</h3>
+                        <p>${message}</p>
+                        <button class="action-btn" onclick="newSearch()" style="margin-top: 15px;">
+                            🔄 Nouvelle Recherche
+                        </button>
+                    </div>
+                `;
+                analysisResults.style.display = 'block';
+            }
+        }
+
         function newSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('suggestions').style.display = 'none';
-            document.getElementById('resultsContainer').style.display = 'none';
+            const resultsContainer = document.getElementById('resultsContainer');
+            const searchInput = document.getElementById('searchInput');
+            const floatBtn = document.getElementById('floatingAiBtn');
+            
+            if (resultsContainer) resultsContainer.style.display = 'none';
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+            }
+            if (floatBtn) {
+                floatBtn.style.display = 'none';
+                floatBtn.classList.remove('show-bubble');
+            }
             currentData = null;
-            currentCoordinates = null;
         }
 
-        // Analyse IA
-        async function analyzeWithAI() {
-            if (!currentData) {
-                alert('Effectuez d\'abord une recherche');
-                return;
-            }
-            
-            const aiLoading = document.getElementById('aiLoading');
-            const aiSection = document.getElementById('aiConstraintsSection');
-            
-            aiLoading.style.display = 'block';
-            
+        /* === Authentification sécurisée côté serveur === */
+        // L'authentification est gérée côté serveur avec Passport.js
+        // Redirection vers les pages d'authentification sécurisées
+        function redirectToLogin() {
+            window.location.href = '/login';
+        }
+        
+        function redirectToRegister() {
+            window.location.href = '/register';
+        }
+        
+        function redirectToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        // === Fonctions utilitaires ===
+        function extractParcelNumber(label) {
+            const match = label.replace(/<[^>]+>/g, '').match(/Parcelle\s*(\d+[a-zA-Z0-9\-]*)/i);
+            if (match) return match[1];
+            const num = label.replace(/<[^>]+>/g, '').match(/\b(\d{3,})\b/);
+            return num ? num[1] : null;
+        }
+
+        function cleanAddress(attrs) {
+            // On privilégie le champ detail si disponible
+            if (attrs.detail && attrs.detail.length > 3) return attrs.detail;
+
+            let txt = attrs.label.replace(/<[^>]+>/g, '');
+
+            // Supprimer la mention Parcelle xxx
+            txt = txt.replace(/Parcelle\s*\d+[a-zA-Z0-9\-]*,?/i, '');
+
+            // Supprimer un éventuel code EGRID (CH + chiffres)
+            txt = txt.replace(/\bCH?\d{8,}\b/gi, '');
+
+            // Supprimer un identifiant numérique (5+ chiffres) en début ou fin de chaîne
+            txt = txt.replace(/^\d{5,}\s*/, '').replace(/\s*\d{5,}$/,'');
+
+            // Supprimer les doubles espaces et virgules inutiles
+            txt = txt.replace(/\s{2,}/g, ' ').replace(/,\s*,/g, ',').trim();
+
+            return txt;
+        }
+
+        // Récupérer l'adresse officielle via la couche des adresses GEOAdmin
+        async function fetchOfficialAddress(easting, northing) {
             try {
-                // L'analyse IA est déjà incluse dans la recherche
-                if (currentData.constraints) {
-                    const aiResult = document.getElementById('aiConstraintsResult');
-                    aiResult.innerHTML = `<div class="ai-result">${currentData.constraints}</div>`;
-                    aiSection.style.display = 'block';
-                } else {
-                    alert('Aucune analyse IA disponible');
+                const url = `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?geometry=${easting},${northing}&geometryFormat=geojson&geometryType=esriGeometryPoint&layers=all:ch.swisstopo.amtliches-gebaeudeadressverzeichnis&tolerance=10&mapExtent=${easting-100},${northing-100},${easting+100},${northing+100}&imageDisplay=100,100,96&lang=fr`;
+                const response = await fetch(url);
+                if (!response.ok) return null;
+                const data = await response.json();
+                if (data.results && data.results.length > 0) {
+                    const attrs = data.results[0].attributes || {};
+                    // Champs possibles : "strname1", "strname2", "streetname", "number", "plz", "zip", "localname"...
+                    const street = attrs.strname1 || attrs.streetname || '';
+                    const num = attrs.number || attrs.hausnr || '';
+                    const zip = attrs.plz || attrs.zip || '';
+                    const city = attrs.localname || attrs.locality || attrs.city || '';
+                    if (street && num && zip && city) {
+                        return `${street} ${num}, ${zip} ${city}`;
+                    }
                 }
-            } catch (error) {
-                console.error('❌ Erreur analyse IA:', error);
-                alert('Erreur lors de l\'analyse IA: ' + error.message);
-            } finally {
-                aiLoading.style.display = 'none';
+            } catch (err) {
+                console.error('Erreur fetchOfficialAddress:', err);
             }
+            return null;
         }
 
-        // Génération PDF
-        function generatePDF() {
-            if (!currentData) {
-                alert('Effectuez d\'abord une recherche');
-                return;
-            }
-            
-            alert('Génération PDF - Fonctionnalité en cours de développement');
+        async function fetchReverseAddress(lat, lng) {
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=fr`);
+                if (!resp.ok) return null;
+                const json = await resp.json();
+                if (json && json.address) {
+                    const a = json.address;
+                    const street = a.road || a.street || a.residential || a.path || '';
+                    const num = a.house_number || '';
+                    const postcode = a.postcode || '';
+                    const city = a.city || a.town || a.village || a.hamlet || a.municipality || '';
+                    if (street && num && postcode && city) {
+                        return `${street} ${num}, ${postcode} ${city}`;
+                    }
+                    if (street && postcode && city) {
+                        return `${street}, ${postcode} ${city}`;
+                    }
+                    if (street && city) {
+                        return `${street}, ${city}`;
+                    }
+                    if (json.display_name) {
+                        // fallback: prendre les deux premiers éléments du display_name
+                        const parts = json.display_name.split(',').map(p=>p.trim());
+                        return parts.slice(0,3).join(', ');
+                    }
+                }
+                return null;
+            } catch(e) {console.error('reverse geocode err',e); return null;}
         }
 
-        console.log('✅ JavaScript DDOT chargé');
+        async function fetchGoogleAddress(lat,lng){
+            try{
+                const url=`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=fr&sensor=false`;
+                const resp=await fetch(url);
+                if(!resp.ok) return null;
+                const j=await resp.json();
+                if(j.status==='OK'&&j.results&&j.results.length){
+                    return j.results[0].formatted_address;
+                }
+            }catch(e){console.error('google geocode err',e);}
+            return null;
+        }
     </script>
 </body>
-</html>
+</html> 

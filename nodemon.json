@@ -1,15 +1,24 @@
 {
   "watch": [
+    "server.js",
+    "public/**/*",
     "src/**/*.ts",
     "src/**/*.js",
+    "routes/**/*.js",
+    "routes/**/*.ts",
     "routes-node/**/*.js",
+    "models/**/*.js",
     "models-node/**/*.js",
+    "services/**/*.js",
     "services-node/**/*.js",
+    "config/**/*.js",
+    "utils/**/*.js",
+    "middleware/**/*.js",
     "public/**/*.css",
     "public/**/*.js",
-    "server.js"
+    "views/**/*.ejs"
   ],
-  "ext": "ts,js,json,css",
+  "ext": "ts,js,json,css,ejs,html",
   "ignore": [
     "node_modules/**",
     "dist/**",
@@ -22,12 +31,12 @@
     "uploads/**",
     "cache/**"
   ],
-  "exec": "ts-node --transpile-only ./src/server.ts",
+  "exec": "node",
   "env": {
     "NODE_ENV": "development"
   },
-  "delay": 300,
-  "verbose": false,
+  "delay": 500,
+  "verbose": true,
   "restartable": "rs",
   "legacyWatch": false,
   "signal": "SIGTERM",

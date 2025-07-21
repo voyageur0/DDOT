@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Safari - Serveur DDOT</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .url-list {
+            list-style: none;
+            padding: 0;
+        }
+        .url-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .url-list a {
+            color: #007aff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .url-list a:hover {
+            text-decoration: underline;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test de Connexion Safari - Serveur DDOT</h1>
+        
+        <div class="test-section info">
+            <h3>📋 Informations Système</h3>
+            <p><strong>Navigateur:</strong> <span id="browser-info"></span></p>
+            <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+        </div>
+
+        <div class="test-section warning">
+            <h3>🌐 URLs à Tester</h3>
+            <p>Cliquez sur chaque URL pour tester la connexion:</p>
+            <ul class="url-list">
+                <li><a href="http://localhost:3001" target="_blank">http://localhost:3001</a> (Recommandé)</li>
+                <li><a href="http://127.0.0.1:3001" target="_blank">http://127.0.0.1:3001</a> (Alternative)</li>
+                <li><a href="http://0.0.0.0:3001" target="_blank">http://0.0.0.0:3001</a> (Toutes interfaces)</li>
+            </ul>
+        </div>
+
+        <div class="test-section info">
+            <h3>🔧 Tests Automatiques</h3>
+            <button onclick="testConnection()">Tester la Connexion</button>
+            <button onclick="testAPI()">Tester l'API</button>
+            <button onclick="clearResults()">Effacer les Résultats</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Informations système
+        document.getElementById('browser-info').textContent = navigator.userAgent.includes('Safari') ? 'Safari ✅' : 'Autre navigateur';
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        function addResult(title, message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-section ${type}`;
+            div.innerHTML = `<h4>${title}</h4><p>${message}</p>`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testConnection() {
+            const urls = [
+                'http://localhost:3001',
+                'http://127.0.0.1:3001',
+                'http://0.0.0.0:3001'
+            ];
+
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        addResult(`✅ Connexion réussie: ${url}`, 
+                            `Status: ${response.status} - ${response.statusText}`, 'success');
+                    } else {
+                        addResult(`❌ Erreur de connexion: ${url}`, 
+                            `Status: ${response.status} - ${response.statusText}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ Échec de connexion: ${url}`, 
+                        `Erreur: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:3001/api/geoadmin-search?searchText=test&limit=1');
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ API Test Réussi', 
+                        `L'API fonctionne correctement. Réponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    addResult('❌ API Test Échoué', 
+                        `Status: ${response.status} - ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ API Test Échoué', 
+                    `Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            setTimeout(() => {
+                testConnection();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

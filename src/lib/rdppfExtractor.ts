@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import axios from 'axios';
-import pdfParse from 'pdf-parse';
+const pdfParse = require('pdf-parse');
 import { callOpenAI } from '../utils/openai';
 
 export interface RdppfConstraint {
@@ -166,13 +166,95 @@ const SYSTEM_PROMPT = `Vous êtes un juriste spécialisé en droit de la constru
 
 Thèmes: Identification, Destination de zone, Indice d'utilisation (IBUS), Gabarits & reculs, Toiture, Stationnement, Espaces de jeux / détente, Prescriptions architecturales.
 
-IMPORTANT: Le champ "rule" doit être une DESCRIPTION TEXTUELLE complète, pas un objet structuré.
+IMPORTANT: 
+1. Le champ "rule" doit être une DESCRIPTION TEXTUELLE complète, pas un objet structuré.
+2. Pour la "Destination de zone", extraire EXACTEMENT la dénomination complète de la zone telle qu'elle apparaît dans le document.
+   - La zone principale doit être extraite en premier (ex: "Zone résidentielle 0.5 (3)")
+   - Ajouter ensuite la surface et le pourcentage si disponibles
+   - Format attendu: "Zone résidentielle 0.5 (3), Surface: 862 m², 100.0%"
+3. NE PAS inclure les zones de dangers (avalanches, inondations, etc.) SAUF si elles sont explicitement mentionnées dans le RDPPF.
+4. Extraire la surface de la parcelle si disponible.
+5. TOUJOURS extraire le degré de sensibilité au bruit s'il est présent (ex: "Degré de sensibilité II").
+6. Si plusieurs zones sont présentes, créer une contrainte séparée pour chaque zone avec son pourcentage respectif.
 
 Format: [{"theme":"<thème>","rule":"<description textuelle complète>"}, …]
 
 Exemple:
-- Correct: {"theme":"Identification","rule":"Immeuble n° 12558, Commune de Vétroz, Surface 862 m², E-GRID CH773017495270"}
-- Incorrect: {"theme":"Identification","rule":{"No":"12558","Commune":"Vétroz"}}`;
+- Correct: {"theme":"Destination de zone","rule":"Zone résidentielle 0.5 (3), Surface: 862 m², 100.0%"}
+- Correct: {"theme":"Prescriptions architecturales","rule":"Degré de sensibilité au bruit: II, Surface: 2257 m², 100.0%"}
+- Incorrect: {"theme":"Destination de zone","rule":{"type":"Zone résidentielle","indice":"0.5"}}`;
+
+/**
+ * Extrait les sections pertinentes du texte RDPPF
+ */
+function extractRelevantSectionsFromText(fullText: string): string {
+  const lines = fullText.split('\n');
+  const relevantLines: string[] = [];
+  let inRelevantSection = false;
+  let captureAll = false;
+  let zoneSection = false;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const nextLine = lines[i + 1] || '';
+    
+    // Détecter les sections importantes
+    if (line.includes('Plans d\'affectation') || 
+        line.includes('Affectation primaire') ||
+        line.includes('Légende des objets touchés') ||
+        line.includes('Zones communales d\'affectation')) {
+      inRelevantSection = true;
+      captureAll = true;
+      zoneSection = true;
+    }
+    
+    // Détecter spécifiquement les zones
+    if (line.includes('Degré de sensibilité') ||
+        line.includes('Zone résidentielle') ||
+        line.includes('Zone à bâtir') ||
+        line.includes('Zone d\'habitation') ||
+        line.includes('Zone mixte') ||
+        line.includes('Zone centre')) {
+      inRelevantSection = true;
+      zoneSection = true;
+    }
+    
+    // Capturer les lignes avec des surfaces et pourcentages
+    if (line.match(/\d+\s*m[²2]/) || line.match(/\d+\.\d+\s*%/)) {
+      inRelevantSection = true;
+    }
+    
+    // Collecter les lignes pertinentes
+    if (inRelevantSection && line.trim().length > 0) {
+      relevantLines.push(line);
+      
+      // Si on est dans une section de zone, capturer aussi la ligne suivante
+      // car souvent la surface est sur la ligne suivante
+      if (zoneSection && nextLine.trim().length > 0) {
+        relevantLines.push(nextLine);
+        i++; // Skip la ligne suivante dans la boucle
+      }
+    }
+    
+    // Arrêter après les dispositions juridiques si on a assez de contenu
+    if (line.includes('Dispositions juridiques') && captureAll) {
+      relevantLines.push(line);
+      // Capturer encore quelques lignes pour les références
+      for (let j = 0; j < 10 && lines[i + j + 1]; j++) {
+        relevantLines.push(lines[i + j + 1]);
+      }
+      break;
+    }
+    
+    // Reset si on change de section
+    if (line.includes('Page') && !captureAll) {
+      inRelevantSection = false;
+      zoneSection = false;
+    }
+  }
+  
+  return relevantLines.join('\n');
+}
 
 /**
  * Analyse le texte du RDPPF et renvoie un tableau de contraintes structurées.
@@ -182,10 +264,13 @@ export async function extractRdppfConstraints(rawText: string): Promise<RdppfCon
   if (!rawText || rawText.length < 50) return [];
 
   console.log(`🔍 Analyse RDPPF complète avec GPT-4.1: ${rawText.length} caractères`);
+  
+  // Extraire les sections pertinentes pour une meilleure analyse
+  const relevantSections = extractRelevantSectionsFromText(rawText);
 
   const messages: any = [
     { role: 'system', content: SYSTEM_PROMPT },
-    { role: 'user', content: rawText } // Analyse du document RDPPF complet !
+    { role: 'user', content: relevantSections } // Analyse des sections pertinentes
   ];
 
   try {

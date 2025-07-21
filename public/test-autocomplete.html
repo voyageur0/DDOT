@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Autocomplétion</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: #0070f3;
+        }
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+            margin-top: 4px;
+        }
+        .autocomplete-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .autocomplete-item:hover {
+            background-color: #f8f9fa;
+        }
+        .autocomplete-item.selected {
+            background-color: #e3f2fd;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de l'Autocomplétion</h1>
+    
+    <div class="search-container">
+        <input type="text" class="search-input" id="testInput" placeholder="Tapez 'sion' pour tester...">
+    </div>
+    
+    <div id="status"></div>
+    
+    <div id="results"></div>
+
+    <script src="/js/autocomplete.js"></script>
+    <script>
+        let autocompleteManager = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const testInput = document.getElementById('testInput');
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            // Initialiser l'autocomplétion
+            autocompleteManager = new AutocompleteManager(
+                '#testInput',
+                '.search-container',
+                {
+                    minLength: 2,
+                    maxResults: 5,
+                    debounceDelay: 300,
+                    cacheResults: true
+                }
+            );
+            
+            // Écouter les événements de sélection
+            testInput.addEventListener('suggestion-selected', function(e) {
+                showStatus('success', `Suggestion sélectionnée: ${e.suggestionValue}`);
+                
+                if (e.suggestionData) {
+                    showResults(e.suggestionData);
+                }
+            });
+            
+            // Test des API
+            testAPIs();
+        });
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function showResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <h3>Données reçues:</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+        
+        async function testAPIs() {
+            try {
+                // Test de l'API GeoAdmin
+                const geoadminResponse = await fetch('/api/geoadmin-search?searchText=sion&limit=2');
+                if (geoadminResponse.ok) {
+                    const geoadminData = await geoadminResponse.json();
+                    showStatus('success', `API GeoAdmin OK - ${geoadminData.results?.length || 0} résultats`);
+                } else {
+                    showStatus('error', `API GeoAdmin erreur: ${geoadminResponse.status}`);
+                }
+                
+                // Test de l'API Suggestions
+                const suggestionsResponse = await fetch('/api/suggestions?q=sion&limit=2');
+                if (suggestionsResponse.ok) {
+                    const suggestionsData = await suggestionsResponse.json();
+                    showStatus('info', `API Suggestions OK - ${suggestionsData.suggestions?.length || 0} suggestions`);
+                } else {
+                    showStatus('error', `API Suggestions erreur: ${suggestionsResponse.status}`);
+                }
+                
+            } catch (error) {
+                showStatus('error', `Erreur de test: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html> 
