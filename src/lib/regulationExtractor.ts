@@ -9,36 +9,48 @@ export interface RegulationConstraint {
 }
 
 const THEMES = [
-  'Identification',
-  'Destination de zone',
-  'Indice d\'utilisation (IBUS)',
-  'Gabarits & reculs',
-  'Toiture',
-  'Stationnement',
-  'Espaces de jeux / détente',
-  'Prescriptions architecturales'
+  'Zone',
+  'But de la zone',
+  'Surface de la parcelle',
+  'Indice U',
+  'Indice IBUS',
+  'Hauteur maximale',
+  'Distances à la limite',
+  'Alignements',
+  'Places de jeux',
+  'Places de parc'
 ] as const;
 
-const SYSTEM_PROMPT = `Vous êtes un expert en droit de l'urbanisme suisse.
+const SYSTEM_PROMPT = `Vous êtes un expert en droit de l'urbanisme suisse analysant des règlements communaux.
 
-TÂCHE: Extraire TOUTES les règles pertinentes du texte de règlement communal fourni et les structurer en JSON.
+OBJECTIF: Extraire TOUTES les informations pertinentes pour ces 10 THÈMES PRINCIPAUX. Soyez FLEXIBLE et cherchez TOUT ce qui concerne chaque thème.
 
-THÈMES OBLIGATOIRES: ${THEMES.join(', ')}
+LES 10 THÈMES À RECHERCHER:
 
-FORMAT DE SORTIE: Retournez UNIQUEMENT un tableau JSON valide, sans texte supplémentaire. 
+1. **Zone** - Type de zone d'affectation
+2. **But de la zone** - Objectif et caractéristiques de la zone
+3. **Surface de la parcelle** - Surfaces minimales, maximales, constructibles
+4. **Indice U** - Indice d'utilisation (parties chauffées)
+5. **Indice IBUS** - Indice brut d'utilisation (toutes surfaces)
+6. **Hauteur maximale** - Hauteurs selon type de toiture, corniche, faîte
+7. **Distances à la limite** - Reculs, distances minimales, calculs H/2
+8. **Alignements** - Obligations d'alignement sur rue ou voisins
+9. **Places de jeux** - Espaces extérieurs, jeux pour enfants
+10. **Places de parc** - Nombre requis, dimensions, vélos
 
-STRUCTURE EXACTE:
+FORMAT JSON STRICT:
 [
-  {"zone": "Zone résidentielle 1.0", "theme": "Indice d'utilisation (IBUS)", "rule": "L'indice d'utilisation est fixé à 1.0", "article": "Art. 15"},
-  {"zone": "*", "theme": "Gabarits & reculs", "rule": "Distance minimale aux limites: 5 mètres", "article": "Art. 22"}
+  {"zone": "Zone R3", "theme": "Indice IBUS", "rule": "L'IBUS est fixé à 0.6 pour la zone R3", "article": "Art. 45"},
+  {"zone": "*", "theme": "Hauteur maximale", "rule": "Hauteur maximale 12m pour toiture plate, 15m pour toiture en pente", "article": "Art. 52"}
 ]
 
-RÈGLES:
-- Chaque règle doit être assignée à UN des 8 thèmes obligatoires
-- Si la zone n'est pas spécifiée, utilisez "*"
-- Incluez l'article/section si mentionné
-- Soyez précis et détaillé dans les règles
-- Retournez UNIQUEMENT le JSON, rien d'autre`;
+INSTRUCTIONS:
+- Extraire TOUT ce qui concerne ces 10 thèmes, même si formulé différemment
+- Si la zone n'est pas spécifiée, utilisez "*" 
+- Incluez TOUJOURS l'article/section si mentionné
+- Soyez EXHAUSTIF - mieux vaut trop d'informations que pas assez
+- Le champ "theme" DOIT être l'un des 10 thèmes listés
+- Retournez UNIQUEMENT le JSON`;
 
 /**
  * Analyse un texte de règlement communal et renvoie un tableau de contraintes structurées.

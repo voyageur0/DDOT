@@ -235,20 +235,59 @@ export function formaterResultatsValais(calcul: ValaisDensityCalculation): strin
 export function extraireIndicesReglement(texteReglement: string): { indiceU?: number; indiceIBUS?: number } {
   const result: { indiceU?: number; indiceIBUS?: number } = {};
   
-  // Patterns pour extraire les indices
-  const patternU = /indice\s+u[^0-9]*([0-9]+[.,][0-9]+)/gi;
-  const patternIBUS = /ibus[^0-9]*([0-9]+[.,][0-9]+)/gi;
+  // Patterns améliorés pour extraire les indices
+  // Recherche indice U avec différentes formulations possibles
+  const patternsU = [
+    /indice\s+u[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /indice\s+d['']utilisation\s+du\s+sol[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /coefficient\s+u[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /u\s*[:=]\s*([0-9]+[.,][0-9]+)/gi
+  ];
+  
+  // Recherche indice IBUS avec différentes formulations
+  const patternsIBUS = [
+    /ibus[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /indice\s+brut\s+d['']utilisation\s+du\s+sol[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /indice\s+IBUS[^0-9]*([0-9]+[.,][0-9]+)/gi,
+    /IBUS\s*[:=]\s*([0-9]+[.,][0-9]+)/gi,
+    /IBUS\s+de\s+([0-9]+[.,][0-9]+)/gi,
+    /fixé\s+à\s+([0-9]+[.,][0-9]+)\s*.*IBUS/gi,
+    /IBUS.*fixé\s+à\s+([0-9]+[.,][0-9]+)/gi
+  ];
   
   // Recherche indice U
-  const matchU = patternU.exec(texteReglement);
-  if (matchU) {
-    result.indiceU = parseFloat(matchU[1].replace(',', '.'));
+  for (const pattern of patternsU) {
+    const matchU = pattern.exec(texteReglement);
+    if (matchU) {
+      const value = parseFloat(matchU[1].replace(',', '.'));
+      if (value > 0 && value < 5) { // Valeurs raisonnables pour un indice U
+        result.indiceU = value;
+        console.log(`📊 Indice U trouvé: ${value} (pattern: ${pattern.source})`);
+        break;
+      }
+    }
   }
   
   // Recherche indice IBUS
-  const matchIBUS = patternIBUS.exec(texteReglement);
-  if (matchIBUS) {
-    result.indiceIBUS = parseFloat(matchIBUS[1].replace(',', '.'));
+  for (const pattern of patternsIBUS) {
+    const matchIBUS = pattern.exec(texteReglement);
+    if (matchIBUS) {
+      const value = parseFloat(matchIBUS[1].replace(',', '.'));
+      if (value > 0 && value < 5) { // Valeurs raisonnables pour un IBUS
+        result.indiceIBUS = value;
+        console.log(`📊 IBUS trouvé: ${value} (pattern: ${pattern.source})`);
+        break;
+      }
+    }
+  }
+  
+  // Si on n'a trouvé qu'un seul des deux indices, essayer de déduire l'autre
+  if (result.indiceU && !result.indiceIBUS) {
+    const ibusConverti = convertirUVersIBUS(result.indiceU);
+    if (ibusConverti) {
+      result.indiceIBUS = ibusConverti;
+      console.log(`📊 IBUS déduit de U: ${ibusConverti.toFixed(2)}`);
+    }
   }
   
   return result;

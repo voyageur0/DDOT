@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Analyse Vétroz - DDOT</title>
+    <style>
+        :root {
+            --primary: #0070f3;
+            --accent: #00d4aa;
+            --surface: #ffffff;
+            --background: #f9fafb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-light: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .search-button {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .search-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #aiAnalysisResults {
+            min-height: 200px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #ef4444;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="margin: 0; color: var(--primary);">Test Analyse IA - DDOT</h1>
+            <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">
+                Test de l'analyse conversationnelle pour Vétroz
+            </p>
+        </div>
+        
+        <div class="search-form">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Ex: Route du Léman 1, Vétroz"
+                value="Route du Léman 1, Vétroz"
+            >
+            <button id="analyzeBtn" class="search-button" onclick="performAnalysis()">
+                Analyser la parcelle
+            </button>
+        </div>
+        
+        <div id="aiAnalysisResults"></div>
+    </div>
+    
+    <!-- Import des scripts nécessaires -->
+    <script src="/js/ai-analysis-enhanced-v2.js"></script>
+    
+    <script>
+        // Variables globales nécessaires
+        window.currentData = {};
+        window.showToast = function(type, title, message) {
+            console.log(`[${type}] ${title}: ${message}`);
+        };
+        
+        async function performAnalysis() {
+            const searchQuery = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('aiAnalysisResults');
+            const button = document.getElementById('analyzeBtn');
+            
+            if (!searchQuery) {
+                resultsDiv.innerHTML = '<div class="error">Veuillez entrer une adresse ou un numéro de parcelle</div>';
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Analyse en cours...';
+            resultsDiv.innerHTML = '<div class="loading">🔍 Recherche et analyse en cours...</div>';
+            
+            try {
+                const response = await fetch('/api/ia-constraints', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        searchQuery: searchQuery,
+                        analysisType: 'complete',
+                        useConversational: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Utiliser la fonction d'affichage du fichier ai-analysis-enhanced-v2.js
+                    if (window.displayAIAnalysisResults) {
+                        window.displayAIAnalysisResults(result);
+                    } else {
+                        resultsDiv.innerHTML = '<pre>' + JSON.stringify(result, null, 2) + '</pre>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <strong>Erreur:</strong> ${result.error || 'Une erreur est survenue'}<br>
+                            ${result.details ? `<small>${result.details}</small>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Erreur de connexion:</strong> ${error.message}
+                    </div>
+                `;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Analyser la parcelle';
+            }
+        }
+        
+        // Fonction helper pour formater l'analyse conversationnelle
+        function formatConversationalAnalysis(text) {
+            if (!text) return '';
+            
+            // Cette fonction est définie dans ai-analysis-enhanced-v2.js
+            // On la laisse ici au cas où
+            return text.split('\n\n').map(p => `<p>${p}</p>`).join('');
+        }
+    </script>
+</body>
+</html>

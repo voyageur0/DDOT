@@ -177,20 +177,96 @@ export async function callOpenAI(params: {
   temperature?: number;
   messages: { role: 'system' | 'user' | 'assistant'; content: string }[];
   max_tokens?: number;
+  reasoning_effort?: 'low' | 'medium' | 'high';
 }) {
-  const {
-    model = 'gpt-4o-mini',
+  let {
+    model = 'gpt-4o',
     temperature = 0,
     messages,
-    max_tokens = 1000
+    max_tokens = 1000,
+    reasoning_effort = 'medium'
   } = params;
 
-  return await exponentialRetry(async () => {
-    return await openai.chat.completions.create({
-      model,
-      temperature,
-      messages,
-      max_tokens
-    });
-  });
+  // Log du modèle utilisé
+  console.log(`🤖 Utilisation du modèle: ${model}`);
+
+  try {
+    // Les modèles o1 et o3 ont des restrictions spéciales
+    const isO3Model = model === 'o3' || model === 'o3-mini';
+    const isO1Model = model === 'o1' || model === 'o1-mini';
+    const isReasoningModel = isO3Model || isO1Model;
+    
+    if (isReasoningModel) {
+      // Modèles de raisonnement: pas de system message, pas de temperature
+      console.log(`🧠 Modèle de raisonnement ${model} avec effort: ${reasoning_effort}`);
+      
+      // Convertir le system message en user message
+      const reasoningMessages = messages.map(msg => {
+        if (msg.role === 'system') {
+          return { 
+            role: 'user' as const, 
+            content: `Instructions: ${msg.content}\n\n` 
+          };
+        }
+        return msg;
+      });
+      
+      // Fusionner les messages user consécutifs
+      const mergedMessages: typeof messages = [];
+      for (const msg of reasoningMessages) {
+        if (msg.role === 'user' && mergedMessages.length > 0 && mergedMessages[mergedMessages.length - 1].role === 'user') {
+          mergedMessages[mergedMessages.length - 1].content += '\n\n' + msg.content;
+        } else {
+          mergedMessages.push(msg);
+        }
+      }
+      
+      // Pour o3/o3-mini, utiliser reasoning_effort
+      if (isO3Model) {
+        return await exponentialRetry(async () => {
+          const requestParams: any = {
+            model,
+            messages: mergedMessages,
+            reasoning_effort
+          };
+          
+          console.log(`📊 Appel o3 avec reasoning_effort=${reasoning_effort}`);
+          return await openai.chat.completions.create(requestParams);
+        });
+      } else {
+        // Pour o1/o1-mini, on peut utiliser max_completion_tokens
+        return await exponentialRetry(async () => {
+          return await openai.chat.completions.create({
+            model,
+            messages: mergedMessages,
+            max_completion_tokens: Math.min(max_tokens, 32768)
+          });
+        });
+      }
+    } else {
+      // Modèles standards (gpt-4o, etc.)
+      return await exponentialRetry(async () => {
+        return await openai.chat.completions.create({
+          model,
+          temperature,
+          messages,
+          max_tokens
+        });
+      });
+    }
+  } catch (error: any) {
+    // Fallback vers gpt-4o si le modèle n'est pas disponible
+    if (error.status === 404 || error.status === 400) {
+      console.log(`⚠️ Modèle ${model} non disponible ou erreur, fallback vers gpt-4o`);
+      return await exponentialRetry(async () => {
+        return await openai.chat.completions.create({
+          model: 'gpt-4o',
+          temperature,
+          messages,
+          max_tokens
+        });
+      });
+    }
+    throw error;
+  }
 } 

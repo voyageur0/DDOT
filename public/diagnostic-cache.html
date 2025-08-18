@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Cache DDOT</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        .file-info {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success { color: #28a745; }
+        .warning { color: #ffc107; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostic Cache DDOT</h1>
+        
+        <div class="section">
+            <h2>📊 État du Navigateur</h2>
+            <div id="browser-info" class="loading">Chargement...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📁 Versions des Fichiers</h2>
+            <div id="file-versions" class="loading">Chargement...</div>
+        </div>
+        
+        <div class="section">
+            <h2>🔄 État du Cache</h2>
+            <div id="cache-status" class="loading">Chargement...</div>
+        </div>
+        
+        <div class="section">
+            <h2>🎮 Vérification des Thèmes de Jeux</h2>
+            <div id="game-themes" class="loading">Chargement...</div>
+        </div>
+        
+        <div class="action-buttons">
+            <button onclick="forceRefresh()">🔄 Forcer le Rafraîchissement</button>
+            <button onclick="clearAllCache()">🗑️ Vider Tout le Cache</button>
+            <button onclick="checkSearchSystem()">🎯 Tester le Système de Recherche</button>
+            <button onclick="location.reload(true)">🔃 Recharger la Page</button>
+        </div>
+        
+        <div class="section" style="margin-top: 20px;">
+            <h2>📝 Journal des Actions</h2>
+            <div id="action-log"></div>
+        </div>
+    </div>
+
+    <script>
+        const log = (message, type = 'info') => {
+            const logDiv = document.getElementById('action-log');
+            const entry = document.createElement('div');
+            entry.className = `file-info ${type}`;
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+        };
+
+        // Informations du navigateur
+        async function checkBrowserInfo() {
+            const info = document.getElementById('browser-info');
+            info.innerHTML = `
+                <div class="file-info">
+                    <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                    <strong>Langue:</strong> ${navigator.language}<br>
+                    <strong>En ligne:</strong> ${navigator.onLine ? '✅ Oui' : '❌ Non'}<br>
+                    <strong>Cookies activés:</strong> ${navigator.cookieEnabled ? '✅ Oui' : '❌ Non'}<br>
+                    <strong>LocalStorage disponible:</strong> ${typeof(Storage) !== "undefined" ? '✅ Oui' : '❌ Non'}
+                </div>
+            `;
+        }
+
+        // Vérifier les versions des fichiers
+        async function checkFileVersions() {
+            const div = document.getElementById('file-versions');
+            try {
+                const response = await fetch('/api/diagnostic/file-versions?' + Date.now());
+                const data = await response.json();
+                
+                let html = '<div class="file-info">';
+                html += `<strong>Timestamp serveur:</strong> ${data.timestamp}<br>`;
+                html += `<strong>Environnement:</strong> ${data.nodeEnv || 'development'}<br>`;
+                html += `<strong>Headers cache:</strong> ${data.cacheHeaders}<br>`;
+                html += '</div>';
+                
+                for (const [file, info] of Object.entries(data.files)) {
+                    html += '<div class="file-info">';
+                    if (info.exists) {
+                        html += `<strong class="success">✅ ${file}</strong><br>`;
+                        html += `Hash: ${info.hash}<br>`;
+                        html += `Taille: ${(info.size / 1024).toFixed(2)} KB<br>`;
+                        html += `Modifié: ${new Date(info.modified).toLocaleString()}`;
+                    } else {
+                        html += `<strong class="error">❌ ${file}</strong> - Fichier non trouvé`;
+                    }
+                    html += '</div>';
+                }
+                
+                div.innerHTML = html;
+                log('Versions des fichiers chargées', 'success');
+            } catch (error) {
+                div.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                log('Erreur lors du chargement des versions: ' + error.message, 'error');
+            }
+        }
+
+        // Vérifier l'état du cache
+        async function checkCacheStatus() {
+            const div = document.getElementById('cache-status');
+            let html = '<div class="file-info">';
+            
+            // Vérifier le cache du navigateur
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    html += `<strong>Caches disponibles:</strong> ${cacheNames.length > 0 ? cacheNames.join(', ') : 'Aucun'}<br>`;
+                } catch (e) {
+                    html += `<strong>Cache API:</strong> <span class="error">Erreur d'accès</span><br>`;
+                }
+            } else {
+                html += `<strong>Cache API:</strong> <span class="warning">Non supporté</span><br>`;
+            }
+            
+            // Vérifier le localStorage
+            try {
+                const lsSize = JSON.stringify(localStorage).length;
+                html += `<strong>LocalStorage:</strong> ${(lsSize / 1024).toFixed(2)} KB utilisés<br>`;
+                html += `<strong>Éléments dans localStorage:</strong> ${Object.keys(localStorage).length}<br>`;
+            } catch (e) {
+                html += `<strong>LocalStorage:</strong> <span class="error">Erreur d'accès</span><br>`;
+            }
+            
+            // Vérifier sessionStorage
+            try {
+                const ssSize = JSON.stringify(sessionStorage).length;
+                html += `<strong>SessionStorage:</strong> ${(ssSize / 1024).toFixed(2)} KB utilisés<br>`;
+            } catch (e) {
+                html += `<strong>SessionStorage:</strong> <span class="error">Erreur d'accès</span><br>`;
+            }
+            
+            html += '</div>';
+            div.innerHTML = html;
+        }
+
+        // Vérifier les thèmes de jeux
+        async function checkGameThemes() {
+            const div = document.getElementById('game-themes');
+            try {
+                // Charger le fichier search-system.js pour vérifier les thèmes
+                const scriptUrl = `/js/search-system.js?v=${Date.now()}`;
+                const response = await fetch(scriptUrl);
+                const scriptContent = await response.text();
+                
+                // Rechercher les thèmes dans le code
+                const themeMatch = scriptContent.match(/const\s+gameThemes\s*=\s*\[([\s\S]*?)\];/);
+                
+                if (themeMatch) {
+                    const themes = eval('[' + themeMatch[1] + ']');
+                    let html = '<div class="file-info success">';
+                    html += `<strong>✅ ${themes.length} thèmes de jeux trouvés:</strong><br>`;
+                    themes.forEach((theme, index) => {
+                        html += `${index + 1}. ${theme}<br>`;
+                    });
+                    html += '</div>';
+                    
+                    // Vérifier aussi le système de rotation
+                    if (scriptContent.includes('currentThemeIndex')) {
+                        html += '<div class="file-info success">✅ Système de rotation des thèmes détecté</div>';
+                    }
+                    
+                    div.innerHTML = html;
+                    log(`${themes.length} thèmes de jeux détectés`, 'success');
+                } else {
+                    div.innerHTML = '<div class="file-info error">❌ Aucun thème de jeu trouvé dans search-system.js</div>';
+                    log('Aucun thème trouvé', 'error');
+                }
+            } catch (error) {
+                div.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                log('Erreur lors de la vérification des thèmes: ' + error.message, 'error');
+            }
+        }
+
+        // Forcer le rafraîchissement
+        async function forceRefresh() {
+            log('Forçage du rafraîchissement...', 'info');
+            try {
+                const response = await fetch('/api/force-refresh');
+                const data = await response.json();
+                log(`Rafraîchissement forcé - Version: ${data.cacheVersion}`, 'success');
+                
+                // Vider les caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    log('Caches du navigateur vidés', 'success');
+                }
+                
+                setTimeout(() => {
+                    log('Rechargement de la page...', 'info');
+                    location.reload(true);
+                }, 1000);
+            } catch (error) {
+                log('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Vider tout le cache
+        async function clearAllCache() {
+            log('Vidage de tous les caches...', 'info');
+            
+            // Vider le cache navigateur
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    log('✅ Cache navigateur vidé', 'success');
+                } catch (e) {
+                    log('❌ Erreur cache navigateur: ' + e.message, 'error');
+                }
+            }
+            
+            // Vider localStorage
+            try {
+                localStorage.clear();
+                log('✅ LocalStorage vidé', 'success');
+            } catch (e) {
+                log('❌ Erreur localStorage: ' + e.message, 'error');
+            }
+            
+            // Vider sessionStorage
+            try {
+                sessionStorage.clear();
+                log('✅ SessionStorage vidé', 'success');
+            } catch (e) {
+                log('❌ Erreur sessionStorage: ' + e.message, 'error');
+            }
+            
+            // Recharger les données
+            setTimeout(() => {
+                checkCacheStatus();
+            }, 500);
+        }
+
+        // Tester le système de recherche
+        async function checkSearchSystem() {
+            log('Test du système de recherche...', 'info');
+            try {
+                // Créer un script temporaire pour tester
+                const script = document.createElement('script');
+                script.src = `/js/search-system.js?v=${Date.now()}`;
+                script.onload = () => {
+                    if (typeof window.initializeSearch === 'function') {
+                        log('✅ Fonction initializeSearch trouvée', 'success');
+                    } else {
+                        log('❌ Fonction initializeSearch non trouvée', 'error');
+                    }
+                    
+                    // Vérifier d'autres éléments
+                    if (window.gameThemes) {
+                        log(`✅ ${window.gameThemes.length} thèmes de jeux chargés`, 'success');
+                    }
+                };
+                script.onerror = () => {
+                    log('❌ Erreur de chargement du script', 'error');
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                log('Erreur: ' + error.message, 'error');
+            }
+        }
+
+        // Initialiser les vérifications
+        window.onload = async () => {
+            await checkBrowserInfo();
+            await checkFileVersions();
+            await checkCacheStatus();
+            await checkGameThemes();
+            log('Diagnostic initialisé', 'info');
+        };
+
+        // Rafraîchir automatiquement toutes les 10 secondes
+        setInterval(() => {
+            checkFileVersions();
+            checkCacheStatus();
+        }, 10000);
+    </script>
+</body>
+</html>

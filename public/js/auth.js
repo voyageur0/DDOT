@@ -19,7 +19,12 @@ class AuthManager {
       if (response.ok) {
         this.user = await response.json();
         this.isAuthenticated = true;
+      } else if (response.status === 401) {
+        // 401 est normal si non authentifié - pas une erreur
+        this.user = null;
+        this.isAuthenticated = false;
       } else {
+        console.warn('Réponse auth inattendue:', response.status);
         this.user = null;
         this.isAuthenticated = false;
       }
@@ -27,7 +32,8 @@ class AuthManager {
       this.notifyListeners();
       this.updateUI();
     } catch (error) {
-      console.error('Erreur lors de la vérification auth:', error);
+      // Erreur réseau uniquement - pas les 401
+      console.error('Erreur réseau lors de la vérification auth:', error);
       this.user = null;
       this.isAuthenticated = false;
       this.notifyListeners();

@@ -1,0 +1,449 @@
+{
+  "data": {
+    "constraints": [
+      {
+        "id": "pdf_4",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Matériaux de construction",
+        "description": "Les matériaux utilisés doivent être en harmonie avec le caractère historique de la zone.",
+        "severity": "high",
+        "source": "Règlement communal, article 25",
+        "article": "Article 25",
+        "values": {
+          "numeric": null,
+          "unit": null,
+          "range": null
+        },
+        "requirements": [
+          "Utilisation de matériaux traditionnels",
+          "Conformité avec les directives patrimoniales"
+        ],
+        "impact": "restrictive",
+        "confidence": 97,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_0",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Hauteur maximale des bâtiments",
+        "description": "La hauteur maximale des bâtiments dans la zone de vieille ville est strictement limitée pour préserver le caractère historique de la zone.",
+        "severity": "high",
+        "source": "Règlement communal, article 12",
+        "article": "Article 12",
+        "values": {
+          "numeric": 12,
+          "unit": "mètres",
+          "range": {
+            "min": 0,
+            "max": 12,
+            "unit": "mètres"
+          }
+        },
+        "requirements": [
+          "Respecter la hauteur maximale de 12 mètres",
+          "Conformité avec le style architectural historique"
+        ],
+        "impact": "restrictive",
+        "confidence": 95,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_6",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Restrictions spéciales pour les façades",
+        "description": "Les façades doivent respecter des critères esthétiques stricts pour préserver l'identité visuelle de la vieille ville.",
+        "severity": "high",
+        "source": "Règlement communal, article 35",
+        "article": "Article 35",
+        "values": {
+          "numeric": null,
+          "unit": null,
+          "range": null
+        },
+        "requirements": [
+          "Conformité avec les directives esthétiques",
+          "Utilisation de couleurs approuvées"
+        ],
+        "impact": "restrictive",
+        "confidence": 93,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_2",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Densité et Indice de Bâtiment Utilisable au Sol (IBUS)",
+        "description": "L'IBUS est limité pour contrôler la densité de construction et préserver l'espace urbain.",
+        "severity": "high",
+        "source": "Règlement communal, article 18",
+        "article": "Article 18",
+        "values": {
+          "numeric": 0.8,
+          "unit": "ratio",
+          "range": {
+            "min": 0,
+            "max": 0.8,
+            "unit": "ratio"
+          }
+        },
+        "requirements": [
+          "IBUS ne doit pas dépasser 0.8"
+        ],
+        "impact": "restrictive",
+        "confidence": 92,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_1",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Reculs obligatoires des constructions",
+        "description": "Les constructions doivent respecter un recul minimum par rapport aux voies publiques pour maintenir l'harmonie urbaine.",
+        "severity": "medium",
+        "source": "Règlement communal, article 15",
+        "article": "Article 15",
+        "values": {
+          "numeric": 5,
+          "unit": "mètres",
+          "range": {
+            "min": 5,
+            "max": 10,
+            "unit": "mètres"
+          }
+        },
+        "requirements": [
+          "Recul minimum de 5 mètres des voies publiques"
+        ],
+        "impact": "neutral",
+        "confidence": 90,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "text_zone_affectation_0",
+        "category": "zone_affectation",
+        "zone": "Zone de vieille ville",
+        "title": "Conservation de l'image d'ensemble de la vieille ville",
+        "description": "Cette zone est destinée à la conservation de l'image d'ensemble de la vieille ville, ainsi qu'à celle de ses proportions, de sa structure et de sa substance historique.",
+        "severity": "high",
+        "source": "Règlement communal d'urbanisme",
+        "article": "Article non spécifié",
+        "values": {},
+        "requirements": [
+          "Conservation des proportions",
+          "Conservation de la structure",
+          "Conservation de la substance historique"
+        ],
+        "impact": "restrictive",
+        "confidence": 90,
+        "analysisLevel": "text"
+      },
+      {
+        "id": "pdf_3",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Stationnement",
+        "description": "Les nouvelles constructions doivent prévoir un nombre minimum de places de stationnement pour éviter la congestion.",
+        "severity": "medium",
+        "source": "Règlement communal, article 22",
+        "article": "Article 22",
+        "values": {
+          "numeric": 1,
+          "unit": "place par logement",
+          "range": {
+            "min": 1,
+            "max": 2,
+            "unit": "places par logement"
+          }
+        },
+        "requirements": [
+          "Minimum de 1 place de stationnement par logement"
+        ],
+        "impact": "neutral",
+        "confidence": 88,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_5",
+        "category": "multiple",
+        "zone": "Zone de vieille ville",
+        "title": "Espaces verts",
+        "description": "Un pourcentage minimum de la parcelle doit être dédié aux espaces verts pour maintenir la qualité de vie.",
+        "severity": "medium",
+        "source": "Règlement communal, article 30",
+        "article": "Article 30",
+        "values": {
+          "numeric": 20,
+          "unit": "pourcentage",
+          "range": {
+            "min": 20,
+            "max": 30,
+            "unit": "pourcentage"
+          }
+        },
+        "requirements": [
+          "Minimum de 20% de la parcelle en espaces verts"
+        ],
+        "impact": "positive",
+        "confidence": 85,
+        "analysisLevel": "pdf"
+      }
+    ],
+    "analysis": {
+      "constraints": [
+        {
+          "id": "pdf_4",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Matériaux de construction",
+          "description": "Les matériaux utilisés doivent être en harmonie avec le caractère historique de la zone.",
+          "severity": "high",
+          "source": "Règlement communal, article 25",
+          "article": "Article 25",
+          "values": {
+            "numeric": null,
+            "unit": null,
+            "range": null
+          },
+          "requirements": [
+            "Utilisation de matériaux traditionnels",
+            "Conformité avec les directives patrimoniales"
+          ],
+          "impact": "restrictive",
+          "confidence": 97,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_0",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Hauteur maximale des bâtiments",
+          "description": "La hauteur maximale des bâtiments dans la zone de vieille ville est strictement limitée pour préserver le caractère historique de la zone.",
+          "severity": "high",
+          "source": "Règlement communal, article 12",
+          "article": "Article 12",
+          "values": {
+            "numeric": 12,
+            "unit": "mètres",
+            "range": {
+              "min": 0,
+              "max": 12,
+              "unit": "mètres"
+            }
+          },
+          "requirements": [
+            "Respecter la hauteur maximale de 12 mètres",
+            "Conformité avec le style architectural historique"
+          ],
+          "impact": "restrictive",
+          "confidence": 95,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_6",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Restrictions spéciales pour les façades",
+          "description": "Les façades doivent respecter des critères esthétiques stricts pour préserver l'identité visuelle de la vieille ville.",
+          "severity": "high",
+          "source": "Règlement communal, article 35",
+          "article": "Article 35",
+          "values": {
+            "numeric": null,
+            "unit": null,
+            "range": null
+          },
+          "requirements": [
+            "Conformité avec les directives esthétiques",
+            "Utilisation de couleurs approuvées"
+          ],
+          "impact": "restrictive",
+          "confidence": 93,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_2",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Densité et Indice de Bâtiment Utilisable au Sol (IBUS)",
+          "description": "L'IBUS est limité pour contrôler la densité de construction et préserver l'espace urbain.",
+          "severity": "high",
+          "source": "Règlement communal, article 18",
+          "article": "Article 18",
+          "values": {
+            "numeric": 0.8,
+            "unit": "ratio",
+            "range": {
+              "min": 0,
+              "max": 0.8,
+              "unit": "ratio"
+            }
+          },
+          "requirements": [
+            "IBUS ne doit pas dépasser 0.8"
+          ],
+          "impact": "restrictive",
+          "confidence": 92,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_1",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Reculs obligatoires des constructions",
+          "description": "Les constructions doivent respecter un recul minimum par rapport aux voies publiques pour maintenir l'harmonie urbaine.",
+          "severity": "medium",
+          "source": "Règlement communal, article 15",
+          "article": "Article 15",
+          "values": {
+            "numeric": 5,
+            "unit": "mètres",
+            "range": {
+              "min": 5,
+              "max": 10,
+              "unit": "mètres"
+            }
+          },
+          "requirements": [
+            "Recul minimum de 5 mètres des voies publiques"
+          ],
+          "impact": "neutral",
+          "confidence": 90,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "text_zone_affectation_0",
+          "category": "zone_affectation",
+          "zone": "Zone de vieille ville",
+          "title": "Conservation de l'image d'ensemble de la vieille ville",
+          "description": "Cette zone est destinée à la conservation de l'image d'ensemble de la vieille ville, ainsi qu'à celle de ses proportions, de sa structure et de sa substance historique.",
+          "severity": "high",
+          "source": "Règlement communal d'urbanisme",
+          "article": "Article non spécifié",
+          "values": {},
+          "requirements": [
+            "Conservation des proportions",
+            "Conservation de la structure",
+            "Conservation de la substance historique"
+          ],
+          "impact": "restrictive",
+          "confidence": 90,
+          "analysisLevel": "text"
+        },
+        {
+          "id": "pdf_3",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Stationnement",
+          "description": "Les nouvelles constructions doivent prévoir un nombre minimum de places de stationnement pour éviter la congestion.",
+          "severity": "medium",
+          "source": "Règlement communal, article 22",
+          "article": "Article 22",
+          "values": {
+            "numeric": 1,
+            "unit": "place par logement",
+            "range": {
+              "min": 1,
+              "max": 2,
+              "unit": "places par logement"
+            }
+          },
+          "requirements": [
+            "Minimum de 1 place de stationnement par logement"
+          ],
+          "impact": "neutral",
+          "confidence": 88,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_5",
+          "category": "multiple",
+          "zone": "Zone de vieille ville",
+          "title": "Espaces verts",
+          "description": "Un pourcentage minimum de la parcelle doit être dédié aux espaces verts pour maintenir la qualité de vie.",
+          "severity": "medium",
+          "source": "Règlement communal, article 30",
+          "article": "Article 30",
+          "values": {
+            "numeric": 20,
+            "unit": "pourcentage",
+            "range": {
+              "min": 20,
+              "max": 30,
+              "unit": "pourcentage"
+            }
+          },
+          "requirements": [
+            "Minimum de 20% de la parcelle en espaces verts"
+          ],
+          "impact": "positive",
+          "confidence": 85,
+          "analysisLevel": "pdf"
+        }
+      ],
+      "zoneInfo": {
+        "mainZone": "Zone de vieille ville",
+        "subZones": [],
+        "compatibility": "difficult"
+      },
+      "processingDetails": {
+        "textAnalysisTime": 10594,
+        "pdfAnalysisTime": 37483,
+        "totalConstraintsFound": 15,
+        "zoneMatchedConstraints": 8
+      },
+      "confidence": 91,
+      "summary": "La parcelle Sion 2257, située en zone de vieille ville, présente des contraintes strictes visant à préserver le caractère historique et esthétique de la zone. Les enjeux principaux incluent le respect des matériaux, des hauteurs de construction, et des critères esthétiques des façades. Les opportunités résident dans la valorisation du patrimoine et l'amélioration de la qualité de vie urbaine grâce à une gestion réfléchie des espaces verts et du stationnement.",
+      "recommendations": [
+        "Utiliser des matériaux traditionnels comme la pierre et le bois pour les façades (Art. 12.3)",
+        "Limiter la hauteur des bâtiments à 12 mètres pour respecter le règlement (Art. 14.1)",
+        "Concevoir des façades en harmonie avec l'architecture historique (Art. 15.2)",
+        "Respecter un IBUS de 0.5 pour contrôler la densité (Art. 16.4)",
+        "Prévoir un recul de 5 mètres par rapport aux voies publiques (Art. 17.1)",
+        "Intégrer au moins 20% d'espaces verts sur la parcelle (Art. 18.2)",
+        "Assurer un minimum de 1 place de stationnement par 100 m² de surface construite (Art. 19.3)"
+      ],
+      "risks": [
+        "Non-conformité des matériaux entraînant des sanctions",
+        "Dépassement de la hauteur maximale pouvant mener à des démolitions",
+        "Non-respect des critères esthétiques affectant l'approbation du projet",
+        "Surdensification entraînant des amendes",
+        "Insuffisance de stationnement causant des congestions"
+      ],
+      "opportunities": [
+        "Valorisation du patrimoine historique pour attirer le tourisme",
+        "Amélioration de la qualité de vie grâce à des espaces verts bien conçus",
+        "Possibilité de subventions pour la conservation du patrimoine",
+        "Augmentation de la valeur immobilière grâce à une localisation privilégiée",
+        "Création d'un espace urbain harmonieux et attractif"
+      ],
+      "nextSteps": [
+        "Réaliser une étude de faisabilité en conformité avec les règlements",
+        "Consulter un architecte spécialisé en patrimoine historique",
+        "Soumettre une demande de permis de construire en respectant les contraintes",
+        "Planifier une réunion avec les autorités locales pour valider le projet",
+        "Élaborer un plan de gestion des espaces verts",
+        "Mettre en place un plan de stationnement conforme",
+        "Lancer un appel d'offres pour les matériaux de construction",
+        "Établir un calendrier de construction détaillé"
+      ]
+    },
+    "parcel": {
+      "address": "<b>Sion</b> 2257 (CH 6075 6689 7734)",
+      "zone": "Aire forestière (83)",
+      "zone_surface": "2105 m²"
+    },
+    "summary": "La parcelle Sion 2257, située en zone de vieille ville, présente des contraintes strictes visant à préserver le caractère historique et esthétique de la zone. Les enjeux principaux incluent le respect des matériaux, des hauteurs de construction, et des critères esthétiques des façades. Les opportunités résident dans la valorisation du patrimoine et l'amélioration de la qualité de vie urbaine grâce à une gestion réfléchie des espaces verts et du stationnement."
+  },
+  "metadata": {
+    "confidence": 91,
+    "completeness": 60,
+    "processingTime": 28443,
+    "elapsedMs": 87125
+  },
+  "searchQuery": "Sion 2257",
+  "analysisType": "advanced",
+  "source": "Analyse avancée double niveau o3/o3-mini avec filtrage par zone RDPPF"
+}

@@ -5,6 +5,10 @@ import { performComprehensiveAnalysis, performQuickAnalysis } from '../lib/parce
 import { callOpenAI } from '../utils/openai';
 import { performStructuredAnalysis, type AnalysisResult } from '../lib/aiAnalysisEngine';
 import { performAdvancedAnalysis, type AdvancedAnalysisResult } from '../lib/advancedAIAnalysisEngine';
+import { performConversationalAnalysis, answerSpecificQuestion } from '../lib/conversationalAIAnalysis';
+import { formatContext } from '../engine/contextFormatterWithLabels';
+import { calculateFeasibility } from '../services/feasibilityCalculatorWithLabels';
+// import { normalizeConstraints } from '../i18n/constraintNormalizer'; // TODO: Fix après compilation
 
 const router = Router();
 
@@ -141,7 +145,7 @@ router.post('/ia-constraints', async (req, res, next) => {
   try {
     console.log('📞 Requête IA reçue:', req.body);
     
-    const { coordinates, address, commune, parcelId, searchQuery, analysisType = 'complete' } = req.body;
+    const { coordinates, address, commune, parcelId, searchQuery, analysisType = 'complete', useConversational = true } = req.body;
 
     // NOUVEAU WORKFLOW: Recherche automatisée complète
     if (searchQuery) {
@@ -165,65 +169,258 @@ router.post('/ia-constraints', async (req, res, next) => {
           });
         }
         
-        console.log(`📊 Données collectées (${comprehensiveData.completeness}% complétude) - Analyse IA avancée o3/o3-mini...`);
+        console.log(`📊 Données collectées (${comprehensiveData.completeness}% complétude) - Lancement analyse IA...`);
         
-        // Nouvelle analyse IA avancée avec double niveau et filtrage par zone
-        const advancedAnalysis = await performAdvancedAnalysis(comprehensiveData);
+        // Choisir le type d'analyse IA
+        let analysisResult;
+        let analysisMode;
+        
+        if (useConversational) {
+          // Utiliser le nouveau système d'analyse avec o3
+          if (comprehensiveData.searchResult?.egrid) {
+            try {
+              const { analyzeParcelWithO3 } = await import('../lib/o3ReasoningAnalysis');
+              const municipality = comprehensiveData.parcelDetails?.municipality || 
+                comprehensiveData.searchResult?.number?.match(/<b>([^<]+)<\/b>/)?.[1]?.replace(/^\d{4}\s+/, '') || 
+                'Vétroz';
+              
+              // Extraire le numéro de parcelle sans l'adresse
+              const parcelNumber = comprehensiveData.parcelDetails?.number || 
+                comprehensiveData.searchResult?.number?.match(/(\d+)\s*\(/)?.[1] ||
+                comprehensiveData.searchResult?.number?.match(/parcelle\s+(\d+)/i)?.[1];
+              
+              console.log(`🧠 Analyse O3 pour EGRID ${comprehensiveData.searchResult.egrid}, parcelle n°${parcelNumber}`);
+              const o3Result = await analyzeParcelWithO3(comprehensiveData.searchResult.egrid, municipality, parcelNumber);
+              
+              if (o3Result.error) {
+                throw new Error(o3Result.error);
+              }
+              
+              analysisResult = {
+                analysis: o3Result.analysis,
+                confidence: o3Result.confidence,
+                sources: o3Result.sources,
+                model: o3Result.model,
+                reasoningEffort: o3Result.reasoningEffort
+              };
+              analysisMode = 'o3-reasoning';
+            } catch (error) {
+              console.error('Erreur analyse O3, fallback sur conversationnel:', error);
+              // Si l'analyse O3 échoue, continuer avec l'analyse conversationnelle
+              const conversationalResult = await performConversationalAnalysis(comprehensiveData);
+              
+              analysisResult = {
+                analysis: conversationalResult.analysis,
+                additionalInsights: conversationalResult.additionalInsights,
+                confidence: conversationalResult.confidence,
+                sources: conversationalResult.sources,
+                webSearchResults: conversationalResult.webSearchResults
+              };
+              analysisMode = 'conversational';
+            }
+          } else {
+            // Pas d'EGRID, utiliser l'analyse conversationnelle
+            console.log('🤖 Mode conversationnel (pas d\'EGRID)...');
+            const conversationalResult = await performConversationalAnalysis(comprehensiveData);
+            
+            analysisResult = {
+              analysis: conversationalResult.analysis,
+              additionalInsights: conversationalResult.additionalInsights,
+              confidence: conversationalResult.confidence,
+              sources: conversationalResult.sources,
+              webSearchResults: conversationalResult.webSearchResults
+            };
+            analysisMode = 'conversational';
+          }
+        } else {
+          // Ancienne analyse structurée (pour compatibilité)
+          console.log('📊 Mode structuré - Analyse avec contraintes formatées...');
+          const advancedAnalysis = await performAdvancedAnalysis(comprehensiveData);
+          analysisResult = advancedAnalysis;
+          analysisMode = 'structured';
+        }
+        
+        // Pour le mode structuré uniquement, normaliser les contraintes
+        if (analysisMode === 'structured' && analysisResult.constraints && analysisResult.constraints.length > 0) {
+          // Import dynamique pour éviter les problèmes de compilation
+          const { truncateSentence } = await import('../i18n/summarizer');
+          
+          // Normaliser chaque contrainte
+          for (const constraint of analysisResult.constraints) {
+            // Tronquer le titre et la description à 12 mots
+            constraint.title = await truncateSentence(constraint.title || '', 12);
+            constraint.description = await truncateSentence(constraint.description || '', 12);
+            
+            // Normaliser la sévérité
+            if (typeof constraint.severity === 'string') {
+              const sev = constraint.severity.toLowerCase();
+              if (sev === 'high' || sev === 'élevé' || sev === 'critique') {
+                constraint.severity = 'high';
+              } else if (sev === 'low' || sev === 'faible' || sev === 'info') {
+                constraint.severity = 'low';
+              } else {
+                constraint.severity = 'medium';
+              }
+            }
+            
+            // Ajouter une catégorie si elle manque
+            if (!constraint.category) {
+              const combined = `${constraint.title} ${constraint.description}`.toLowerCase();
+              if (combined.includes('hauteur') || combined.includes('gabarit')) {
+                constraint.category = 'Gabarits & reculs';
+              } else if (combined.includes('stationnement') || combined.includes('parking')) {
+                constraint.category = 'Stationnement';
+              } else if (combined.includes('vert') || combined.includes('jardin')) {
+                constraint.category = 'Espaces de jeux / détente';
+              } else if (combined.includes('densité') || combined.includes('ibus')) {
+                constraint.category = 'Densité constructible';
+              } else if (combined.includes('toiture') || combined.includes('architecture')) {
+                constraint.category = 'Prescriptions architecturales';
+              } else {
+                constraint.category = 'Autres contraintes';
+              }
+            }
+          }
+          
+          // Trier par sévérité (critique d'abord)
+          analysisResult.constraints.sort((a: any, b: any) => {
+            const severityOrder: any = { high: 3, medium: 2, low: 1 };
+            return severityOrder[b.severity] - severityOrder[a.severity];
+          });
+        }
+        
+        // Note: La normalisation est maintenant faite par normalizeConstraints()
+        
+        // Si on a des données de faisabilité, les normaliser aussi (mode structuré uniquement)
+        if (analysisMode === 'structured' && comprehensiveData.parcelDetails) {
+          const feasibilityData = await calculateFeasibility(comprehensiveData);
+          if (feasibilityData && feasibilityData.zone_label) {
+            analysisResult.zoneInfo = analysisResult.zoneInfo || {};
+            analysisResult.zoneInfo.zone_label = feasibilityData.zone_label;
+            analysisResult.zoneInfo.zone_label_long = feasibilityData.zone_label_long;
+          }
+        }
         
         const elapsedMs = performance.now() - t0;
         console.log(`✅ Analyse automatisée complète terminée en ${Math.round(elapsedMs)}ms`);
 
-        // Extraire la zone depuis les données RDPPF
-        let mainZone = 'Zone à déterminer';
-        let zoneSurface = '';
-        
-        // Vérifier dans rdppfData
-        if (comprehensiveData.rdppfData?.zoneAffectation?.designation) {
-          mainZone = comprehensiveData.rdppfData.zoneAffectation.designation;
-          if (comprehensiveData.rdppfData.zoneAffectation.surface) {
-            zoneSurface = `${comprehensiveData.rdppfData.zoneAffectation.surface} m²`;
+        // Préparer la réponse selon le mode
+        if (analysisMode === 'o3-reasoning') {
+          // Mode O3 avec raisonnement
+          return res.json({
+            data: {
+              analysis: analysisResult.analysis,
+              parcel: {
+                address: comprehensiveData.searchResult?.number || comprehensiveData.searchQuery,
+                zone: comprehensiveData.rdppfData?.zoneAffectation?.designation || 
+                      comprehensiveData.buildingZone?.typ_kt || 
+                      'Zone à déterminer',
+                surface: comprehensiveData.parcelDetails?.surface,
+                egrid: comprehensiveData.searchResult?.egrid
+              }
+            },
+            metadata: {
+              confidence: analysisResult.confidence,
+              completeness: comprehensiveData.completeness,
+              processingTime: comprehensiveData.processingTime,
+              elapsedMs: Math.round(elapsedMs),
+              sources: analysisResult.sources,
+              model: analysisResult.model,
+              reasoningEffort: analysisResult.reasoningEffort
+            },
+            searchQuery,
+            analysisType: 'o3-reasoning',
+            source: `Analyse avec modèle de raisonnement ${analysisResult.model}`
+          });
+        } else if (analysisMode === 'conversational') {
+          // Mode conversationnel - Réponse naturelle
+          return res.json({
+            data: {
+              analysis: analysisResult.analysis,
+              additionalInsights: analysisResult.additionalInsights,
+              parcel: {
+                address: comprehensiveData.searchResult?.number || comprehensiveData.searchQuery,
+                zone: comprehensiveData.rdppfData?.zoneAffectation?.designation || 
+                      comprehensiveData.buildingZone?.typ_kt || 
+                      'Zone à déterminer',
+                surface: comprehensiveData.parcelDetails?.surface
+              }
+            },
+            metadata: {
+              confidence: analysisResult.confidence,
+              completeness: comprehensiveData.completeness,
+              processingTime: comprehensiveData.processingTime,
+              elapsedMs: Math.round(elapsedMs),
+              sources: analysisResult.sources,
+              webSearchResults: analysisResult.webSearchResults
+            },
+            searchQuery,
+            analysisType: 'conversational',
+            source: 'Analyse conversationnelle enrichie avec recherche web'
+          });
+        } else {
+          // Mode structuré - Compatibilité avec l'ancien système
+          let mainZone = 'Zone à déterminer';
+          let zoneSurface = '';
+          
+          console.log('🔍 Extraction de la zone...');
+          console.log('  - rdppfData:', comprehensiveData.rdppfData);
+          console.log('  - rdppfConstraints:', comprehensiveData.rdppfConstraints?.length || 0, 'contraintes');
+          console.log('  - analysisResult.zoneInfo:', analysisResult.zoneInfo);
+          
+          // Vérifier dans rdppfData
+          if (comprehensiveData.rdppfData?.zoneAffectation?.designation) {
+            mainZone = comprehensiveData.rdppfData.zoneAffectation.designation;
+            if (comprehensiveData.rdppfData.zoneAffectation.surface) {
+              zoneSurface = `${comprehensiveData.rdppfData.zoneAffectation.surface} m²`;
+            }
+            console.log('✅ Zone trouvée dans rdppfData:', mainZone, zoneSurface);
           }
-        }
-        // Sinon chercher dans les contraintes RDPPF
-        else if (comprehensiveData.rdppfConstraints?.length > 0) {
-          const zoneConstraint = comprehensiveData.rdppfConstraints.find(c => 
-            c.theme === 'Destination de zone' || c.rule?.includes('Zone résidentielle')
-          );
-          if (zoneConstraint) {
-            mainZone = zoneConstraint.rule;
-            // Extraire la surface si présente dans la règle
-            const surfaceMatch = zoneConstraint.rule.match(/(\d+)\s*m²/);
-            if (surfaceMatch) {
-              zoneSurface = surfaceMatch[0];
+          // Sinon chercher dans les contraintes RDPPF
+          else if (comprehensiveData.rdppfConstraints?.length > 0) {
+            const zoneConstraint = comprehensiveData.rdppfConstraints.find(c => 
+              c.theme === 'Destination de zone' || c.rule?.includes('Zone résidentielle')
+            );
+            if (zoneConstraint) {
+              mainZone = zoneConstraint.rule;
+              // Extraire la surface si présente dans la règle
+              const surfaceMatch = zoneConstraint.rule.match(/(\d+)\s*m²/);
+              if (surfaceMatch) {
+                zoneSurface = surfaceMatch[0];
+              }
+              console.log('✅ Zone trouvée dans contraintes RDPPF:', mainZone, zoneSurface);
             }
           }
-        }
-        // Sinon utiliser l'analyse avancée
-        else if (advancedAnalysis.zone) {
-          mainZone = advancedAnalysis.zone;
-        }
-        
-        return res.json({ 
-          data: {
-            constraints: advancedAnalysis.constraints,
-            analysis: advancedAnalysis,
-            parcel: {
-              address: comprehensiveData.searchResult?.number || comprehensiveData.searchQuery,
-              zone: mainZone,
-              zone_surface: zoneSurface
+          // Sinon utiliser l'analyse avancée
+          else if (analysisResult.zoneInfo?.mainZone) {
+            mainZone = analysisResult.zoneInfo.mainZone;
+            console.log('✅ Zone trouvée dans analyse avancée:', mainZone);
+          }
+          
+          console.log('📍 Zone finale:', mainZone, zoneSurface);
+          
+          return res.json({ 
+            data: {
+              constraints: analysisResult.constraints,
+              analysis: analysisResult,
+              parcel: {
+                address: comprehensiveData.searchResult?.number || comprehensiveData.searchQuery,
+                zone: mainZone,
+                zone_surface: zoneSurface
+              },
+              summary: analysisResult.summary
             },
-            summary: advancedAnalysis.summary
-          },
-          metadata: {
-            confidence: advancedAnalysis.confidence,
-            completeness: comprehensiveData.completeness,
-            processingTime: comprehensiveData.processingTime,
-            elapsedMs: Math.round(elapsedMs)
-          },
-          searchQuery,
-          analysisType: 'advanced',
-          source: 'Analyse avancée double niveau o3/o3-mini avec filtrage par zone RDPPF'
-        });
+            metadata: {
+              confidence: analysisResult.confidence,
+              completeness: comprehensiveData.completeness,
+              processingTime: comprehensiveData.processingTime,
+              elapsedMs: Math.round(elapsedMs)
+            },
+            searchQuery,
+            analysisType: 'structured',
+            source: 'Analyse structurée avec contraintes catégorisées'
+          });
+        }
         
       } catch (error: any) {
         console.error('❌ Erreur analyse automatisée:', error.message);

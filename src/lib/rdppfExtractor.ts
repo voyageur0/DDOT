@@ -161,28 +161,74 @@ export async function extractTextFromPdf(filePath: string): Promise<string> {
   return data.text;
 }
 
-const SYSTEM_PROMPT = `Vous êtes un juriste spécialisé en droit de la construction suisse.
-À partir du texte RDPPF ci-dessous, identifiez toutes les informations pertinentes pour les 8 thèmes obligatoires et restituez-les sous forme JSON.
+const SYSTEM_PROMPT = `Vous êtes un expert en droit de la construction suisse analysant des documents d'urbanisme (RDPPF et règlements communaux).
 
-Thèmes: Identification, Destination de zone, Indice d'utilisation (IBUS), Gabarits & reculs, Toiture, Stationnement, Espaces de jeux / détente, Prescriptions architecturales.
+OBJECTIF: Extraire TOUTES les informations pertinentes pour ces 10 THÈMES PRINCIPAUX. Ne vous limitez PAS à des contraintes figées, mais cherchez TOUT ce qui concerne chaque thème.
 
-IMPORTANT: 
-1. Le champ "rule" doit être une DESCRIPTION TEXTUELLE complète, pas un objet structuré.
-2. Pour la "Destination de zone", extraire EXACTEMENT la dénomination complète de la zone telle qu'elle apparaît dans le document.
-   - La zone principale doit être extraite en premier (ex: "Zone résidentielle 0.5 (3)")
-   - Ajouter ensuite la surface et le pourcentage si disponibles
-   - Format attendu: "Zone résidentielle 0.5 (3), Surface: 862 m², 100.0%"
-3. NE PAS inclure les zones de dangers (avalanches, inondations, etc.) SAUF si elles sont explicitement mentionnées dans le RDPPF.
-4. Extraire la surface de la parcelle si disponible.
-5. TOUJOURS extraire le degré de sensibilité au bruit s'il est présent (ex: "Degré de sensibilité II").
-6. Si plusieurs zones sont présentes, créer une contrainte séparée pour chaque zone avec son pourcentage respectif.
+LES 10 THÈMES À RECHERCHER:
 
-Format: [{"theme":"<thème>","rule":"<description textuelle complète>"}, …]
+1. **Zone** - Type de zone d'affectation (résidentielle, mixte, artisanale, etc.)
+   - Exemples: "Zone résidentielle 0.5 (3)", "Zone mixte A", "Zone centre-ville"
+   - Inclure la désignation COMPLÈTE avec indices et numéros
 
-Exemple:
-- Correct: {"theme":"Destination de zone","rule":"Zone résidentielle 0.5 (3), Surface: 862 m², 100.0%"}
-- Correct: {"theme":"Prescriptions architecturales","rule":"Degré de sensibilité au bruit: II, Surface: 2257 m², 100.0%"}
-- Incorrect: {"theme":"Destination de zone","rule":{"type":"Zone résidentielle","indice":"0.5"}}`;
+2. **But de la zone** - Objectif et caractéristiques de la zone
+   - Usage principal autorisé
+   - Activités permises/interdites
+   - Caractère de la zone (résidentiel, commercial, etc.)
+
+3. **Surface de la parcelle** - Toutes les surfaces mentionnées
+   - Surface totale de la parcelle
+   - Surface constructible
+   - Surface minimale requise
+
+4. **Indice U** - Indice d'utilisation du sol (parties chauffées uniquement)
+   - Valeur de l'indice U
+   - Calcul et application
+   - Bonus éventuels
+
+5. **Indice IBUS** - Indice brut d'utilisation du sol (toutes surfaces)
+   - Valeur IBUS ou conversion depuis l'indice U
+   - Inclut parkings, caves, etc.
+   - Tableau de conversion Valais si mentionné
+
+6. **Hauteur maximale** - Toutes les hauteurs selon le type de toiture
+   - Hauteur max si toiture en pente
+   - Hauteur max si toiture plate
+   - Hauteur à la corniche
+   - Nombre d'étages autorisés
+
+7. **Distances à la limite** - Tous les reculs et distances
+   - Distance minimale aux limites
+   - Calcul selon hauteur du bâtiment (ex: H/2)
+   - Distances entre bâtiments
+   - Alignements obligatoires
+
+8. **Alignements** - Obligations d'alignement
+   - Alignement sur rue
+   - Alignement sur parcelles voisines
+   - Maintien d'alignements existants
+   - Plans d'alignement
+
+9. **Places de jeux** - Espaces extérieurs obligatoires
+   - Places de jeux pour enfants (immeubles)
+   - Espaces verts minimaux
+   - Aménagements extérieurs requis
+   - Pourcentage de surface libre
+
+10. **Places de parc** - Stationnement obligatoire
+    - Nombre de places par logement
+    - Places visiteurs requises
+    - Dimensions minimales
+    - Places pour vélos
+
+INSTRUCTIONS:
+- Extraire TOUT ce qui concerne ces 10 thèmes, même si formulé différemment
+- Le champ "theme" doit être l'un des 10 thèmes ci-dessus
+- Le champ "rule" contient l'information COMPLÈTE extraite du document
+- Respecter le texte EXACT du document source
+- Si une information concerne plusieurs thèmes, créer plusieurs entrées
+
+FORMAT: [{"theme":"<un des 10 thèmes>","rule":"<texte exact extrait>"}]`;
 
 /**
  * Extrait les sections pertinentes du texte RDPPF
@@ -202,7 +248,9 @@ function extractRelevantSectionsFromText(fullText: string): string {
     if (line.includes('Plans d\'affectation') || 
         line.includes('Affectation primaire') ||
         line.includes('Légende des objets touchés') ||
-        line.includes('Zones communales d\'affectation')) {
+        line.includes('Zones communales d\'affectation') ||
+        line.includes('GEOMETRIE TOUCHEE') ||
+        line.includes('Type de restriction de droit public')) {
       inRelevantSection = true;
       captureAll = true;
       zoneSection = true;
@@ -214,13 +262,21 @@ function extractRelevantSectionsFromText(fullText: string): string {
         line.includes('Zone à bâtir') ||
         line.includes('Zone d\'habitation') ||
         line.includes('Zone mixte') ||
-        line.includes('Zone centre')) {
+        line.includes('Zone centre') ||
+        line.includes('Aire forestière') ||
+        line.includes('Zone agricole') ||
+        line.match(/Zone\s+[a-zA-ZÀ-ÿ\s]+\d+[.,]\d+/)) { // Pattern pour "Zone xxx 0.5"
       inRelevantSection = true;
       zoneSection = true;
     }
     
     // Capturer les lignes avec des surfaces et pourcentages
-    if (line.match(/\d+\s*m[²2]/) || line.match(/\d+\.\d+\s*%/)) {
+    if (line.match(/\d+\s*m[²2]/) || line.match(/\d+[.,]\d+\s*%/)) {
+      inRelevantSection = true;
+    }
+    
+    // Capturer les lignes avec des indices entre parenthèses (ex: "(3)")
+    if (line.match(/\(\d+\)/) && zoneSection) {
       inRelevantSection = true;
     }
     

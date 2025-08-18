@@ -1,13 +1,23 @@
-// AI Loader Enhanced avec Mini-Jeux Modernes et Novateurs
+// AI Loader Enhanced avec Mini-Jeux Ultra Modernes
 class AILoaderEnhanced {
   constructor() {
     this.progressValue = 0;
     this.activeGame = null;
-    this.games = {
-      snake: new ModernSnakeGame(),
-      breakout: new ModernBreakoutGame(),
-      spaceshooter: new ModernSpaceShooterGame()
-    };
+    // Charger les classes ultra-modernes si disponibles
+    if (typeof UltraModernSnakeGame !== 'undefined') {
+      this.games = {
+        snake: new UltraModernSnakeGame(),
+        breakout: new UltraModernBreakoutGame(),
+        spaceshooter: new UltraModernSpaceShooterGame()
+      };
+    } else {
+      // Fallback aux classes modernes
+      this.games = {
+        snake: new ModernSnakeGame(),
+        breakout: new ModernBreakoutGame(),
+        spaceshooter: new ModernSpaceShooterGame()
+      };
+    }
     this.steps = [
       { id: 'geo', title: 'Géolocalisation', desc: 'Recherche de la parcelle', icon: '📍' },
       { id: 'rdppf', title: 'Extraction RDPPF', desc: 'Analyse des données cadastrales', icon: '📋' },

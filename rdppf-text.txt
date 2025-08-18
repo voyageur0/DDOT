@@ -1,0 +1,309 @@
+
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 1/10
+Extrait du cadastre des restrictions de droit
+public à la propriété foncière (cadastre RDPPF)
+No de l’immeuble12558
+Type d’immeubleBien-fonds
+E-GRIDCH773017495270
+CommuneVétroz (6025)
+Secteur
+Surface862 m²
+Etat de la mensuration officielle10.08.2025
+Identifiant de l’extraitd282e1f0-0786-4c64-9957-1e178e22db9a
+Date de création de l’extrait11.08.2025
+Organisme responsable du cadastreService de la géoinformation
+Rue du Scex 4
+1950 Sion
+https://geo.vs.ch
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 2/10
+Sommaire des thèmes RDPPF
+Restrictions à la propriété foncière qui touchent l’immeuble 12558 de Vétroz
+Page
+3Plans d’affectation (cantonaux/communaux) - Affectation primaire (En vigueur)
+5Plan de la zone de sécurité (Modification avec effet anticipé)
+7Degré de sensibilité au bruit (dans les zones d’affectation) (En vigueur)
+Restrictions à la propriété foncière qui ne touchent pas l’immeuble
+Zones réservées
+Plans d'affectation (cantonaux / communaux) - Affectation superposée
+Zones réservées des routes nationales
+Alignements des routes nationales
+Zones réservées des installations ferroviaires
+Alignements des installations ferroviaires
+Zones réservées des installations aéroportuaires
+Alignements des installations aéroportuaires
+Cadastre des sites pollués
+Cadastre des sites pollués – domaine militaire
+Cadastre des sites pollués – domaine des aérodromes civils
+Cadastre des sites pollués – domaine des transports publics
+Zones de protection des eaux souterraines
+Périmètres de protection des eaux souterraines
+Espace réservé aux eaux
+Limites forestières statiques
+Distances par rapport à la forêt
+Réserves forestières
+Zones réservées des lignes d’une tension nominale égale ou supérieure à 220 kV
+Alignements des installations électriques à courant fort
+Restrictions à la propriété foncière pour lesquelles aucune donnée n’est disponible
+Informations générales
+Le contenu du cadastre RDPPF est supposé connu. Le canton du
+Valais n’engage pas sa responsabilité sur l’exactitude ou la
+fiabilité des documents législatifs dans leur version électronique.
+L’extrait a un caractère informatif et ne crée aucun droit ou
+obligation. La primauté va aux documents qui ont été légalement
+adoptés ou publiés. Vous trouverez d’autres informations sur le
+cadastre RDPPF sous 
+www.cadastre.ch ou www.vs.ch/rdppf
+Restrictions de propriété dans le registre foncier
+Il est possible que des restrictions de propriété fassent l’objet
+d’une mention au registre foncier, en plus des indications figurant
+sur cet extrait.
+Clause de non-responsabilité du cadastre des sites pollués (CSP)
+Le cadastre des sites pollués (CSP) est établi d’après les critères émis
+par l’Office fédéral de l’environnement OFEV. Il est mis à jour
+continuellement sur la base des nouvelles connaissances
+(investigations). Les surfaces des sites indiqués dans le cadastre des
+sites pollués peuvent ne pas correspondre à la surface effectivement
+polluée. Cela ne signifie pas que tout terrain non inscrit au cadastre ne
+soit pas pollué et qu’il soit libre de tout déchet et pollution. Les zones
+utilisées à des fins de transports publics, militaire et aéronautique sont
+de la responsabilité de la Confédération.
+Pour de plus amples informations veuillez vous adresser au Service de
+l’environnement : SEN-Sites-pollues@admin.vs.ch
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 3/1011.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 3/10
+Plans d’affectation (cantonaux/communaux) -
+Affectation primaire
+En vigueur
+TypeSurfacePart
+Légende des objets touchésZone résidentielle 0.5 (3)862 m
+2
+100.0 %
+Autre légende (visible dans le cadre
+du plan)
+Zone de transport à l'intérieur des
+zones à bâtir (51)
+Dispositions juridiquesDécision du Conseil d'Etat DECCE 0 (10.08.2016)
+https://oereblex.vs.ch/api/attachments/4508.html
+Modification partielle du règlement communal MRCCZ 0 
+(10.08.2016)
+https://oereblex.vs.ch/api/attachments/4509.html
+Décision du Conseil d'Etat - énergies renouvelables DECCE 0 
+(08.05.2013)
+https://oereblex.vs.ch/api/attachments/4510.html
+Modification du règlement communal - énergies renouvelables 
+MRCCZ 0 (08.05.2013)
+https://oereblex.vs.ch/api/attachments/4511.html
+Décision du Conseil d'Etat DECCE 0 (06.12.2006)
+https://oereblex.vs.ch/api/attachments/4506.html
+Modification du règlement communal MRCCZ 0 (06.12.2006)
+https://oereblex.vs.ch/api/attachments/4507.html
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 4/10
+Décision du Conseil d'Etat DECCE 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4496.html
+Plan de zones n°1, 1:2000 PAZ 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4499.html
+Règlement communal RCCZ 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4497.html
+Bases légalesLoi fédérale sur l'aménagement du territoire (LAT), RS 700
+https://www.admin.ch/ch/f/sr/c700.html
+Loi d'application de la loi fédérale sur l'aménagement du 
+territoire (LcAT), RS 701.1
+https://lex.vs.ch/app/fr/texts_of_law/701.1
+Loi sur les constructions (LC), RS 705.1
+https://lex.vs.ch/app/fr/texts_of_law/705.1
+Ordonnance sur les constructions (OC), RS 705.100
+https://lex.vs.ch/app/fr/texts_of_law/705.100
+Accord intercantonal harmonisant la terminologie dans le 
+domaine des constructions (AIHC), RS 705.101
+http://lex.vs.ch/data/705.101/fr
+Informations et renvois
+supplémentaires
+Newsletter n°1 du secrétariat cantonal des constructions et 
+Police des constructions 
+"https://www.vs.ch/documents/34257/3050395/NL1_FR_PDF.pdf"
+Légende complète Affectation primaire
+https://rdppfvs.geopol.ch/legend/ch.Nutzungsplanung
+Service compétentService du développement territorial SDT
+https://www.vs.ch/fr/web/sdt
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 5/1011.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 5/10
+Plan de la zone de sécurité
+Modification avec effet anticipé
+TypeSurfacePart
+Légende des objets touchésPérimètre de la zone de sécurité 
+mis à l'enquête publique
+862 m
+2
+100.0 %
+Autre légende (visible dans le cadre
+du plan)
+Dispositions juridiquesPlan de la zone de sécurité "Aéroport de Sion" 1:10'000 
+Commune de Vétroz
+https://data.geo.admin.ch/ch.bazl.sicherheitszonenplan_v2_0.oereb/Rechtsvorschriften/Aenderung/108-
+D-0223.pdf
+Publication au Bulletin officiel du Canton du Valais (18 
+2019) "Aéroport de Sion: Plan de la zone de sécurité"
+https://data.geo.admin.ch/ch.bazl.sicherheitszonenplan_v2_0.oereb/Rechtsvorschriften/Aenderung/108-
+D-0204.pdf
+Bases légalesLoi fédérale sur l'aviation (LA), RS 748.0
+https://www.admin.ch/ch/f/sr/c748_0.html
+Ordonnance sur l'infrastructure aéronautique (OSIA), RS 
+748.131.1
+https://www.admin.ch/ch/f/sr/c748_131_1.html
+Informations et renvois
+supplémentaires
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 6/10
+Plan de la zone de sécurité "Aéroport de Sion" 1:40'000 Sommaire
+https://data.geo.admin.ch/ch.bazl.sicherheitszonenplan_v2_0.oereb/Rechtsvorschriften/Aenderung/108-
+D-0226.pdf
+Rapport technique (26.03.2019) "Aéroport de Sion: Plan de la zone
+de sécurité"
+https://data.geo.admin.ch/ch.bazl.sicherheitszonenplan_v2_0.oereb/Rechtsvorschriften/Aenderung/108-
+D-0227.pdf
+Service compétentOffice fédéral de l'aviation civile OFAC
+https://www.bazl.admin.ch/bazl/fr/home.html
+
+11.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 7/1011.08.2025   14:52:04  d282e1f0-0786-4c64-9957-1e178e22db9aPage 7/10
+Degré de sensibilité au bruit (dans les zones
+d’affectation)
+En vigueur
+TypeSurfacePart
+Légende des objets touchésDegré de sensibilité II862 m
+2
+100.0 %
+Autre légende (visible dans le cadre
+du plan)
+Aucune degré de sensibilité
+Dispositions juridiquesDécision du Conseil d'Etat DECCE 0 (10.08.2016)
+https://oereblex.vs.ch/api/attachments/4508.html
+Modification partielle du règlement communal MRCCZ 0 
+(10.08.2016)
+https://oereblex.vs.ch/api/attachments/4509.html
+Décision du Conseil d'Etat - énergies renouvelables DECCE 0 
+(08.05.2013)
+https://oereblex.vs.ch/api/attachments/4510.html
+Modification du règlement communal - énergies renouvelables 
+MRCCZ 0 (08.05.2013)
+https://oereblex.vs.ch/api/attachments/4511.html
+Décision du Conseil d'Etat DECCE 0 (06.12.2006)
+https://oereblex.vs.ch/api/attachments/4506.html
+Modification du règlement communal MRCCZ 0 (06.12.2006)
+https://oereblex.vs.ch/api/attachments/4507.html
+
+11.08.2025   14:52:05  d282e1f0-0786-4c64-9957-1e178e22db9aPage 8/10
+Décision du Conseil d'Etat DECCE 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4496.html
+Plan de zones n°1, 1:2000 PAZ 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4499.html
+Règlement communal RCCZ 0 (29.06.1994)
+https://oereblex.vs.ch/api/attachments/4497.html
+Bases légalesOrdonnance sur la protection contre le bruit (OPB), RS 
+814.41
+https://www.admin.ch/ch/f/sr/c814_41.html
+Loi sur la protection de l'environnement (LcPE), RS 814.1
+https://lex.vs.ch/app/fr/texts_of_law/814.1
+Informations et renvois
+supplémentaires
+Service compétentService du développement territorial SDT
+https://www.vs.ch/fr/web/sdt
+
+11.08.2025   14:52:05  d282e1f0-0786-4c64-9957-1e178e22db9aPage 9/1011.08.2025   14:52:05  d282e1f0-0786-4c64-9957-1e178e22db9aPage 9/10
+Termes et abréviations
+Alignements des installations ferroviaires:Entre les alignements, il est interdit de procéder à des 
+modifications des constructions existantes ou de prendre des mesures allant à l'encontre de la finalité poursuivie 
+par les installations ferroviaires présentes ou à venir.
+Alignements des installations aéroportuaires:Entre les alignements, il est interdit de procéder à des 
+modifications des constructions existantes ou de prendre des mesures allant à l'encontre de la finalité poursuivie 
+par les installations aéroportuaires présentes ou à venir.
+Alignements des routes nationales:Des alignements sont définis de part et d'autre de la route lorsque le 
+tracé de cette dernière est définitif. Ces alignements permettent de tenir compte d'impératifs différents: ceux 
+touchant à la sécurité du trafic et à la salubrité publique mais également ceux découlant d'un possible 
+élargissement de la chaussée à l'avenir. Entre les alignements définis, une autorisation est indispensable pour 
+procéder à de nouvelles constructions ou pour modifier des bâtiments existants, même si ces derniers ne sont que 
+partiellement frappés d'alignement.
+Alignements des installations électriques à courant fort:Entre les alignements, il est interdit de 
+procéder à des modifications des constructions existantes ou de prendre des mesures allant à l'encontre de la 
+finalité poursuivie par les installations à courant fort présentes ou à venir.
+Base légale:Il s'agit de lois, d'ordonnances etc. à caractère général et abstrait (général car les personnes 
+concernées ne sont pas connues et abstrait parce que le périmètre est défini sans plan) édictés au niveau fédéral, 
+cantonal ou communal et qui ne constituent que des bases juridiques générales de la restriction de propriété. Les 
+bases légales ne font pas partie du cadastre RDPPF qui contient toutefois des renvois vers les bases légales 
+appropriées.
+Cadastre des sites pollués:Le cadastre répertorie les décharges et les autres sites pollués par des déchets 
+qui doivent être assainis lorsqu'ils sont à l'origine d'effets nocifs ou indésirables ou s'il existe un danger 
+concret que de tels effets surviennent. L'autorité compétente détermine les sites pollués en se fondant sur 
+l'ensemble des informations dont elle dispose (cartes, inventaires ou annonces qui lui sont faites). Elle inscrit au
+cadastre les sites dont la pollution est avérée ou semble très probable.
+Cadastre RDPPF:Cadastre des restrictions de droit public à la propriété foncière
+CSP:Cadastre des sites pollués
+Degrés de sensibilité au bruit:Des degrés de sensibilité au bruit sont définis pour délimiter certaines zones:
+on distingue celles nécessitant une protection accrue contre le bruit, celles où l'exploitation d'aucun 
+établissement susceptible de générer des nuisances sonores n'est permise et celles où l'exploitation 
+d'établissements générant des nuisances moyennes à fortes est autorisée.
+Disposition juridique:Norme juridique à caractère général et concret qui, formant un tout avec les géodonnées de
+base qui lui sont associées, décrit directement la restriction de propriété et est régie par la même procédure.
+Distances par rapport à la forêt:Les constructions et les installations proches de la forêt ne sont permises 
+que si elles ne portent atteinte ni à sa conservation, ni à son entretien, ni à son exploitation.
+Effet anticipé:L'enquête publique génère un effet anticipé: à compter de son ouverture, seuls peuvent 
+généralement être autorisés les projets de construction qui ne contreviennent pas aux nouvelles dispositions mises à
+l'enquête.
+E-GRID:Identificateur fédéral des immeubles; Désignation composée d'un préfixe et d'un numéro qui permet 
+l'identification univoque pour tout le pays de chaque immeuble immatriculé au registre foncier et sert à l'échange 
+des données entre les systèmes informatiques.
+Espace réservé aux eaux:Les cours d'eau ne peuvent retrouver leur état naturel que si un espace suffisant est
+ménagé afin qu'ils puissent remplir leurs diverses fonctions. Ces surfaces doivent rester libres de toute nouvelle 
+installation. Les installations existantes bénéficient de la garantie de la situation acquise.
+Limites forestières statiques:Les limites forestières statiques doivent être fixées sur la base de 
+constatations de la nature forestière faisant foi juridiquement. De nouveaux peuplements en dehors de ces limites ne
+sont pas considérés comme étant des forêts.
+
+11.08.2025   14:52:05  d282e1f0-0786-4c64-9957-1e178e22db9aPage 10/10
+N° OFS:Numéro officiel de la commune issu du répertoire officiel des communes; Attribué pour la toute première 
+fois en 1986 par l'Office fédéral de la statistique avec le répertoire officiel des communes, ce numéro sert à la 
+désignation univoque d'entités territoriales en Suisse.
+Organisme responsable du cadastre:L'organisme responsable du cadastre au sein du canton obtient les 
+données à rassembler dans le cadastre RDPPF auprès des services spécialisés compétents. Il gère ces données et les 
+met à la disposition du public via le géoportail RDPPF cantonal.
+Périmètres de protection des eaux souterraines:Périmètres concentriques dont le but est de protéger 
+l'exploitation et l'alimentation artificielle de nappes souterraines et dans lequel il est interdit de construire 
+des bâtiments ou d'effectuer des travaux qui pourraient compromettre l'établissement futur d'installations 
+d'exploitation ou d'alimentation des eaux souterraines.
+Plans d'affectation:Détermination de l'affectation des différentes surfaces du sol (agriculture, agglomérations,
+forêts, etc.).
+Plan de la zone de sécurité:Plan de zone représentant la zone de sécurité et indiquant les restrictions de la 
+propriété en surface et en hauteur.
+RDPPF:Restriction de droit public à la propriété foncière
+Restriction de la propriété:Les restrictions de propriété ont toujours pour but de préserver les intérêts 
+d'autres personnes auxquels ceux du propriétaire doivent se soumettre dans le cadre d'une relation donnée. Il s'agit
+soit des propriétaires d'immeubles contigus, de voisins, d'autres cercles de particuliers voire de la collectivité 
+dans son ensemble, soit de l'Etat. Les restrictions au profit des voisins ou d'autres particuliers relèvent 
+normalement du droit privé, celles décidées au profit de la collectivité relevant du droit public.
+Réserves forestières:Surface forestière protégée qui assure la conservation de la diversité des espèces 
+animales et végétales.
+Service compétent:Service de la Confédération, du canton ou de la commune dont relèvent la saisie, la mise à 
+jour et la gestion des géodonnées de base selon la législation.
+Zones de protection des eaux souterraines:Zones de protection des eaux souterraines devant garantir qu'en
+cas de danger imminent (p. ex. en cas d'accident impliquant des substances pouvant polluer les eaux), on dispose de
+suffisamment de temps et d'espace pour prendre les mesures qui s'imposent.
+Zones réservées:Zone comprenant un territoire pour lequel un plan d'affectation doit être adopté ou adapté et 
+à l'intérieur de laquelle rien ne doit être entrepris qui puisse entraver l'établissement du plan d'affectation.
+Zones réservées des installations aéroportuaires:Des zones réservées peuvent être instaurées sur des 
+portions de territoires clairement délimitées, afin de garantir la parfaite disponibilité des biens-fonds requis 
+pour les installations aéroportuaires. Au sein de ces zones, toute modification des constructions contraire à 
+l'affectation prévue est proscrite.
+Zones réservées des installations ferroviaires:Des zones réservées peuvent être instaurées sur des portions 
+de territoires clairement délimitées, afin de garantir la parfaite disponibilité des biens-fonds requis pour la 
+construction future d'ouvrages et d'installations ferroviaires. Au sein de ces zones, toute modification des 
+constructions contraire à l'affectation prévue est proscrite.
+Zones réservées des lignes d'une tension nominale égale ou supérieure à 220 kV:Des zones 
+réservées peuvent être instaurées sur des portions de territoires clairement délimitées, afin de garantir la 
+parfaite disponibilité des biens-fonds requis pour les lignes d'une tension nominale égale ou supérieure à 220 kV. 
+Au sein de ces zones, toute modification des constructions contraire à l'affectation prévue est proscrite.
+Zones réservées des routes nationales:Des zones réservées peuvent être instaurées sur des portions de 
+territoires clairement délimitées, afin de garantir la parfaite disponibilité des terrains requis pour la 
+construction des routes nationales. Au sein de ces zones, toute modification des constructions contraire à 
+l'affectation prévue est proscrite.

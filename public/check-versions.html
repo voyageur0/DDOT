@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification des versions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { border-left: 4px solid #10b981; }
+        .error { border-left: 4px solid #ef4444; }
+        .warning { border-left: 4px solid #f59e0b; }
+        h1 { color: #1f2937; }
+        pre {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vérification des versions des scripts</h1>
+    
+    <button onclick="checkVersions()">Vérifier les versions</button>
+    <button onclick="clearCache()">Vider le cache et recharger</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function checkVersions() {
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+            
+            // Vérifier les jeux ultra
+            addStatus('Chargement des jeux ultra-modernes...', 'warning');
+            
+            try {
+                const gamesScript = document.createElement('script');
+                gamesScript.src = `/js/ai-loader-games-ultra.js?v=${Date.now()}`;
+                
+                await new Promise((resolve, reject) => {
+                    gamesScript.onload = resolve;
+                    gamesScript.onerror = reject;
+                    document.head.appendChild(gamesScript);
+                });
+                
+                if (typeof UltraModernSnakeGame !== 'undefined') {
+                    addStatus('✅ Jeux ultra-modernes chargés avec succès', 'success');
+                    addStatus(`Classes disponibles:
+- UltraModernSnakeGame: ${typeof UltraModernSnakeGame}
+- UltraModernBreakoutGame: ${typeof UltraModernBreakoutGame}
+- UltraModernSpaceShooterGame: ${typeof UltraModernSpaceShooterGame}`, 'success');
+                } else {
+                    addStatus('❌ Classes de jeux ultra non trouvées', 'error');
+                }
+            } catch (error) {
+                addStatus(`❌ Erreur chargement jeux: ${error.message}`, 'error');
+            }
+            
+            // Vérifier le loader principal
+            addStatus('Chargement du loader principal...', 'warning');
+            
+            try {
+                const loaderScript = document.createElement('script');
+                loaderScript.src = `/js/ai-loader-enhanced-modern.js?v=${Date.now()}`;
+                
+                await new Promise((resolve, reject) => {
+                    loaderScript.onload = resolve;
+                    loaderScript.onerror = reject;
+                    document.head.appendChild(loaderScript);
+                });
+                
+                if (typeof AILoaderEnhanced !== 'undefined') {
+                    addStatus('✅ Loader principal chargé', 'success');
+                    
+                    // Tester l'initialisation
+                    const loader = new AILoaderEnhanced();
+                    if (loader.games && Object.keys(loader.games).length > 0) {
+                        addStatus(`✅ Jeux initialisés: ${Object.keys(loader.games).join(', ')}`, 'success');
+                        
+                        // Vérifier les types de jeux
+                        const gameTypes = Object.entries(loader.games).map(([name, game]) => 
+                            `${name}: ${game.constructor.name}`
+                        ).join('\n');
+                        addStatus(`Types de jeux:\n${gameTypes}`, 'success');
+                    }
+                } else {
+                    addStatus('❌ Classe AILoaderEnhanced non trouvée', 'error');
+                }
+            } catch (error) {
+                addStatus(`❌ Erreur chargement loader: ${error.message}`, 'error');
+            }
+            
+            // Vérifier le système d'analyse
+            addStatus('Vérification du système d\'analyse...', 'warning');
+            
+            if (typeof performAIAnalysis === 'function') {
+                addStatus('✅ Fonction performAIAnalysis disponible', 'success');
+            } else {
+                addStatus('❌ Fonction performAIAnalysis non trouvée', 'error');
+            }
+            
+            if (typeof displayAIAnalysisResults === 'function') {
+                addStatus('✅ Fonction displayAIAnalysisResults disponible', 'success');
+            } else {
+                addStatus('❌ Fonction displayAIAnalysisResults non trouvée', 'error');
+            }
+        }
+        
+        function addStatus(message, type) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<pre>${message}</pre>`;
+            results.appendChild(div);
+        }
+        
+        function clearCache() {
+            // Forcer le rechargement complet
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => {
+                        caches.delete(name);
+                    });
+                });
+            }
+            
+            // Recharger la page avec un timestamp
+            window.location.href = window.location.pathname + '?v=' + Date.now();
+        }
+        
+        // Vérifier automatiquement au chargement
+        window.addEventListener('load', () => {
+            setTimeout(checkVersions, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -74,6 +74,12 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
   
   let successCount = 0;
   const totalSteps = 5; // Nombre total d'étapes simplifiées (sans dangers naturels)
+  console.log('🎯 Démarrage analyse complète avec 5 étapes:');
+  console.log('  1. Recherche parcelle');
+  console.log('  2. Extraction RDPPF');
+  console.log('  3. Zones et contraintes GeoAdmin');
+  console.log('  4. Règlement communal');
+  console.log('  5. Calcul densité constructible (indices U/IBUS)');
   
   try {
     // ÉTAPE 1: Recherche de la parcelle
@@ -126,7 +132,12 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
           
           // Utiliser directement analyzeRdppf avec les améliorations
           analysis.rdppfConstraints = await analyzeRdppf(rdppfUrl);
-          if (analysis.rdppfConstraints.length) successCount++;
+          if (analysis.rdppfConstraints.length) {
+            successCount++;
+            console.log(`✅ Étape 2 réussie: ${analysis.rdppfConstraints.length} contraintes RDPPF`);
+          } else {
+            console.log('❌ Étape 2 échouée: Aucune contrainte RDPPF extraite');
+          }
           
           // Extraire les informations structurées des contraintes
           const zoneConstraint = analysis.rdppfConstraints.find(c => c.theme === 'Destination de zone');
@@ -168,7 +179,7 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
           
           console.log(`📑 RDPPF analysé: ${analysis.rdppfConstraints.length} contraintes extraites`);
         } catch (rdppfError: any) {
-          console.log(`⚠️ Erreur RDPPF: ${rdppfError.message}`);
+          console.log(`❌ Étape 2 échouée - Erreur RDPPF: ${rdppfError.message}`);
           console.log(`📑 Stack: ${rdppfError.stack?.substring(0, 200)}...`);
           analysis.errors.push(`RDPPF: ${rdppfError.message}`);
         }
@@ -183,7 +194,12 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     console.log('🗺️ Étape 3/5: Zones et contraintes...');
     try {
       analysis.zones = await identifyZonesAndConstraints(x, y);
-      if (Object.keys(analysis.zones).length > 0) successCount++;
+      if (Object.keys(analysis.zones).length > 0) {
+        successCount++;
+        console.log('✅ Étape 3 réussie: Zones GeoAdmin identifiées');
+      } else {
+        console.log('❌ Étape 3 échouée: Aucune zone GeoAdmin trouvée');
+      }
     } catch (error) {
       analysis.errors.push(`Erreur zones: ${error}`);
     }
@@ -196,7 +212,16 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
       const municipalityMatch = analysis.searchResult.number.match(/<b>([^<]+)<\/b>/);
       if (municipalityMatch) {
         municipality = municipalityMatch[1];
-        console.log(`📋 Commune extraite du label: ${municipality}`);
+        // IMPORTANT: Si c'est un code postal (4 chiffres), extraire le nom de commune après
+        if (/^\d{4}$/.test(municipality)) {
+          const realMunicipalityMatch = analysis.searchResult.number.match(/\d{4}\s+([^<]+)/);
+          if (realMunicipalityMatch) {
+            municipality = realMunicipalityMatch[1].trim();
+            console.log(`📋 Commune corrigée (sans code postal): ${municipality}`);
+          }
+        } else {
+          console.log(`📋 Commune extraite du label: ${municipality}`);
+        }
       }
     }
     
@@ -243,7 +268,12 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
             }
             
             console.log(`✅ Règlement analysé: ${analysis.communalConstraints.length} contraintes extraites au total`);
-            if (analysis.communalConstraints.length > 0) successCount++;
+            if (analysis.communalConstraints.length > 0) {
+              successCount++;
+              console.log('✅ Étape 4 réussie: Contraintes du règlement communal extraites');
+            } else {
+              console.log('❌ Étape 4 échouée: Aucune contrainte communale extraite');
+            }
           }
         } catch (fileError: any) {
           console.log(`⚠️ Règlement local non trouvé (${fileError.message}), recherche web...`);
@@ -270,8 +300,13 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
     // ÉTAPE 5: Calcul de densité constructible (Valais)
     console.log('📏 Étape 5/5: Calcul densité constructible...');
     try {
-      if (analysis.parcelDetails?.surface && municipality) {
-        console.log(`📏 Calcul densité pour terrain de ${analysis.parcelDetails.surface} m² (${municipality})`);
+      // Essayer de récupérer la surface depuis différentes sources
+      let terrainSurface = analysis.parcelDetails?.surface || 
+                          analysis.rdppfData?.zoneAffectation?.surface ||
+                          0;
+      
+      if (terrainSurface > 0 && municipality) {
+        console.log(`📏 Calcul densité pour terrain de ${terrainSurface} m² (${municipality})`);
         
         // Extraire les indices depuis les règlements communaux
         let indices: { indiceU?: number; indiceIBUS?: number } = {};
@@ -304,7 +339,7 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
         // Calculer la densité si on a trouvé au moins un indice
         if (indices.indiceU || indices.indiceIBUS) {
           analysis.valaisDensity = calculerDensiteValais({
-            terrainSurface: analysis.parcelDetails.surface,
+            terrainSurface: terrainSurface,
             indiceU: indices.indiceU,
             indiceIBUS: indices.indiceIBUS,
             commune: municipality,
@@ -312,9 +347,11 @@ export async function performComprehensiveAnalysis(searchQuery: string): Promise
             projetMINERGIE: false // Par défaut, peut être modifié par l'utilisateur
           });
           
-          console.log(`✅ Densité calculée: U=${analysis.valaisDensity.surfaceUtileU} m², IBUS=${analysis.valaisDensity.surfaceUtileIBUS} m²`);
+          successCount++;
+          console.log(`✅ Étape 5 réussie: Densité calculée: U=${analysis.valaisDensity.surfaceUtileU || 'N/A'} m², IBUS=${analysis.valaisDensity.surfaceUtileIBUS || 'N/A'} m²`);
         } else {
-          console.log('⚠️ Aucun indice de construction trouvé dans les documents');
+          console.log('❌ Étape 5 échouée: Aucun indice de construction trouvé dans les documents');
+          analysis.errors.push('Indices de construction (U/IBUS) non trouvés');
         }
       }
     } catch (error) {
@@ -494,25 +531,60 @@ export async function performQuickAnalysis(searchQuery: string): Promise<Compreh
     
     if (analysis.searchResult) {
       const { x, y } = analysis.searchResult.center;
+      const egrid = analysis.searchResult.egrid;
       
       // Essayer de récupérer quelques données essentielles en parallèle
-      const [parcelDetails, buildingZone, zones] = await Promise.allSettled([
+      const promises: Promise<any>[] = [
         getParcelDetails(x, y),
         getBuildingZoneInfo(x, y),
         identifyZonesAndConstraints(x, y)
-      ]);
+      ];
+      
+      // Ajouter RDPPF si on a un EGRID
+      if (egrid) {
+        const rdppfUrl = `https://rdppfvs.geopol.ch/extract/pdf?EGRID=${egrid}&LANG=fr`;
+        promises.push(analyzeRdppf(rdppfUrl).catch(err => {
+          console.log(`⚠️ RDPPF rapide échoué: ${err.message}`);
+          return [];
+        }));
+      }
+      
+      const [parcelDetails, buildingZone, zones, rdppfConstraints] = await Promise.allSettled(promises);
       
       if (parcelDetails.status === 'fulfilled') analysis.parcelDetails = parcelDetails.value;
       if (buildingZone.status === 'fulfilled') analysis.buildingZone = buildingZone.value;
       if (zones.status === 'fulfilled') analysis.zones = zones.value;
+      if (rdppfConstraints && rdppfConstraints.status === 'fulfilled') {
+        analysis.rdppfConstraints = rdppfConstraints.value;
+        
+        // Extraire la zone depuis RDPPF
+        const zoneConstraint = analysis.rdppfConstraints.find(c => c.theme === 'Destination de zone');
+        if (zoneConstraint) {
+          const zoneMatch = zoneConstraint.rule.match(/^([^,]+)/)
+          if (zoneMatch) {
+            const zoneDesignation = zoneMatch[1].trim();
+            analysis.rdppfData = {
+              zoneAffectation: {
+                designation: zoneDesignation
+              }
+            };
+            
+            const surfaceMatch = zoneConstraint.rule.match(/Surface:\s*(\d+)\s*m²/);
+            if (surfaceMatch) {
+              analysis.rdppfData.zoneAffectation.surface = parseInt(surfaceMatch[1]);
+            }
+          }
+        }
+      }
       
       // Calcul de complétude approximatif
       let successCount = 1; // searchResult réussi
       if (analysis.parcelDetails) successCount++;
       if (Object.keys(analysis.buildingZone).length > 0) successCount++;
       if (Object.keys(analysis.zones).length > 0) successCount++;
+      if (analysis.rdppfConstraints.length > 0) successCount++;
       
-      analysis.completeness = Math.round((successCount / 4) * 100);
+      analysis.completeness = Math.round((successCount / 5) * 100);
     }
     
     analysis.processingTime = Date.now() - startTime;

@@ -4,9 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DDOT - Plateforme d'Analyse Urbanistique</title>
+    
+    <!-- Meta tags anti-cache agressifs -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Forcer le rechargement des ressources avec timestamp unique -->
+    <script>
+        // Générer un cache buster unique basé sur le timestamp
+        window.CACHE_VERSION = Date.now();
+    </script>
+    
+    <!-- CSS avec cache buster dynamique -->
     <link rel="stylesheet" href="/css/modern-ui.css">
     <link rel="stylesheet" href="/css/auth.css">
     <link rel="stylesheet" href="/css/ai-loader.css">
+    
+    <script>
+        // Forcer le rechargement des CSS avec version unique
+        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.includes('?')) {
+                link.setAttribute('href', href + '?v=' + window.CACHE_VERSION);
+            }
+        });
+    </script>
+    
     <meta name="description" content="Analyse intelligente d'urbanisme pour le Valais - Découvrez les contraintes de construction en temps réel">
 </head>
 <body>
@@ -750,6 +775,14 @@
         }
     </style>
 
+    <!-- Charger search-system.js en premier -->
+    <script>
+        const searchSystemScript = document.createElement('script');
+        searchSystemScript.src = `/js/search-system.js?v=${window.CACHE_VERSION}`;
+        searchSystemScript.async = false;
+        document.head.appendChild(searchSystemScript);
+    </script>
+    
     <script>
         // Variables globales
         window.currentData = null;
@@ -788,8 +821,19 @@
             const heroSearchForm = document.getElementById('heroSearchForm');
             const heroSearchInput = document.getElementById('heroSearchInput');
             
-            // Initialiser le nouveau système de recherche
-            searchSystem = new SearchSystem();
+            // Attendre que SearchSystem soit chargé
+            const initSearchSystem = () => {
+                if (typeof SearchSystem !== 'undefined') {
+                    window.searchSystem = new SearchSystem();
+                    console.log('✅ SearchSystem initialisé');
+                } else {
+                    // Réessayer dans 50ms
+                    setTimeout(initSearchSystem, 50);
+                }
+            };
+            
+            // Lancer l'initialisation
+            initSearchSystem();
             
             // Écouter les événements de sélection
             heroSearchInput.addEventListener('search-selected', async function(e) {
@@ -1022,7 +1066,7 @@
             
             try {
                 // 2. Fallback: utiliser l'API de géocodage inverse de GeoAdmin
-                const url = `https://api3.geo.admin.ch/rest/services/api/SearchServer?type=locations&limit=1&bbox=${coordinates.lng-0.001},${coordinates.lat-0.001},${coordinates.lng+0.001},${coordinates.lat+0.001}&origins=address`;
+                const url = `/api/geoadmin-search?type=locations&limit=1&bbox=${coordinates.lng-0.001},${coordinates.lat-0.001},${coordinates.lng+0.001},${coordinates.lat+0.001}&origins=address&searchText=*`;
                 
                 const response = await fetch(url);
                 if (response.ok) {
@@ -1114,7 +1158,7 @@
                 // 3. Essayer avec une approche alternative via search
                 const egrid = geoAdminData.featureId || geoAdminData.id;
                 if (egrid) {
-                    const searchUrl = `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${egrid}&type=featuresearch&bbox=0,0,100,100&sr=2056`;
+                    const searchUrl = `/api/geoadmin-search?searchText=${egrid}&type=featuresearch&bbox=0,0,100,100&sr=2056`;
                     
                     const response = await fetch(searchUrl);
                     if (response.ok) {
@@ -2643,10 +2687,20 @@
         }
     </style>
     
-    <!-- Scripts d'authentification -->
-    <script src="/js/auth.js?v=2"></script>
-    <script src="/js/search-system.js?v=1"></script>
-    <script src="/js/ai-analysis-enhanced-v2.js?v=15"></script>
+    <!-- Scripts d'authentification avec cache buster dynamique -->
+    <script>
+        // Charger seulement auth.js (search-system.js est déjà chargé)
+        const authScript = document.createElement('script');
+        authScript.src = '/js/auth.js?v=' + window.CACHE_VERSION;
+        authScript.async = false;
+        document.head.appendChild(authScript);
+    </script>
+    <script>
+        // Charger le script d'analyse avec version dynamique pour éviter le cache
+        const analysisScriptV2 = document.createElement('script');
+        analysisScriptV2.src = `/js/ai-analysis-enhanced-v2.js?v=${Date.now()}`;
+        document.head.appendChild(analysisScriptV2);
+    </script>
     
     <!-- Script pour vérifier le chargement des modules -->
     <script>
@@ -2738,15 +2792,23 @@
                     
                     // Charger le script du loader avec mini-jeux
                     if (!window.AILoaderEnhanced && !document.querySelector('script[src*="ai-loader-enhanced.js"]')) {
-                        const loaderScript = document.createElement('script');
-                        loaderScript.src = '/js/ai-loader-enhanced-modern.js';
-                        loaderScript.onload = function() {
-                            if (window.AILoaderEnhanced) {
-                                const loader = new window.AILoaderEnhanced();
-                                loader.init();
-                            }
+                        // D'abord charger les jeux ultra-modernes
+                        const timestamp = Date.now();
+                        const gamesScript = document.createElement('script');
+                        gamesScript.src = `/js/ai-loader-games-ultra.js?v=${timestamp}`;
+                        gamesScript.onload = function() {
+                            // Ensuite charger le loader principal
+                            const loaderScript = document.createElement('script');
+                            loaderScript.src = `/js/ai-loader-enhanced-modern.js?v=${timestamp}`;
+                            loaderScript.onload = function() {
+                                if (window.AILoaderEnhanced) {
+                                    const loader = new window.AILoaderEnhanced();
+                                    loader.init();
+                                }
+                            };
+                            document.head.appendChild(loaderScript);
                         };
-                        document.head.appendChild(loaderScript);
+                        document.head.appendChild(gamesScript);
                     }
                     
                     // Lancer l'analyse

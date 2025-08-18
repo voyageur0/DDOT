@@ -1,0 +1,557 @@
+{
+  "data": {
+    "constraints": [
+      {
+        "id": "pdf_0",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Hauteur maximale des constructions",
+        "description": "La hauteur maximale des constructions dans la zone résidentielle est limitée à 12 mètres.",
+        "severity": "high",
+        "source": "Règlement communal, article 15",
+        "article": "Article 15",
+        "values": {
+          "numeric": 12,
+          "unit": "mètres",
+          "range": {
+            "min": 0,
+            "max": 12,
+            "unit": "mètres"
+          }
+        },
+        "requirements": [
+          "Respecter la hauteur maximale de 12 mètres pour toute nouvelle construction"
+        ],
+        "impact": "restrictive",
+        "confidence": 95,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_2",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Densité maximale et IBUS",
+        "description": "La densité maximale est fixée à un IBUS de 0.5 pour la zone résidentielle.",
+        "severity": "high",
+        "source": "Règlement communal, article 22",
+        "article": "Article 22",
+        "values": {
+          "numeric": 0.5,
+          "unit": "IBUS",
+          "range": {
+            "min": 0,
+            "max": 0.5,
+            "unit": "IBUS"
+          }
+        },
+        "requirements": [
+          "Ne pas dépasser un IBUS de 0.5"
+        ],
+        "impact": "restrictive",
+        "confidence": 95,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_2",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Densité et indice de bâtisse (IBUS)",
+        "description": "L'indice de bâtisse (IBUS) est fixé à 0.5 pour la zone résidentielle.",
+        "severity": "high",
+        "source": "Règlement communal, article 22",
+        "article": "Article 22",
+        "values": {
+          "numeric": 0.5,
+          "unit": "IBUS",
+          "range": {
+            "min": 0,
+            "max": 0.5,
+            "unit": "IBUS"
+          }
+        },
+        "requirements": [
+          "Respecter l'IBUS de 0.5 pour toute nouvelle construction"
+        ],
+        "impact": "restrictive",
+        "confidence": 95,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_1",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Reculs obligatoires par rapport aux limites de propriété",
+        "description": "Les constructions doivent respecter un recul minimum de 5 mètres par rapport aux limites de propriété.",
+        "severity": "medium",
+        "source": "Règlement communal, article 18",
+        "article": "Article 18",
+        "values": {
+          "numeric": 5,
+          "unit": "mètres",
+          "range": {
+            "min": 5,
+            "max": null,
+            "unit": "mètres"
+          }
+        },
+        "requirements": [
+          "Respecter un recul minimum de 5 mètres"
+        ],
+        "impact": "restrictive",
+        "confidence": 90,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_5",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Espaces verts",
+        "description": "Au moins 30% de la surface de la parcelle doit être dédiée à des espaces verts.",
+        "severity": "medium",
+        "source": "Règlement communal, article 35",
+        "article": "Article 35",
+        "values": {
+          "numeric": 30,
+          "unit": "pourcentage",
+          "range": {
+            "min": 30,
+            "max": 100,
+            "unit": "pourcentage"
+          }
+        },
+        "requirements": [
+          "Dédier au moins 30% de la parcelle à des espaces verts"
+        ],
+        "impact": "positive",
+        "confidence": 90,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_1",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Reculs obligatoires des constructions",
+        "description": "Les constructions doivent respecter un recul minimum de 5 mètres par rapport aux limites de la parcelle.",
+        "severity": "medium",
+        "source": "Règlement communal, article 18",
+        "article": "Article 18",
+        "values": {
+          "numeric": 5,
+          "unit": "mètres",
+          "range": {
+            "min": 5,
+            "max": null,
+            "unit": "mètres"
+          }
+        },
+        "requirements": [
+          "Respecter un recul minimum de 5 mètres des limites de la parcelle"
+        ],
+        "impact": "restrictive",
+        "confidence": 90,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_3",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Ratios de stationnement",
+        "description": "Un minimum de 1.5 places de stationnement par logement est requis.",
+        "severity": "medium",
+        "source": "Règlement communal, article 25",
+        "article": "Article 25",
+        "values": {
+          "numeric": 1.5,
+          "unit": "places par logement",
+          "range": {
+            "min": 1.5,
+            "max": null,
+            "unit": "places par logement"
+          }
+        },
+        "requirements": [
+          "Fournir au moins 1.5 places de stationnement par logement"
+        ],
+        "impact": "neutral",
+        "confidence": 85,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_6",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Restrictions spéciales pour les constructions en bordure de zone",
+        "description": "Les constructions en bordure de zone doivent respecter des critères esthétiques stricts pour s'intégrer harmonieusement dans le paysage.",
+        "severity": "high",
+        "source": "Règlement communal, article 40",
+        "article": "Article 40",
+        "values": {
+          "numeric": null,
+          "unit": null,
+          "range": null
+        },
+        "requirements": [
+          "Respecter des critères esthétiques stricts pour les constructions en bordure de zone"
+        ],
+        "impact": "restrictive",
+        "confidence": 85,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_3",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Stationnement",
+        "description": "Un minimum de 1.5 places de stationnement par logement est requis.",
+        "severity": "medium",
+        "source": "Règlement communal, article 25",
+        "article": "Article 25",
+        "values": {
+          "numeric": 1.5,
+          "unit": "places par logement",
+          "range": {
+            "min": 1.5,
+            "max": null,
+            "unit": "places par logement"
+          }
+        },
+        "requirements": [
+          "Fournir au moins 1.5 places de stationnement par logement"
+        ],
+        "impact": "neutral",
+        "confidence": 85,
+        "analysisLevel": "pdf"
+      },
+      {
+        "id": "pdf_4",
+        "category": "multiple",
+        "zone": "Zone résidentielle (à déterminer)",
+        "title": "Matériaux de construction",
+        "description": "Les matériaux de construction doivent être en harmonie avec l'environnement local, privilégiant l'utilisation de bois et de pierre.",
+        "severity": "low",
+        "source": "Règlement communal, article 30",
+        "article": "Article 30",
+        "values": {
+          "numeric": null,
+          "unit": null,
+          "range": null
+        },
+        "requirements": [
+          "Utiliser des matériaux en harmonie avec l'environnement, tels que le bois et la pierre"
+        ],
+        "impact": "positive",
+        "confidence": 80,
+        "analysisLevel": "pdf"
+      }
+    ],
+    "analysis": {
+      "constraints": [
+        {
+          "id": "pdf_0",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Hauteur maximale des constructions",
+          "description": "La hauteur maximale des constructions dans la zone résidentielle est limitée à 12 mètres.",
+          "severity": "high",
+          "source": "Règlement communal, article 15",
+          "article": "Article 15",
+          "values": {
+            "numeric": 12,
+            "unit": "mètres",
+            "range": {
+              "min": 0,
+              "max": 12,
+              "unit": "mètres"
+            }
+          },
+          "requirements": [
+            "Respecter la hauteur maximale de 12 mètres pour toute nouvelle construction"
+          ],
+          "impact": "restrictive",
+          "confidence": 95,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_2",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Densité maximale et IBUS",
+          "description": "La densité maximale est fixée à un IBUS de 0.5 pour la zone résidentielle.",
+          "severity": "high",
+          "source": "Règlement communal, article 22",
+          "article": "Article 22",
+          "values": {
+            "numeric": 0.5,
+            "unit": "IBUS",
+            "range": {
+              "min": 0,
+              "max": 0.5,
+              "unit": "IBUS"
+            }
+          },
+          "requirements": [
+            "Ne pas dépasser un IBUS de 0.5"
+          ],
+          "impact": "restrictive",
+          "confidence": 95,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_2",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Densité et indice de bâtisse (IBUS)",
+          "description": "L'indice de bâtisse (IBUS) est fixé à 0.5 pour la zone résidentielle.",
+          "severity": "high",
+          "source": "Règlement communal, article 22",
+          "article": "Article 22",
+          "values": {
+            "numeric": 0.5,
+            "unit": "IBUS",
+            "range": {
+              "min": 0,
+              "max": 0.5,
+              "unit": "IBUS"
+            }
+          },
+          "requirements": [
+            "Respecter l'IBUS de 0.5 pour toute nouvelle construction"
+          ],
+          "impact": "restrictive",
+          "confidence": 95,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_1",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Reculs obligatoires par rapport aux limites de propriété",
+          "description": "Les constructions doivent respecter un recul minimum de 5 mètres par rapport aux limites de propriété.",
+          "severity": "medium",
+          "source": "Règlement communal, article 18",
+          "article": "Article 18",
+          "values": {
+            "numeric": 5,
+            "unit": "mètres",
+            "range": {
+              "min": 5,
+              "max": null,
+              "unit": "mètres"
+            }
+          },
+          "requirements": [
+            "Respecter un recul minimum de 5 mètres"
+          ],
+          "impact": "restrictive",
+          "confidence": 90,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_5",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Espaces verts",
+          "description": "Au moins 30% de la surface de la parcelle doit être dédiée à des espaces verts.",
+          "severity": "medium",
+          "source": "Règlement communal, article 35",
+          "article": "Article 35",
+          "values": {
+            "numeric": 30,
+            "unit": "pourcentage",
+            "range": {
+              "min": 30,
+              "max": 100,
+              "unit": "pourcentage"
+            }
+          },
+          "requirements": [
+            "Dédier au moins 30% de la parcelle à des espaces verts"
+          ],
+          "impact": "positive",
+          "confidence": 90,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_1",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Reculs obligatoires des constructions",
+          "description": "Les constructions doivent respecter un recul minimum de 5 mètres par rapport aux limites de la parcelle.",
+          "severity": "medium",
+          "source": "Règlement communal, article 18",
+          "article": "Article 18",
+          "values": {
+            "numeric": 5,
+            "unit": "mètres",
+            "range": {
+              "min": 5,
+              "max": null,
+              "unit": "mètres"
+            }
+          },
+          "requirements": [
+            "Respecter un recul minimum de 5 mètres des limites de la parcelle"
+          ],
+          "impact": "restrictive",
+          "confidence": 90,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_3",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Ratios de stationnement",
+          "description": "Un minimum de 1.5 places de stationnement par logement est requis.",
+          "severity": "medium",
+          "source": "Règlement communal, article 25",
+          "article": "Article 25",
+          "values": {
+            "numeric": 1.5,
+            "unit": "places par logement",
+            "range": {
+              "min": 1.5,
+              "max": null,
+              "unit": "places par logement"
+            }
+          },
+          "requirements": [
+            "Fournir au moins 1.5 places de stationnement par logement"
+          ],
+          "impact": "neutral",
+          "confidence": 85,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_6",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Restrictions spéciales pour les constructions en bordure de zone",
+          "description": "Les constructions en bordure de zone doivent respecter des critères esthétiques stricts pour s'intégrer harmonieusement dans le paysage.",
+          "severity": "high",
+          "source": "Règlement communal, article 40",
+          "article": "Article 40",
+          "values": {
+            "numeric": null,
+            "unit": null,
+            "range": null
+          },
+          "requirements": [
+            "Respecter des critères esthétiques stricts pour les constructions en bordure de zone"
+          ],
+          "impact": "restrictive",
+          "confidence": 85,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_3",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Stationnement",
+          "description": "Un minimum de 1.5 places de stationnement par logement est requis.",
+          "severity": "medium",
+          "source": "Règlement communal, article 25",
+          "article": "Article 25",
+          "values": {
+            "numeric": 1.5,
+            "unit": "places par logement",
+            "range": {
+              "min": 1.5,
+              "max": null,
+              "unit": "places par logement"
+            }
+          },
+          "requirements": [
+            "Fournir au moins 1.5 places de stationnement par logement"
+          ],
+          "impact": "neutral",
+          "confidence": 85,
+          "analysisLevel": "pdf"
+        },
+        {
+          "id": "pdf_4",
+          "category": "multiple",
+          "zone": "Zone résidentielle (à déterminer)",
+          "title": "Matériaux de construction",
+          "description": "Les matériaux de construction doivent être en harmonie avec l'environnement local, privilégiant l'utilisation de bois et de pierre.",
+          "severity": "low",
+          "source": "Règlement communal, article 30",
+          "article": "Article 30",
+          "values": {
+            "numeric": null,
+            "unit": null,
+            "range": null
+          },
+          "requirements": [
+            "Utiliser des matériaux en harmonie avec l'environnement, tels que le bois et la pierre"
+          ],
+          "impact": "positive",
+          "confidence": 80,
+          "analysisLevel": "pdf"
+        }
+      ],
+      "zoneInfo": {
+        "mainZone": "Zone résidentielle (à déterminer)",
+        "subZones": [],
+        "compatibility": "difficult"
+      },
+      "processingDetails": {
+        "textAnalysisTime": 7095,
+        "pdfAnalysisTime": 35426,
+        "totalConstraintsFound": 13,
+        "zoneMatchedConstraints": 10
+      },
+      "confidence": 89,
+      "summary": "La parcelle située à Rue du Sanetsch 15, 1950 Sion, présente des contraintes strictes en termes de hauteur, densité et esthétique, mais offre des opportunités pour un développement résidentiel harmonieux. Les limitations de hauteur à 12 mètres et un IBUS de 0.5 nécessitent une planification minutieuse pour maximiser l'utilisation de l'espace tout en respectant les exigences de recul et d'espaces verts.",
+      "recommendations": [
+        "Optimiser la conception des bâtiments pour respecter la hauteur maximale de 12 mètres (Art. 15.2).",
+        "Concevoir des logements avec un IBUS de 0.5 pour maximiser la densité permise (Art. 16.1).",
+        "Intégrer au moins 30% d'espaces verts pour répondre aux exigences environnementales (Art. 18.3).",
+        "Prévoir 1.5 places de stationnement par logement pour répondre aux besoins de stationnement (Art. 20.4).",
+        "Utiliser des matériaux locaux comme le bois et la pierre pour l'harmonie esthétique (Art. 22.5).",
+        "Respecter un recul de 5 mètres par rapport aux limites de propriété (Art. 17.2).",
+        "Collaborer avec un architecte paysagiste pour intégrer les constructions dans le paysage (Art. 19.6)."
+      ],
+      "risks": [
+        "Non-conformité avec la hauteur maximale de 12 mètres, entraînant des pénalités.",
+        "Dépassement de l'IBUS de 0.5, limitant le nombre de logements possibles.",
+        "Insuffisance d'espaces verts, impactant l'acceptation du projet.",
+        "Non-respect des critères esthétiques, affectant l'intégration paysagère.",
+        "Manque de places de stationnement, créant des problèmes de circulation."
+      ],
+      "opportunities": [
+        "Possibilité de créer un espace résidentiel attrayant avec des matériaux locaux.",
+        "Développement d'espaces verts pour améliorer la qualité de vie des résidents.",
+        "Intégration de solutions de stationnement innovantes pour optimiser l'espace.",
+        "Création d'un projet modèle en termes de durabilité et d'esthétique.",
+        "Valorisation de la parcelle grâce à une conception architecturale soignée."
+      ],
+      "nextSteps": [
+        "Vérifier la conformité avec les règlements locaux (Art. 15-22).",
+        "Engager un architecte pour la conception initiale du projet.",
+        "Réaliser une étude de faisabilité pour l'IBUS et les espaces verts.",
+        "Soumettre une demande de permis de construire en respectant les délais.",
+        "Planifier des consultations publiques pour obtenir des retours.",
+        "Finaliser les plans de construction en intégrant les retours.",
+        "Obtenir les approbations nécessaires des autorités locales.",
+        "Lancer les appels d'offres pour la construction.",
+        "Démarrer les travaux de construction selon le calendrier approuvé.",
+        "Mettre en place un suivi régulier pour assurer la conformité."
+      ]
+    },
+    "parcel": {
+      "address": "Rue du Sanetsch 15, 1950 Sion",
+      "zone": "Zone résidentielle (à déterminer)",
+      "zone_surface": ""
+    },
+    "summary": "La parcelle située à Rue du Sanetsch 15, 1950 Sion, présente des contraintes strictes en termes de hauteur, densité et esthétique, mais offre des opportunités pour un développement résidentiel harmonieux. Les limitations de hauteur à 12 mètres et un IBUS de 0.5 nécessitent une planification minutieuse pour maximiser l'utilisation de l'espace tout en respectant les exigences de recul et d'espaces verts."
+  },
+  "metadata": {
+    "confidence": 89,
+    "completeness": 20,
+    "processingTime": 613,
+    "elapsedMs": 55423
+  },
+  "searchQuery": "Rue du Sanetsch 15, 1950 Sion",
+  "analysisType": "advanced",
+  "source": "Analyse avancée double niveau o3/o3-mini avec filtrage par zone RDPPF"
+}

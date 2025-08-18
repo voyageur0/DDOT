@@ -282,6 +282,173 @@
     }
 };
 
+    // Fonction pour formater l'analyse conversationnelle avec style DDOT
+    function formatConversationalAnalysis(text) {
+        if (!text) return '';
+        
+        // Remplacer les paragraphes par des divs avec espacement
+        let formatted = text.split('\n\n').map(paragraph => {
+            if (!paragraph.trim()) return '';
+            
+            // Détecter les titres (commencent par ### ou sont en majuscules)
+            if (paragraph.startsWith('###')) {
+                const title = paragraph.replace(/^###\s*/, '');
+                return `
+                    <h4 style="
+                        font-size: 20px;
+                        font-weight: 600;
+                        color: #0070f3;
+                        margin: 1.5rem 0 0.75rem 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    ">
+                        <span style="
+                            width: 4px;
+                            height: 24px;
+                            background: linear-gradient(135deg, #0070f3 0%, #00d4aa 100%);
+                            border-radius: 2px;
+                        "></span>
+                        ${title}
+                    </h4>
+                `;
+            }
+            
+            // Détecter les listes
+            if (paragraph.includes('\n- ') || paragraph.startsWith('- ')) {
+                const items = paragraph.split('\n').filter(line => line.trim().startsWith('-'));
+                return `
+                    <ul style="
+                        margin: 1rem 0;
+                        padding-left: 0;
+                        list-style: none;
+                    ">
+                        ${items.map(item => `
+                            <li style="
+                                margin: 0.5rem 0;
+                                padding-left: 1.5rem;
+                                position: relative;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    top: 0.5rem;
+                                    width: 6px;
+                                    height: 6px;
+                                    background: #00d4aa;
+                                    border-radius: 50%;
+                                "></span>
+                                ${highlightKeyTerms(item.replace(/^-\s*/, ''))}
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+            
+            // Détecter les listes numérotées
+            if (/^\d+\./.test(paragraph)) {
+                const items = paragraph.split('\n').filter(line => /^\d+\./.test(line.trim()));
+                return `
+                    <ol style="
+                        margin: 1rem 0;
+                        padding-left: 0;
+                        list-style: none;
+                        counter-reset: ddot-counter;
+                    ">
+                        ${items.map(item => `
+                            <li style="
+                                margin: 0.75rem 0;
+                                padding-left: 2rem;
+                                position: relative;
+                                counter-increment: ddot-counter;
+                            ">
+                                <span style="
+                                    position: absolute;
+                                    left: 0;
+                                    top: 0.25rem;
+                                    width: 24px;
+                                    height: 24px;
+                                    background: linear-gradient(135deg, #0070f3 0%, #00d4aa 100%);
+                                    color: white;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                ">${item.match(/^\d+/)[0]}</span>
+                                ${highlightKeyTerms(item.replace(/^\d+\.\s*/, ''))}
+                            </li>
+                        `).join('')}
+                    </ol>
+                `;
+            }
+            
+            // Paragraphe normal
+            return `
+                <p style="
+                    margin: 1rem 0;
+                    line-height: 1.8;
+                    color: #374151;
+                ">
+                    ${highlightKeyTerms(paragraph)}
+                </p>
+            `;
+        }).join('');
+        
+        return formatted;
+    }
+    
+    // Fonction pour mettre en évidence les termes importants
+    function highlightKeyTerms(text) {
+        // Termes importants à mettre en évidence avec les couleurs DDOT
+        const highlights = {
+            // Termes légaux et réglementaires
+            'LAT': '<span style="color: #0070f3; font-weight: 600;">LAT</span>',
+            'LCAT': '<span style="color: #0070f3; font-weight: 600;">LCAT</span>',
+            'RDPPF': '<span style="color: #0070f3; font-weight: 600;">RDPPF</span>',
+            'IBUS': '<span style="color: #00d4aa; font-weight: 600;">IBUS</span>',
+            'indice U': '<span style="color: #00d4aa; font-weight: 600;">indice U</span>',
+            'coefficient': '<span style="color: #00d4aa; font-weight: 600;">coefficient</span>',
+            
+            // Surfaces et mesures (avec regex pour capturer les valeurs)
+            'm²': 'm²',
+            'mètres': '<span style="color: #8b5cf6; font-weight: 500;">mètres</span>',
+            'surface': '<span style="color: #8b5cf6; font-weight: 500;">surface</span>',
+            'hauteur': '<span style="color: #f59e0b; font-weight: 500;">hauteur</span>',
+            
+            // Actions importantes
+            'IMPORTANT': '<span style="color: #ef4444; font-weight: 700;">IMPORTANT</span>',
+            'ATTENTION': '<span style="color: #f59e0b; font-weight: 700;">ATTENTION</span>',
+            'RECOMMANDATION': '<span style="color: #00d4aa; font-weight: 700;">RECOMMANDATION</span>',
+            'obligatoire': '<span style="color: #ef4444; font-weight: 600;">obligatoire</span>',
+            'interdit': '<span style="color: #ef4444; font-weight: 600;">interdit</span>',
+            'autorisé': '<span style="color: #10b981; font-weight: 600;">autorisé</span>',
+            
+            // Zones
+            'zone résidentielle': '<span style="color: #2563eb; font-weight: 600;">zone résidentielle</span>',
+            'zone mixte': '<span style="color: #2563eb; font-weight: 600;">zone mixte</span>',
+            'zone industrielle': '<span style="color: #2563eb; font-weight: 600;">zone industrielle</span>',
+            'zone à bâtir': '<span style="color: #2563eb; font-weight: 600;">zone à bâtir</span>',
+        };
+        
+        // Remplacer les nombres suivis d'unités
+        text = text.replace(/(\d+(?:\.\d+)?)\s*(m²|m|%)/g, 
+            '<span style="color: #0070f3; font-weight: 600;">$1$2</span>');
+        
+        // Remplacer les termes clés
+        for (const [term, replacement] of Object.entries(highlights)) {
+            const regex = new RegExp(`\\b${term}\\b`, 'gi');
+            text = text.replace(regex, replacement);
+        }
+        
+        // Mettre en gras le texte entre **
+        text = text.replace(/\*\*(.*?)\*\*/g, 
+            '<strong style="color: #111827; font-weight: 600;">$1</strong>');
+        
+        return text;
+    }
+    
     // Copier la fonction displayAIAnalysisResults depuis l'ancien fichier
     window.displayAIAnalysisResults = function(result) {
     // Utiliser le nouveau div dans parcelInfoSection
@@ -302,7 +469,8 @@
         resultsSection.style.display = 'block';
     }
     
-    if (!result.data || !result.data.constraints) {
+    // Vérifier si on a des données (mode conversationnel ou structuré)
+    if (!result.data || (!result.data.constraints && !result.data.analysis)) {
         resultsDiv.innerHTML = `
             <div class="result-card">
                 <p style="color: var(--text-secondary);">Aucune donnée d'analyse disponible</p>
@@ -311,7 +479,10 @@
         return;
     }
     
-    const constraints = result.data.constraints;
+    // Détecter le mode d'analyse (o3-reasoning, conversationnel ou structuré)
+    const isO3Reasoning = result.analysisType === 'o3-reasoning';
+    const isConversational = result.analysisType === 'conversational' || (!result.data.constraints && result.data.analysis);
+    const constraints = result.data.constraints || [];
     const analysis = result.data.analysis;
     const parcel = result.data.parcel;
     const metadata = result.metadata;
@@ -366,25 +537,45 @@
                             -webkit-text-fill-color: transparent;
                             background-clip: text;
                         ">Analyse Complète</h3>
-                        ${metadata?.confidence ? `
-                            <div style="
-                                margin-left: auto;
-                                padding: 0.5rem 1rem;
-                                background: ${metadata.confidence >= 80 ? 'rgba(0, 212, 170, 0.1)' : metadata.confidence >= 60 ? 'rgba(255, 107, 53, 0.1)' : 'rgba(255, 51, 51, 0.1)'};
-                                color: ${metadata.confidence >= 80 ? 'var(--success)' : metadata.confidence >= 60 ? 'var(--warning)' : 'var(--error)'};
-                                border-radius: 8px;
-                                font-weight: 600;
-                                display: flex;
-                                align-items: center;
-                                gap: 0.5rem;
-                            ">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20z"/>
-                                    <path d="M12 6v6l4 2"/>
-                                </svg>
-                                Confiance: ${metadata.confidence}%
-                            </div>
-                        ` : ''}
+                        <div style="display: flex; gap: 0.75rem; margin-left: auto;">
+                            ${metadata?.model ? `
+                                <div style="
+                                    padding: 0.5rem 1rem;
+                                    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
+                                    color: #8b5cf6;
+                                    border-radius: 8px;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                ">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                    ${metadata.model.toUpperCase()}
+                                    ${metadata.reasoningEffort ? ` (${metadata.reasoningEffort})` : ''}
+                                </div>
+                            ` : ''}
+                            ${metadata?.confidence ? `
+                                <div style="
+                                    padding: 0.5rem 1rem;
+                                    background: ${metadata.confidence >= 80 ? 'rgba(0, 212, 170, 0.1)' : metadata.confidence >= 60 ? 'rgba(255, 107, 53, 0.1)' : 'rgba(255, 51, 51, 0.1)'};
+                                    color: ${metadata.confidence >= 80 ? 'var(--success)' : metadata.confidence >= 60 ? 'var(--warning)' : 'var(--error)'};
+                                    border-radius: 8px;
+                                    font-weight: 600;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                ">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20z"/>
+                                        <path d="M12 6v6l4 2"/>
+                                    </svg>
+                                    Confiance: ${metadata.confidence}%
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
                     
                     ${parcel ? `
@@ -421,8 +612,134 @@
                 </div>
             </div>
             
-            ${result.data.summary ? `
-                <!-- Résumé exécutif -->
+            ${(isO3Reasoning || isConversational) && analysis ? `
+                <!-- Analyse ${isO3Reasoning ? 'avec raisonnement avancé' : 'conversationnelle'} DDOT -->
+                <div class="ddot-ai-analysis" style="
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+                    border-radius: 20px;
+                    padding: 2.5rem;
+                    position: relative;
+                    border: 1px solid rgba(0, 112, 243, 0.1);
+                    box-shadow: 0 10px 40px rgba(0, 112, 243, 0.05);
+                ">
+                    <!-- Header DDOT IA -->
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        gap: 1rem;
+                        margin-bottom: 2rem;
+                        padding-bottom: 1.5rem;
+                        border-bottom: 1px solid rgba(0, 112, 243, 0.1);
+                    ">
+                        <div style="
+                            width: 56px;
+                            height: 56px;
+                            background: linear-gradient(135deg, #0070f3 0%, #00d4aa 100%);
+                            border-radius: 16px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            box-shadow: 0 4px 12px rgba(0, 112, 243, 0.2);
+                        ">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 style="
+                                font-size: 24px;
+                                font-weight: 700;
+                                margin: 0;
+                                background: linear-gradient(135deg, #0070f3 0%, #00d4aa 100%);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                background-clip: text;
+                            ">Assistant IA DDOT</h3>
+                            <p style="
+                                font-size: 14px;
+                                color: #6b7280;
+                                margin: 0.25rem 0 0 0;
+                            ">Analyse personnalisée de votre parcelle</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenu formaté -->
+                    <div class="ddot-ai-content" style="
+                        font-size: 16px;
+                        line-height: 1.8;
+                        color: #374151;
+                    ">
+                        ${formatConversationalAnalysis(analysis)}
+                    </div>
+                    
+                    ${result.data.additionalInsights ? `
+                        <div style="
+                            margin-top: 2rem;
+                            padding-top: 2rem;
+                            border-top: 1px solid rgba(0, 112, 243, 0.1);
+                        ">
+                            <h4 style="
+                                font-size: 18px;
+                                font-weight: 600;
+                                color: #0070f3;
+                                margin: 0 0 1rem 0;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                            ">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                                Recommandations complémentaires
+                            </h4>
+                            <div style="
+                                padding: 1rem;
+                                background: rgba(0, 112, 243, 0.05);
+                                border-radius: 12px;
+                                border-left: 3px solid #0070f3;
+                            ">
+                                ${formatConversationalAnalysis(result.data.additionalInsights)}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${metadata?.sources && metadata.sources.length > 0 ? `
+                        <div style="
+                            margin-top: 2rem;
+                            padding: 1rem;
+                            background: rgba(0, 0, 0, 0.02);
+                            border-radius: 12px;
+                        ">
+                            <div style="
+                                font-size: 12px;
+                                color: #6b7280;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                                margin-bottom: 0.5rem;
+                            ">Sources consultées</div>
+                            <div style="
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 0.5rem;
+                            ">
+                                ${metadata.sources.map(source => `
+                                    <span style="
+                                        font-size: 12px;
+                                        padding: 0.25rem 0.75rem;
+                                        background: white;
+                                        border-radius: 6px;
+                                        border: 1px solid #e5e7eb;
+                                        color: #4b5563;
+                                    ">${source}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : result.data.summary ? `
+                <!-- Résumé exécutif (mode structuré) -->
                 <div class="executive-summary" style="
                     background: var(--surface);
                     border-radius: 16px;
@@ -545,7 +862,8 @@
                 </div>
             ` : ''}
             
-            <!-- Contraintes détaillées avec design innovant -->
+            ${!isConversational && constraints.length > 0 ? `
+            <!-- Contraintes détaillées avec design innovant (mode structuré uniquement) -->
             <div class="constraints-section" style="
                 position: relative;
                 padding: 2rem;
@@ -604,22 +922,73 @@
                     position: relative;
                 ">
                     ${constraints.map((constraint, index) => {
-                        // Catégories thématiques avec couleurs cohérentes
+                        // 10 Thèmes principaux avec couleurs et icônes
                         const themeConfig = {
+                            'Zone': { 
+                                gradient: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
+                                icon: '🏙️',
+                                color: '#2563eb'
+                            },
+                            'But de la zone': { 
+                                gradient: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
+                                icon: '🎯',
+                                color: '#6366f1'
+                            },
+                            'Surface de la parcelle': { 
+                                gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+                                icon: '📏',
+                                color: '#10b981'
+                            },
+                            'Indice U': { 
+                                gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
+                                icon: '📊',
+                                color: '#8b5cf6'
+                            },
+                            'Indice IBUS': { 
+                                gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+                                icon: '📈',
+                                color: '#ec4899'
+                            },
+                            'Hauteur maximale': { 
+                                gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                                icon: '🏢',
+                                color: '#f59e0b'
+                            },
+                            'Distances à la limite': { 
+                                gradient: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
+                                icon: '📐',
+                                color: '#ef4444'
+                            },
+                            'Alignements': { 
+                                gradient: 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
+                                icon: '📏',
+                                color: '#14b8a6'
+                            },
+                            'Places de jeux': { 
+                                gradient: 'linear-gradient(135deg, #22c55e 0%, #4ade80 100%)',
+                                icon: '🌳',
+                                color: '#22c55e'
+                            },
+                            'Places de parc': { 
+                                gradient: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
+                                icon: '🚗',
+                                color: '#0ea5e9'
+                            },
+                            // Anciens thèmes pour compatibilité
                             'Destination de zone': { 
                                 gradient: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
                                 icon: '🏙️',
                                 color: '#2563eb'
                             },
                             'Indice d\'utilisation (IBUS)': { 
-                                gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-                                icon: '📊',
-                                color: '#8b5cf6'
+                                gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+                                icon: '📈',
+                                color: '#ec4899'
                             },
                             'Gabarits & reculs': { 
-                                gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+                                gradient: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
                                 icon: '📐',
-                                color: '#ec4899'
+                                color: '#ef4444'
                             },
                             'Toiture': { 
                                 gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
@@ -627,14 +996,14 @@
                                 color: '#f59e0b'
                             },
                             'Stationnement': { 
-                                gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+                                gradient: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
                                 icon: '🚗',
-                                color: '#10b981'
+                                color: '#0ea5e9'
                             },
                             'Espaces de jeux / détente': { 
-                                gradient: 'linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)',
+                                gradient: 'linear-gradient(135deg, #22c55e 0%, #4ade80 100%)',
                                 icon: '🌳',
-                                color: '#14b8a6'
+                                color: '#22c55e'
                             },
                             'Prescriptions architecturales': { 
                                 gradient: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
@@ -673,7 +1042,7 @@
                                 position: relative;
                                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                                 cursor: pointer;
-                                animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) \${index * 0.05}s both;
+                                animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.05}s both;
                                 overflow: hidden;
                             " 
                             onmouseover="
@@ -695,7 +1064,7 @@
                                     left: 0;
                                     right: 0;
                                     height: 4px;
-                                    background: \${theme.gradient};
+                                    background: ${theme.gradient};
                                     transition: height 0.3s ease;
                                 "></div>
                                 
@@ -703,14 +1072,14 @@
                                     <div class="icon-container" style="
                                         width: 56px;
                                         height: 56px;
-                                        background: \${theme.gradient};
+                                        background: ${theme.gradient};
                                         border-radius: 16px;
                                         display: flex;
                                         align-items: center;
                                         justify-content: center;
                                         font-size: 28px;
                                         flex-shrink: 0;
-                                        box-shadow: 0 8px 24px \${theme.color}30;
+                                        box-shadow: 0 8px 24px ${theme.color}30;
                                         position: relative;
                                         overflow: hidden;
                                         transition: all 0.3s ease;
@@ -725,7 +1094,7 @@
                                             transform: translateX(-100%);
                                             animation: shine 3s infinite;
                                         "></div>
-                                        <span style="position: relative; z-index: 1;">\${constraint.icon || theme.icon}</span>
+                                        <span style="position: relative; z-index: 1;">${constraint.icon || theme.icon}</span>
                                     </div>
                                     
                                     <div style="flex: 1;">
@@ -735,16 +1104,16 @@
                                             margin: 0 0 0.5rem 0;
                                             color: var(--text-primary);
                                             letter-spacing: -0.02em;
-                                        ">\${constraint.title}</h5>
+                                        ">${constraint.title}</h5>
                                         
                                         <p style="
                                             color: var(--text-secondary);
                                             font-size: 14px;
                                             line-height: 1.7;
                                             margin: 0;
-                                        ">\${constraint.description}</p>
+                                        ">${constraint.description}</p>
                                         
-                                        \${constraint.details ? \`
+                                        ${constraint.details ? `
                                             <div style="
                                                 margin-top: 1rem; 
                                                 padding: 1rem; 
@@ -752,17 +1121,17 @@
                                                 border-radius: 12px;
                                                 border: 1px solid #e5e7eb;
                                             ">
-                                                \${constraint.details.values ? \`
+                                                ${constraint.details.values ? `
                                                     <div style="
                                                         display: flex;
                                                         gap: 0.75rem;
                                                         flex-wrap: wrap;
-                                                        margin-bottom: \${constraint.details.requirements?.length > 0 ? '0.75rem' : '0'};
+                                                        margin-bottom: ${constraint.details.requirements?.length > 0 ? '0.75rem' : '0'};
                                                     ">
-                                                        \${constraint.details.values.numeric ? \`
+                                                        ${constraint.details.values.numeric ? `
                                                             <div style="
                                                                 padding: 0.625rem 1.25rem;
-                                                                background: \${theme.gradient};
+                                                                background: ${theme.gradient};
                                                                 color: white;
                                                                 border-radius: 12px;
                                                                 font-size: 16px;
@@ -770,22 +1139,22 @@
                                                                 display: flex;
                                                                 align-items: center;
                                                                 gap: 0.5rem;
-                                                                box-shadow: 0 4px 12px \${theme.color}20;
+                                                                box-shadow: 0 4px 12px ${theme.color}20;
                                                                 letter-spacing: -0.02em;
                                                             ">
                                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                                                                     <polyline points="22 4 12 14.01 9 11.01"/>
                                                                 </svg>
-                                                                \${constraint.details.values.numeric} \${constraint.details.values.unit || ''}
+                                                                ${constraint.details.values.numeric} ${constraint.details.values.unit || ''}
                                                             </div>
-                                                        \` : ''}
-                                                        \${constraint.details.values.range ? \`
+                                                        ` : ''}
+                                                        ${constraint.details.values.range ? `
                                                             <div style="
                                                                 padding: 0.625rem 1.25rem;
                                                                 background: white;
-                                                                color: \${theme.color};
-                                                                border: 2px solid \${theme.color}20;
+                                                                color: ${theme.color};
+                                                                border: 2px solid ${theme.color}20;
                                                                 border-radius: 12px;
                                                                 font-size: 16px;
                                                                 font-weight: 700;
@@ -796,17 +1165,17 @@
                                                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                                                     <path d="M3 12h18m-9-9v18"/>
                                                                 </svg>
-                                                                \${constraint.details.values.range.min} - \${constraint.details.values.range.max} \${constraint.details.values.range.unit || ''}
+                                                                ${constraint.details.values.range.min} - ${constraint.details.values.range.max} ${constraint.details.values.range.unit || ''}
                                                             </div>
-                                                        \` : ''}
+                                                        ` : ''}
                                                     </div>
-                                                \` : ''}
+                                                ` : ''}
                                                 
-                                                \${constraint.details.requirements && constraint.details.requirements.length > 0 ? \`
+                                                ${constraint.details.requirements && constraint.details.requirements.length > 0 ? `
                                                     <div style="font-size: 14px;">
                                                         <strong style="color: #374151; font-weight: 600;">Exigences spécifiques :</strong>
                                                         <ul style="margin: 0.5rem 0 0 1.25rem; padding: 0; list-style: none;">
-                                                            \${constraint.details.requirements.map(req => \`
+                                                            ${constraint.details.requirements.map(req => `
                                                                 <li style="
                                                                     color: #6b7280; 
                                                                     position: relative; 
@@ -819,19 +1188,19 @@
                                                                         top: 0.5rem;
                                                                         width: 6px;
                                                                         height: 6px;
-                                                                        background: \${theme.color};
+                                                                        background: ${theme.color};
                                                                         border-radius: 50%;
                                                                     "></span>
-                                                                    \${req}
+                                                                    ${req}
                                                                 </li>
-                                                            \`).join('')}
+                                                            `).join('')}
                                                         </ul>
                                                     </div>
-                                                \` : ''}
+                                                ` : ''}
                                             </div>
-                                        \` : ''}
+                                        ` : ''}
                                         
-                                        \${constraint.source || constraint.article ? \`
+                                        ${constraint.source || constraint.article ? `
                                             <div style="
                                                 display: flex;
                                                 align-items: center;
@@ -848,9 +1217,9 @@
                                                     <line x1="16" y1="13" x2="8" y2="13"/>
                                                     <line x1="16" y1="17" x2="8" y2="17"/>
                                                 </svg>
-                                                <span style="font-weight: 500;">\${constraint.source || 'Règlement communal'} \${constraint.article ? \`- \${constraint.article}\` : ''}</span>
+                                                <span style="font-weight: 500;">${constraint.source || 'Règlement communal'} ${constraint.article ? `- ${constraint.article}` : ''}</span>
                                             </div>
-                                        \` : ''}
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -858,6 +1227,7 @@
                     }).join('')}
                 </div>
             </div>
+            ` : ''}
             
             ${analysis?.recommendations && analysis.recommendations.length > 0 ? `
                 <!-- Recommandations -->

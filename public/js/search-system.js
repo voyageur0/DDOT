@@ -1,6 +1,41 @@
 // Nouveau système de recherche et autocomplétion - Version propre
 // Utilise directement l'API GeoAdmin sans complexité
 
+// Thèmes de jeux ultra-modernes qui changent régulièrement
+const gameThemes = [
+  "Simulateur de vol interstellaire",
+  "Construction de ville cyberpunk",
+  "Course de drones futuristes",
+  "Terraformation de Mars",
+  "Hackathon quantique",
+  "Trading de cryptomonnaie virtuelle",
+  "Exploration de multivers",
+  "Défense de base lunaire",
+  "Ingénierie génétique avancée",
+  "Réseau neuronal artificiel",
+  "Voyage temporel paradoxal",
+  "Colonisation galactique",
+  "Bataille de robots géants",
+  "Simulation économique dystopique",
+  "Parkour en réalité augmentée"
+];
+
+// Contraintes flexibles et variées
+const constraintThemes = [
+  { icon: "🏗️", title: "Urbanisme et zonage" },
+  { icon: "🌱", title: "Environnement et biodiversité" },
+  { icon: "🚗", title: "Mobilité et stationnement" },
+  { icon: "🏠", title: "Architecture et esthétique" },
+  { icon: "⚡", title: "Énergie et durabilité" },
+  { icon: "💧", title: "Gestion des eaux" },
+  { icon: "📏", title: "Dimensions et distances" },
+  { icon: "🔊", title: "Nuisances sonores" },
+  { icon: "🎨", title: "Patrimoine culturel" },
+  { icon: "🛡️", title: "Sécurité et prévention" }
+];
+
+let currentThemeIndex = Math.floor(Math.random() * gameThemes.length);
+
 class SearchSystem {
   constructor() {
     this.searchInput = null;
@@ -9,8 +44,19 @@ class SearchSystem {
     this.currentSuggestions = [];
     this.selectedIndex = -1;
     this.debounceTimer = null;
+    this.currentGameTheme = gameThemes[currentThemeIndex];
     
     this.init();
+    this.startThemeRotation();
+  }
+  
+  startThemeRotation() {
+    // Changer de thème toutes les 30 secondes
+    setInterval(() => {
+      currentThemeIndex = (currentThemeIndex + 1) % gameThemes.length;
+      this.currentGameTheme = gameThemes[currentThemeIndex];
+      console.log(`🎮 Nouveau thème de jeu: ${this.currentGameTheme}`);
+    }, 30000);
   }
   
   init() {
@@ -119,8 +165,8 @@ class SearchSystem {
     try {
       this.showLoading();
       
-      // URL API GeoAdmin correcte pour parcelles, adresses et lieux
-      const url = `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(query)}&origins=parcel,address,gg25&type=locations&limit=15&sr=4326`;
+      // Utiliser le proxy pour éviter les erreurs CORS
+      const url = `/api/geoadmin-search?searchText=${encodeURIComponent(query)}&origins=parcel,address,gg25&type=locations&limit=15&sr=4326`;
       
       console.log('Recherche URL:', url);
       
@@ -490,3 +536,6 @@ if (!document.getElementById('search-system-styles')) {
 
 // Export
 window.SearchSystem = SearchSystem;
+window.gameThemes = gameThemes;
+window.constraintThemes = constraintThemes;
+window.getCurrentGameTheme = () => gameThemes[currentThemeIndex];

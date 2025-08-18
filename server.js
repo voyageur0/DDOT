@@ -225,17 +225,36 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser()); // Middleware pour parser les cookies
 
 // Configuration des fichiers statiques - servir le dossier public
+// Headers anti-cache agressifs pour le développement
 app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+  maxAge: 0,
   etag: false,
-  dotfiles: 'ignore'
+  dotfiles: 'ignore',
+  setHeaders: (res, path) => {
+    // Headers anti-cache très agressifs
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
+    // Forcer le rechargement pour les fichiers JS et CSS
+    if (path.endsWith('.js') || path.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Last-Modified', new Date().toUTCString());
+    }
+  }
 }));
 
 // Servir le dossier reglements pour les PDF des règlements communaux
 app.use('/reglements', express.static(path.join(__dirname, 'reglements'), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
+  maxAge: 0,
   etag: false,
-  dotfiles: 'ignore'
+  dotfiles: 'ignore',
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
 }));
 
 // Middleware de logging simple
@@ -447,6 +466,73 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end(); // No Content
 });
 
+// === ENDPOINTS DE CACHE ET DIAGNOSTIC ===
+// Endpoint pour forcer le rafraîchissement du cache
+app.get('/api/force-refresh', (req, res) => {
+  // Générer un timestamp unique
+  const cacheVersion = Date.now();
+  
+  // Headers anti-cache maximum
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('X-Cache-Version', cacheVersion);
+  
+  res.json({
+    success: true,
+    message: 'Cache forcé à se rafraîchir',
+    cacheVersion: cacheVersion,
+    timestamp: new Date().toISOString(),
+    advice: 'Rechargez la page avec Ctrl+Shift+R (Windows/Linux) ou Cmd+Shift+R (Mac)'
+  });
+});
+
+// Endpoint de diagnostic pour vérifier les versions des fichiers
+app.get('/api/diagnostic/file-versions', (req, res) => {
+  const fs = require('fs');
+  const crypto = require('crypto');
+  
+  const files = [
+    'public/js/search-system.js',
+    'public/js/auth.js',
+    'public/js/ai-analysis-enhanced.js',
+    'public/css/modern-ui.css',
+    'public/css/auth.css',
+    'public/index.html'
+  ];
+  
+  const fileVersions = {};
+  
+  files.forEach(file => {
+    try {
+      const filePath = path.join(__dirname, file);
+      if (fs.existsSync(filePath)) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const hash = crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
+        const stats = fs.statSync(filePath);
+        fileVersions[file] = {
+          hash: hash,
+          size: stats.size,
+          modified: stats.mtime,
+          exists: true
+        };
+      } else {
+        fileVersions[file] = { exists: false };
+      }
+    } catch (error) {
+      fileVersions[file] = { error: error.message };
+    }
+  });
+  
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({
+    timestamp: new Date().toISOString(),
+    nodeEnv: process.env.NODE_ENV,
+    cacheHeaders: 'aggressive-no-cache',
+    files: fileVersions
+  });
+});
+
 // Routes principales
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -541,10 +627,22 @@ app.use('/api/documents', ensureAuthenticated, csrfMiddleware, documentRoutes);
 app.use('/api/analysis', aiAnalysisLimiter, analysisRoutes); // Analyse avec rate limiting
 
 app.use('/api/payment', csrfMiddleware, paymentRoutes);
-app.use('/api/ia-constraints', aiAnalysisLimiter, iaConstraintsRoutes);
+// app.use('/api/ia-constraints', aiAnalysisLimiter, iaConstraintsRoutes); // Désactivé - utiliser la route TypeScript
+
+// Routes de traçabilité et transparence
+const evidenceRouter = require('./routes-node/evidenceRouter');
+app.use('/api/evidence', evidenceRouter);
 app.use('/api', iaConstraintsTS); // Routes TypeScript pour l'analyse IA avancée
 app.use('/api', ownersTS); // Routes TypeScript pour les propriétaires
 app.use('/api', utilsTS); // Routes TypeScript utilitaires
+
+// Route de test pour les labels
+try {
+  const testLabelsRouter = require('./src/routes/testLabels').default;
+  app.use('/api', testLabelsRouter);
+} catch (err) {
+  console.log('Route testLabels pas encore compilée');
+}
 /*app.post('/api/ia-constraints', aiAnalysisLimiter, async (req, res) => {
   console.log('🔍 Requête IA reçue:', req.body);
   
